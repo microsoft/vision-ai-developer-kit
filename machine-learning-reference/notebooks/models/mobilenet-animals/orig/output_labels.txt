@@ -1,0 +1,37 @@
+abyssinian
+bengal
+birman
+bombay
+british shorthair
+egyptian mau
+maine coon
+persian
+ragdoll
+russian blue
+siamese
+sphynx
+american bulldog
+american pit bull terrier
+basset hound
+beagle
+boxer
+chihuahua
+english cocker spaniel
+english setter
+german shorthaired
+great pyrenees
+havanese
+japanese chin
+keeshond
+leonberger
+miniature pinscher
+newfoundland
+pomeranian
+pug
+saint bernard
+samoyed
+scottish terrier
+shiba inu
+staffordshire bull terrier
+wheaten terrier
+yorkshire terrier
