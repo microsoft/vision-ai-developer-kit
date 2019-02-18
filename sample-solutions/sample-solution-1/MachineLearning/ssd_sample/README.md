@@ -1,10 +1,10 @@
 # TensorFlow Mobilenet SSD Models
 
-1. COCO-trained models: ssd_inception_v2_coco
-    * Download and expand the pretrained [ssd_inception_v2_coco model](http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz).
+1. COCO-trained models: ssd_mobilenet_v2_coco
+    * Download and expand the pretrained [ssd_mobilenet_v2_coco model](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_coco_2018_03_29.tar.gz).
     * Copy the extracted frozen_inference_graph.pb to "sample-solution-1\MachineLearning\models\ssd_mobilenet_v2_coco" folder
     * Overwrite "current_config.py" by "ssd_mobilenet_v2_coco.py" under "sample-solution-1\MachineLearning\scripts\model_configs" folder
-    * Execute "01-convert-model-containerize.py" under "sample-solution-1\MachineLearning\scripts" folder to convert model and generate deployment.json for "ssd_inception_v2_coco" model
+    * Execute "01-convert-model-containerize.py" under "sample-solution-1\MachineLearning\scripts" folder to convert model and generate deployment.json for "ssd_mobilenet_v2_coco" model
 
 2. Sample to retrain Mobilenet V1 SSD Model by a custom dataset "poker3"
     * "poker3" under this folder is a custom dataset.
