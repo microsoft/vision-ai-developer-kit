@@ -46,7 +46,7 @@ Note: The above installation steps works for the latest Azure Machine Learning S
 
 9. Click **[Explorer]** icon, click **[…]** at **[AZURE IOT HUB DEVICES]** section right side, and select **[Select IoT Hub]** command to select an IoT Hub. 
 
-10. Expand **[AZURE IOT HUB DEVICES]** section, right-click an IoT edge device, select **[Create Development for Single Device]** command, select **deployment.json** file under **EdgeSolution\config** folder, and click **[Select Edge Deployment Manifest]** button to deploy the container image to the IoT edge device. 
+10. Expand **[AZURE IOT HUB DEVICES]** section, right-click an IoT edge device, select **[Create Deployment for Single Device]** command, select **deployment.json** file under **EdgeSolution\config** folder, and click **[Select Edge Deployment Manifest]** button to deploy the container image to the IoT edge device. 
 
 11. Setup the Vision AI Developer Kit to connect to the IoT Edge device and deploy the module image. 
 
