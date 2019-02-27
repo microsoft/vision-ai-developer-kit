@@ -1,0 +1,1 @@
+## This folder contain tested models for tflite those are validated to work on the camera.
