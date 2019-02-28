@@ -4,9 +4,13 @@ import tensorflow as tf
 import cv2
 
 #%%
-model_path = "/home/boris/exported/ssd_mobilenet_v1_coco_2018_01_28/ssd_graph.tflite"
-input_file = "/home/boris/dog.jpg"
+model_path = "path-to-frozen-tflite-model.tflite"
+input_file = "dog.jpg"
 
+# Normalize image for SSD:
+# - Convert to RGB
+# - Resize to 300 x 300
+# - make sure each element is in [-1, 1]
 img = cv2.imread(input_file)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 img = cv2.resize(img, (300, 300)).astype(np.float32)
