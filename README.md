@@ -19,7 +19,7 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 * [Github Repo](https://github.com/Microsoft/vision-ai-developer-kit) - This site
 * [Documentation/Get Started](https://aka.ms/VAIDKGetStarted) - All documentation for the Vision AI Developer Kit
-* [Landing Page](https://microsoft.github.io/azure-iot-developer-kit/docs/projects/) - Learn more about the Vision AI Developer Kit
+* [Landing Page](https://aka.ms/VisionAIDevKit) - Learn more about the Vision AI Developer Kit
 * [Qualcomm QCS603](https://www.qualcomm.com/products/vision-intelligence-300-platform) - Learn more about the chipset powering the Vision AI Developer Kit hardware
 
 ### Get a kit
