@@ -12,7 +12,7 @@
             "registryCredentials": {"__REGISTRY_NAME": {
 			"username": "__REGISTRY_USER_NAME",
 			"password":"__REGISTRY_PASSWORD",
-			"address":"__REGISTRY_NAME.azurecr.io",
+			"address":"__REGISTRY_NAME.azurecr.io"
 		}
             }
           }
