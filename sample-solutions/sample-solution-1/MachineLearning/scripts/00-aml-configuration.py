@@ -35,7 +35,7 @@ resource_group = "<my-resource-group>"
 workspace_name = "<my-workspace-name>"
 
 # supported regions: https://azure.microsoft.com/en-us/global-infrastructure/services/?products=machine-learning-service
-workspace_region = "eastus2" 
+workspace_region = "eastus" 
 
 
 #%%
