@@ -42,7 +42,8 @@
 
 6. Click **[Run Cell]** or **[Run All Cells]** link on the top line of the cell. It will create a new workspace if it doesn’t exist and write a **config.json** file under **aml_config** folder. 
 
-7. Open **01-convert-model-containerize.py** under **MachineLearning\scripts** folder and click **[Run Cell]** or **[Run All Cells]** link to register model, convert model, create container image, and write settings related to the container image to **.env** file under **EdgeSolution** folder. 
+7. Open **01-convert-model-containerize.py** under **MachineLearning\scripts** folder and click **[Run Cell]** or **[Run All Cells]** link to register model, convert model, create container image, and write settings related to the container image to **.env** file under **EdgeSolution** folder.
+    * **Note:** **01-convert-model-containerize.py** script will import settings from **current_config.py** file in **MachineLearning\scripts\model_configs** folder.  So, this script can be reused to create container image for different model by changing **current_config.py**'s content.
 
 8. Right click **deployment.template.json** file under **EdgeSolution** folder and select **[Generate IoT Edge Deployment Manifest]** command to create a new **deployment.json** file under **EdgeSolution\config** folder.
 
