@@ -13,7 +13,7 @@ cfg = __BASE
 __BASE.MODEL_PATH = "MachineLearning/models/mobilenet-retrain-local/"
 __BASE.MODEL_NAME = "retrained_graph_local.pb"
 __BASE.MODEL_TAGS = {"Device": "peabody", "type": "mobilenet", "area": "iot", "version": "1.0"}
-__BASE.MODEL_DESCRIPTION = "Retrained MobileNet model by soda_cans dataset on a local machine"
+__BASE.MODEL_DESCRIPTION = "Retrained MobileNet model by poker12 dataset on a local machine"
 
 # Settings used in SnpeConverter.convert_tf_model()
 __BASE.MODEL_INPUT_NODE = "input"
@@ -25,7 +25,7 @@ __BASE.IMAGE_NAME = "mobilenetretrainlocal"
 
 # Settings used in IotContainerImage.image_configuration()
 __BASE.IMAGE_TAGS = ["mobilenet"]
-__BASE.IMAGE_DESCRIPTION = "Retrained MobileNet model by soda_cans dataset on a local machine"
+__BASE.IMAGE_DESCRIPTION = "Retrained MobileNet model by poker12 dataset on a local machine"
 
 # Settings used in deployment.json
 __BASE.MODULE_NAME = "VisionSampleImagenet_retrain_local"

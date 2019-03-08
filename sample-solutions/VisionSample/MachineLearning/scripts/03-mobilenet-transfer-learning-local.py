@@ -18,7 +18,7 @@ retrain_model_dir = os.path.join(current_dir, 'MachineLearning/models/mobilenet-
 os.makedirs(retrain_model_dir, exist_ok = True)
 
 # Data directory
-data_dir = os.path.join(current_dir, 'MachineLearning/data/soda_cans')
+data_dir = os.path.join(current_dir, 'MachineLearning/data/poker12')
 
 #%%
 # Pre-download base model for retrain.py to fix display blocked by sys.stdout.flush()
@@ -65,7 +65,7 @@ finally:
 # Retrain mobilenet model by run command
 
 get_ipython().run_line_magic('run', '-i MachineLearning/scripts/transfer_learning_scripts/retrain.py \
-                                    --image_dir MachineLearning/data/soda_cans \
+                                    --image_dir MachineLearning/data/poker12 \
                                     --architecture mobilenet_1.0_224 \
                                     --output_graph MachineLearning/models/mobilenet-retrain-local/retrained_graph_local.pb \
                                     --output_labels MachineLearning/models/mobilenet-retrain-local/output_labels.txt \

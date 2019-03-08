@@ -7,7 +7,7 @@
     "BlueMean":104,
     "GreenMean":117,
     "RedMean":123,
-    "TargetFPS":5,
+    "TargetFPS":15,
     "ConfThreshold":0.5,
     "DLC_NAME":"model.dlc",
     "LABELS_NAME":"output_labels.txt",
@@ -20,5 +20,5 @@
         "Postprocessor/BatchMultiClassNonMaxSuppression_scores", 
         "Postprocessor/BatchMultiClassNonMaxSuppression_boxes", 
         "detection_classes:0"],
-    "Runtime":0
+    "Runtime":1
 }
