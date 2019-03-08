@@ -72,3 +72,6 @@
     * After the script execution finished, it will write a **va-snpe-engine-library_config.json** config file to **MachineLearning\models\mobilenet-retrain-local** folder and overwrite **current_config.py** by **mobilenet_retrain_local_config.py** in **MachineLearning\scripts\model_configs** folder.
     * Repeat step 7 and 8 in the above section to open and execute **01-convert-model-containerize.py** to convert model, create container image, and generate **deployment.json** for deploying the new MobileNet V1 model retrained on **poker12** dataset.
 
+# Retrain MobileNet V1 SSD Object Detection Model
+
+Refer to **README.md** in **MachineLearning\ssd_sample** folder for more detail.
