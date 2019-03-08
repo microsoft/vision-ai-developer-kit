@@ -1,0 +1,48 @@
+{
+  "name": "visionaidevkit",
+  "version": "1.0.0",
+  "description": "Vision AI Dev Kit",
+  "scripts": {
+    "watch": "node ./node_modules/typescript/bin/tsc -p . -w",
+    "build": "node ./node_modules/typescript/bin/tsc -p .",
+    "test": "node ./node_modules/jest/bin/jest.js",
+    "start": "NODE_ENV=local node ./dist/index.js",
+    "tslint": "node ./node_modules/tslint/bin/tslint -p ./tsconfig.json"
+  },
+  "repository": {},
+  "keywords": [
+    "azure",
+    "iot",
+    "visionai"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "sseiber",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "@types/nconf": "^0.10.0",
+    "@types/node": "^10.12.2",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.4",
+    "tslint": "^5.13.1",
+    "typescript": "^3.3.3333"
+  },
+  "dependencies": {
+    "nconf": "^0.10.0",
+    "request": "^2.88.0"
+  },
+  "jest": {
+    "rootDir": "./src/",
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/../node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ]
+  }
+}
