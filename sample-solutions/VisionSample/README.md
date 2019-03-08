@@ -23,16 +23,18 @@ Note: Must use the region listed in the supported regions for Azure Machine Lear
 
 # Deploy a Model Container Image in VS Code 
 
-1. Download the latest VS Code sample from https://github.com/Microsoft/vision-ai-developer-kit/tree/master/sample-solutions/sample-solution-1 and expand it. 
+1. Download the latest VS Code sample from https://github.com/Microsoft/vision-ai-developer-kit/tree/master/sample-solutions/VisionSample and expand it. 
 
-2. Launch VS Code, and select [File > Open Folder…] command to open **sample-solution-1** directory as workspace root. 
+2. Launch VS Code, and select **[File > Open Folder…]** command to open **VisionSample** directory as workspace root. 
 
 3. Use **[Python: Select Interpreter]** command in the command palette box or click the current **Python interpreter**”** option on the bottom line to set **python.pythonPath** in .vscode\settings.json. 
 
 4. Close VS Code and launch VS Code again by “Run as administrator”. Select **[Terminal > New Terminal]** command to open a terminal window, change directory to **MachineLearning\scripts**, and execute the following commands to install required Python packages: 
-    * pip install msgpack==0.6.1
-    * pip install --ignore-installed PyYAML==4.2b1
-    * pip install --upgrade -r requirements.txt
+    ```<language>
+    pip install msgpack==0.6.1
+    pip install --ignore-installed PyYAML==4.2b1
+    pip install --upgrade -r requirements.txt
+    ```
 
 Note: The above installation steps works for the latest Azure Machine Learning SDK version v1.0.8 and install Python 3.6.5 by [Anaconda with Python version 3.6.5](https://repo.anaconda.com/archive/Anaconda3-5.2.0-Windows-x86_64.exe). If the version of AML SDK, Python, or other packages will be changed in the future, you might have to install or upgrade packages manually. 
 
