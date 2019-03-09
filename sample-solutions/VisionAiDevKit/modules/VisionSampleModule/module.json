@@ -4,7 +4,7 @@
     "image": {
         "repository": "mycapreg.azurecr.io/visionsamplemodule",
         "tag": {
-            "version": "1.0.7_SSD",
+            "version": "1.0.8_SSD_test",
             "platforms": {
                 "amd64": "./Dockerfile.amd64",
                 "arm32v7": "./Dockerfile.arm32v7"

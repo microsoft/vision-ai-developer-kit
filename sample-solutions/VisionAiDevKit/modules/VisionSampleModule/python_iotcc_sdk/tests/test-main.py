@@ -30,7 +30,7 @@ def main(protocol=None):
 
     #getting Iot hub sdk ready with hub manager
     hub_manager = iot.HubManager()
-
+    print("this is my test...")
     #Connecting to camer using ipcWebServer SDK and turing camera on and then starting inferencing 
     with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
         #transferring model files to camera for inferencing 
