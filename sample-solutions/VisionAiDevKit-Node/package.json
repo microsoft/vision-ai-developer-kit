@@ -29,8 +29,10 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
+    "lodash.get": "^4.4.2",
     "nconf": "^0.10.0",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "yargs": "^13.2.2"
   },
   "jest": {
     "rootDir": "./src/",

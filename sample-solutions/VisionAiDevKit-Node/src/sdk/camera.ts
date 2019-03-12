@@ -4,26 +4,32 @@
 
 // This module contains the high level client APIs.
 
-import IpcProvider from './ipcProvider';
-import { VideoInferenceIterator } from './frameIterators';
-import { logger } from './logger';
+import { EventEmitter } from 'events';
+import { IpcProvider } from './ipcProvider';
+import { InferenceStreamProcessor, FrameInference, FrameInferenceObject } from './inferenceStream';
+import { logger } from '../services/logger';
 
-export default class CameraClient {
-    public static connect(username: string, password: string, ipAddress: string): CameraClient {
-        const connection = new IpcProvider(username, password, ipAddress);
+export class CameraClient extends EventEmitter {
+    public static async connect(username: string, password: string, ipAddress: string): Promise<CameraClient> {
+        const ipcSession = IpcProvider.getInstance(username, password, ipAddress);
 
         try {
-            connection.connect();
-            return new CameraClient(connection);
+            await ipcSession.ipcLogin();
+
+            const cameraClient = new CameraClient(ipcSession);
+
+            return cameraClient;
         }
         catch (ex) {
             logger.log(['cameraClient', 'error'], ex.message);
+
+            ipcSession.ipcLogout();
 
             throw new Error(ex.message);
         }
     }
 
-    private connection: IpcProvider = null;
+    private ipcSession: any = null;
     private previewRunning: boolean = false;
     private previewUrl: string = '';
     private vamRunning: boolean = false;
@@ -33,8 +39,10 @@ export default class CameraClient {
     private bitrates: any[] = [];
     private framerates: any[] = [];
 
-    constructor(connection: IpcProvider) {
-        this.connection = connection;
+    constructor(ipcSession: IpcProvider) {
+        super();
+
+        this.ipcSession = ipcSession;
         this.previewRunning = false;
         this.previewUrl = '';
         this.vamRunning = false;
@@ -45,27 +53,9 @@ export default class CameraClient {
         this.framerates = [];
     }
 
-    // Inference generator for the application.
-    //
-    // This inference generator gives inferences from the VA metadata stream.
-    //
-    // Parameters
-    // ----------
-    // inferenceIterator : VideoInferenceIterator class object
-    //
-    // Yields
-    // ------
-    // AiCameraInference: AiCameraInference class object
-    //     This AiCameraInference object yielded
-    //     from VideoInferenceIterator.start()
-    //
-    // Raises
-    // ------
-    // EOFError
-    //     If the preview is not started.
-    //     Or if the vam is not started.
-
-    public * getInferences(inferenceIterator: any) {
+    public async getInferences(inferenceProcessor?: InferenceStreamProcessor) {
+        this.previewRunning = true;
+        this.vamRunning = true;
         if (!this.previewRunning) {
             throw new Error('preview not started');
         }
@@ -74,8 +64,8 @@ export default class CameraClient {
             throw new Error('VAM not started');
         }
 
-        if (!inferenceIterator) {
-            inferenceIterator = new VideoInferenceIterator();
+        if (!inferenceProcessor) {
+            inferenceProcessor = new InferenceStreamProcessor();
         }
 
         try {
@@ -87,32 +77,20 @@ export default class CameraClient {
                 this.vamUrl = this.vamUrl.replace('0.0.0.0', '127.0.0.1');
             }
 
-            yield inferenceIterator.start(this.vamUrl);
+            inferenceProcessor.on('inference', async (inference: FrameInference) => {
+                const scaledInference = this.scaleInference(inference);
+
+                if (this.listenerCount('inference') > 0) {
+                    this.emit('inference', scaledInference);
+                }
+            });
+
+            inferenceProcessor.start(this.vamUrl);
         }
         finally {
-            inferenceIterator.stop();
+            inferenceProcessor.stop();
         }
     }
-
-    // This method is for setting preview params.
-    //
-    // Parameters
-    // ----------
-    // resolution : str
-    //     A value from resolutions attribute
-    // encode : str
-    //     A value from encodetype attribute
-    // bitrate : str
-    //     A value from bitrates attribute
-    // framerate : int
-    //     A value from framerates attribute
-    // display_out : {0, 1}
-    //     For enabling or disabling HDMI output
-    //
-    // Returns
-    // -------
-    // bool
-    //     True if the request is successful. False on failure.
 
     public async configurePreview(resolution: any, encode: any, bitrate: any, framerate: any, displayOut: any) {
         let res = 1; // 1080P
@@ -161,7 +139,7 @@ export default class CameraClient {
         };
 
         try {
-            const response = await this.connection.post('/video', payload);
+            const response = await this.ipcSession.ipcPostRequest('/video', payload);
 
             return response.status;
         }
@@ -172,31 +150,15 @@ export default class CameraClient {
         }
     }
 
-    // This is a switch for preview.
-    //
-    // Preview can be enabled or disabled using this API.
-    //
-    // Parameters
-    // ----------
-    // status : bool
-    //     Set it True for enabling and False for disabling preview.
-    //
-    // Returns
-    // -------
-    // bool
-    //     True if the request was successful. False on failure.
-
     public async togglePreview(status) {
         const payload = {
             switchStatus: status
         };
 
         try {
-            const response = await this.connection.post('/preview', payload);
+            const response = await this.ipcSession.ipcPostRequest('/preview', payload);
 
-            this.previewRunning = response.status;
-
-            return this.previewRunning;
+            return this.previewRunning = response.status;
         }
         catch (ex) {
             logger.log(['cameraClient', 'error'], ex.message);
@@ -204,20 +166,6 @@ export default class CameraClient {
             return false;
         }
     }
-
-    // This is a switch for VA.
-
-    // VA can be enabled or disabled using this API.
-
-    // Parameters
-    // ----------
-    // status : bool
-    //     Set it True for enabling and False for disabling VA.
-
-    // Returns
-    // -------
-    // bool
-    //     True if the request was successful. False on failure.
 
     public async toggleVam(status) {
         const payload = {
@@ -226,11 +174,9 @@ export default class CameraClient {
         };
 
         try {
-            const response = await this.connection.post('/vam', payload);
+            const response = await this.ipcSession.ipcPostRequest('/vam', payload);
 
-            this.vamRunning = response.status;
-
-            return this.vamRunning;
+            return this.vamRunning = response.status;
         }
         catch (ex) {
             logger.log(['cameraClient', 'error'], ex.message);
@@ -238,19 +184,6 @@ export default class CameraClient {
             return false;
         }
     }
-
-    // This is for configuring overlay params.
-    //
-    // Parameters
-    // ----------
-    // type : {None, "inference", "text"}
-    //     Type of the overlay you want to configure.
-    // text : str, optional
-    //     Text for text overlay type (the default is None).
-    //
-    // Returns
-    //     True if the configuration was successful.
-    //     False on failure.
 
     public configureOverlay(type: any, text: string) {
         if (type === 'inference') {
@@ -264,27 +197,13 @@ export default class CameraClient {
         return false;
     }
 
-    // This is a switch for overlay.
-    //
-    // Overlay can be enabled or disabled using this API.
-    //
-    // Parameters
-    // ----------
-    // status : bool
-    //     Set it True for enabling and False for disabling overlay.
-    //
-    // Returns
-    // -------
-    // bool
-    //     True if the request was successful. False on failure.
-
     public async toggleOverlay(status) {
         const payload = {
             switchStatus: status
         };
 
         try {
-            const response = await this.connection.post('/overlay', payload);
+            const response = await this.ipcSession.ipcPostRequest('/overlay', payload);
 
             return response.status;
         }
@@ -294,17 +213,10 @@ export default class CameraClient {
             return false;
         }
     }
-
-    // This method is for logging out from the camera.
-    //
-    // Returns
-    // -------
-    // bool
-    //     True if the request was successful. False on failure.
 
     public async logout() {
         try {
-            const response = await this.connection.post('logout', {});
+            const response = await this.ipcSession.ipcPostRequest('logout');
 
             return response.status;
         }
@@ -314,16 +226,6 @@ export default class CameraClient {
             return false;
         }
     }
-
-    // Private method for inference overlay configuration.
-    //
-    // This is used by configure_overlay for inference type overlay.
-    //
-    // Returns
-    // -------
-    // bool
-    //     True if the configuration was successful.
-    //     False on failure.
 
     private async configureInferenceOverlay() {
         const payload = {
@@ -338,7 +240,7 @@ export default class CameraClient {
         };
 
         try {
-            const response = await this.connection.post('/overlayconfig', payload);
+            const response = await this.ipcSession.ipcPostRequest('/overlayconfig', payload);
 
             return response.status;
         }
@@ -348,16 +250,6 @@ export default class CameraClient {
             return false;
         }
     }
-
-    // Private method for text overlay configuration.
-    //
-    // This is used by configure_overlay for text type overlay.
-    //
-    // Returns
-    // -------
-    // bool
-    //     True if the configuration was successful.
-    //     False on failure.
 
     private async configureTextOverlay(text: string) {
         const payload = {
@@ -372,7 +264,7 @@ export default class CameraClient {
         };
 
         try {
-            const response = await this.connection.post('overlayconfig', payload);
+            const response = await this.ipcSession.ipcPostRequest('overlayconfig', payload);
 
             return response.status;
         }
@@ -383,16 +275,9 @@ export default class CameraClient {
         }
     }
 
-    // Private method for getting VA url
-    //
-    // Returns
-    // -------
-    // str
-    //     Preview VA url
-
     private async getVamInfo() {
         try {
-            const response = await this.connection.get('/vam');
+            const response = await this.ipcSession.ipcGetRequest('/vam');
 
             if (this.vamRunning) {
                 this.vamUrl = response.url;
@@ -407,16 +292,9 @@ export default class CameraClient {
         }
     }
 
-    // Private method for getting preview url
-    //
-    // Returns
-    // -------
-    // str
-    //     Preview RTSP url
-
     private async getPreviewInfo() {
         try {
-            const response = await this.connection.get('/preview');
+            const response = await this.ipcSession.ipcGetRequest('/preview');
 
             if (this.previewRunning) {
                 this.previewUrl = response.url;
@@ -431,21 +309,11 @@ export default class CameraClient {
         }
     }
 
-    // Private method for getting preview params
-    //
-    // This method populates the resolutions, encodetype, bitrates
-    // and framerates attribute. It is called by configure preview.
-    //
-    // Returns
-    // -------
-    // bool
-    //     True if the request is successful. False on failure.
-
     private async getCameraParams() {
         const path = '/video';
 
         try {
-            const response = await this.connection.get('/video');
+            const response = await this.ipcSession.ipcGetRequest('/video');
 
             if (response.status) {
                 this.resolutions = response.resolution;
@@ -460,6 +328,38 @@ export default class CameraClient {
             logger.log(['cameraClient', 'error'], ex.message);
 
             return false;
+        }
+    }
+
+    private scaleInference(inference) {
+        if (!inference) {
+            return;
+        }
+
+        const objects = inference.objects;
+        if (objects && Array.isArray(objects)) {
+            const scaledObjects = objects.map((object: FrameInferenceObject) => {
+                return {
+                    ...object,
+                    position: {
+                        x: (object.position.x * 1920) / 10000,
+                        y: (object.position.y * 1080) / 10000,
+                        width: (object.position.width * 1920) / 10000,
+                        height: (object.position.height * 1080) / 10000
+                    }
+                };
+            });
+
+            return {
+                timestamp: inference.timestamp,
+                objects: scaledObjects
+            };
+        }
+        else {
+            return {
+                timestamp: inference.timestamp || Date.now(),
+                objects: []
+            };
         }
     }
 

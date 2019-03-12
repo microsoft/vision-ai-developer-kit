@@ -1,0 +1,52 @@
+{
+    // Use IntelliSense to learn about possible Node.js debug attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Remote",
+            "address": "localhost",
+            "port": 9221,
+            "restart": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/home/scotts/source/repos/iotc-persondetector"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "console": "integratedTerminal",
+            "program": "${workspaceRoot}/src/index.ts",
+            "args": [
+                "--ip-address", "192.168.86.26",
+                "--username", "admin",
+                "--password", "admin"
+            ],
+            "smartStep": true,
+            "showAsyncStacks": true,
+            "sourceMaps": true,
+            "preLaunchTask": "ts-watch",
+            "outFiles": [
+                "${workspaceRoot}/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "NODE_ENV": "local",
+                "PORT": "9030",
+                "loggingFlag": "0"
+            }
+        }
+    ]
+}

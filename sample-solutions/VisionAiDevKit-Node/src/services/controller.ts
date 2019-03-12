@@ -1,55 +1,47 @@
-import { spawn } from 'child_process';
-import { config } from './config';
 import { logger } from './logger';
-import { objectDetector } from './objectDetector';
-import PicProcessor from './picProcessor';
+import { CameraClient } from '../sdk/camera';
+import { FrameInference } from '../sdk/inferenceStream';
+import { utilities } from './utilities';
+import * as _get from 'lodash.get';
 
 class ControllerService {
-    private gotOne = 0;
-
+    // @ts-ignore (context)
     public async run(context: any) {
         logger.log(['controller', 'info'], `Starting capture processes`);
 
         try {
-            const appContext = {
-                ...context,
-                ...{
-                    useWebCam: config.get('useWebCam'),
-                    webCamDeviceIndex: config.get('webCamDeviceIndex')
-                }
-            };
+            const ipAddress = _get(context, 'args.ipAddress') || await utilities.getWlanIp();
+            logger.log(['controller', 'info'], `Detected host ipAddress as: ${ipAddress}`);
 
-            await objectDetector.init(appContext);
+            const cameraClient = await CameraClient.connect(context.args.username, context.args.username, ipAddress);
 
-            if (!appContext.useWebCam) {
-                const ffmpegProcess = spawn(config.get('ffmpegCommand'),
-                    config.get('captureCommandArgs').split(' '),
-                    { stdio: ['ignore', 'pipe', 'ignore'] });
+            cameraClient.on('inference', async(inference: FrameInference) => {
+                logger.log(['controller', 'info'], `Inference: ${JSON.stringify(inference, null, 2)}`);
 
-                ffmpegProcess.on('error', (error) => {
-                    logger.log(['ControllerService', 'error'], `ffmpegProcess.on(error): ${error}`);
-                });
-
-                ffmpegProcess.on('exit', (code, signal) => {
-                    logger.log(['ControllerService', 'info'], `ffmpegProcess.on(exit), code: ${code}, signal: ${signal}`);
-                });
-
-                const picProcessor = new PicProcessor({});
-
-                // @ts-ignore (jpeg)
-                picProcessor.on('jpeg', async(jpeg: Buffer) => {
-                    if (!this.gotOne) {
-                        this.gotOne = 0;
-                        await objectDetector.detectObjectFromImageBuffer(jpeg);
+                const inferences = _get(inference, 'objects');
+                if (inferences && Array.isArray(inferences)) {
+                    for (const inferenceItem of inferences) {
+                        logger.log(['controller', 'info'], `Inference: `
+                            + `id:${_get(inferenceItem, 'id')} `
+                            + `"${_get(inferenceItem, 'label')}" `
+                            + `${_get(inferenceItem, 'confidence')}% `
+                            + `[${_get(inferenceItem, 'x')}, `
+                            + `${_get(inferenceItem, 'y')}, `
+                            + `${_get(inferenceItem, 'width')}, `
+                            + `${_get(inferenceItem, 'height')}]`);
                     }
-                });
+                }
+            });
 
-                // start pumping jpegs out of the camera
-                ffmpegProcess.stdout.pipe(picProcessor);
-            }
+            await cameraClient.getInferences();
+
+            // tslint:disable-next-line: no-empty
+            setInterval(() => {
+                logger.log(['controller', 'info'], `Health check...`);
+            }, 1000 * 15);
         }
-        catch (e) {
-            logger.log(['ControllerService', 'error'], e.message);
+        catch (ex) {
+            logger.log(['ControllerService', 'error'], ex.message);
         }
     }
 }

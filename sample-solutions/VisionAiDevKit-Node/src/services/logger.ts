@@ -1,10 +1,9 @@
 import { config } from './config';
 
 class LoggingService {
-    private loggingFlag: boolean = false;
+    private loggingFlag: string = '0';
 
-    // @ts-ignore (context)
-    public async init(context: any) {
+    constructor() {
         this.loggingFlag = config.get('loggingFlag');
     }
 
