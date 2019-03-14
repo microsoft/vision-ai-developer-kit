@@ -71,22 +71,36 @@ print(model.name, model.url, model.version, model.id, model.created_time)
 #%%
 from azureml.contrib.iot.model_converters import SnpeConverter
 
-# submit a compile request
-compile_request = SnpeConverter.convert_tf_model(
-     ws,
-     source_model = model,
-     input_node = cfg.MODEL_INPUT_NODE,
-     input_dims = cfg.MODEL_INPUT_DIMS,
-     outputs_nodes = cfg.MODEL_OUTPUTS_NODES,
-     allow_unconsumed_nodes = True)
+print(cfg.SNPECONVERTER_TYPE.lower())
+if cfg.SNPECONVERTER_TYPE.lower() == "tensorflow":
+    # submit a compile request
+    compile_request = SnpeConverter.convert_tf_model(
+        ws,
+        source_model = model,
+        input_node = cfg.MODEL_INPUT_NODE,
+        input_dims = cfg.MODEL_INPUT_DIMS,
+        outputs_nodes = cfg.MODEL_OUTPUTS_NODES,
+        allow_unconsumed_nodes = True)
+elif cfg.SNPECONVERTER_TYPE.lower() == "caffe":
+    # submit a compile request
+    compile_request = SnpeConverter.convert_caffe_model(
+        ws,
+        source_model=model,
+        mirror_content = True)
 
-print('compile_request information:')
-print(compile_request._operation_id)
+try:
+    print('compile_request information:')
+    print(compile_request._operation_id)
+except:
+    print("Fail to convert. Please check __BASE.SNPECONVERTER_TYPE in current_config.py")
 
 #%%
-# Wait for the request to complete
-print('Wait for the request to complete...')
-compile_request.wait_for_completion(show_output=True, timeout=None)
+try:
+    # Wait for the request to complete
+    print('Wait for the request to complete...')
+    compile_request.wait_for_completion(show_output=True, timeout=None)
+except:
+    print("Fail to convert. Please check __BASE.SNPECONVERTER_TYPE in current_config.py")
 
 
 #%%
@@ -161,5 +175,3 @@ with open('EdgeSolution/.env', 'w') as env_file:
     env_file.write("REGISTRY_USER_NAME={}\n" .format(username))
     env_file.write("REGISTRY_PASSWORD={}\n" .format(password))
     env_file.write("REGISTRY_IMAGE_LOCATION={}\n" .format(image.image_location))
-
-
