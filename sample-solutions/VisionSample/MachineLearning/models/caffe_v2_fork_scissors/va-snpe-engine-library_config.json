@@ -1,18 +1,22 @@
 {
-"Engine":0,
-"NetworkIO":0,
-"ScaleWidth":227,
-"ScaleHeight":227,
-"PixelNorm":0,
-"BlueMean":0,
-"GreenMean":0,
-"RedMean":0,
-"TargetFPS":10,
-"ConfThreshold":0.0,
-"DLC_NAME":"model.dlc",
-"LABELS_NAME":"labels.txt",
-"InputLayers":"data:0",
-"OutputLayers":["loss"],
-"ResultLayers":["loss:0"],
-"Runtime":0
+    "Engine": 2,
+    "NetworkIO": 0,
+    "ScaleWidth": 227,
+    "ScaleHeight": 227,
+    "PixelNorm": 128,
+    "BlueMean": 104,
+    "GreenMean": 117,
+    "RedMean": 123,
+    "TargetFPS": 10,
+    "ConfThreshold": 0.0,
+    "DLC_NAME": "model.dlc",
+    "LABELS_NAME": "labels.txt",
+    "InputLayers": "data",
+    "OutputLayers": [
+        "loss"
+    ],
+    "ResultLayers": [
+        "loss"
+    ],
+    "Runtime": 1
 }
