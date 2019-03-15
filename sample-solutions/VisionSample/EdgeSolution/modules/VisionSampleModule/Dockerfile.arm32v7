@@ -1,0 +1,19 @@
+FROM arm32v7/ubuntu:16.04
+
+WORKDIR /var/azureml-app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libboost-python-dev \
+    libcurl4-openssl-dev libssl-dev python3-pip libpython3-dev && \
+    rm -rf /var/lib/apt/lists/* 
+
+RUN pip3 install --upgrade pip 
+RUN pip install --upgrade setuptools
+
+RUN pip install requests
+RUN pip install azure-iothub-device-client
+
+COPY . .
+RUN chmod -R 777 /var/azureml-app/azureml-models
+
+ENTRYPOINT [ "python3", "-u", "./main.py" ]
