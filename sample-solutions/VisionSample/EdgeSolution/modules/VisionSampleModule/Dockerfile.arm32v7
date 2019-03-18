@@ -11,7 +11,7 @@ RUN pip3 install --upgrade pip
 RUN pip install --upgrade setuptools
 
 RUN pip install requests
-RUN pip install azure-iothub-device-client
+RUN pip3 install --no-cache-dir https://modelmgmtreswcus.azureedge.net/wheels/azure_iothub_device_client-1.4.3-py3-none-linux_armv7l.whl
 
 COPY . .
 RUN chmod -R 777 /var/azureml-app/azureml-models
