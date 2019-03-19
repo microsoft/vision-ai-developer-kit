@@ -10,8 +10,23 @@ RUN apt-get update && \
 RUN pip3 install --upgrade pip 
 RUN pip install --upgrade setuptools
 
-RUN pip install requests
+# Repository of pre-built wheels for ARM
+RUN echo '[global]' >> /etc/pip.conf && \
+    echo 'extra-index-url=https://www.piwheels.org/simple' >> /etc/pip.conf
+
 RUN pip3 install --no-cache-dir https://modelmgmtreswcus.azureedge.net/wheels/azure_iothub_device_client-1.4.3-py3-none-linux_armv7l.whl
+
+RUN wget -O /THIRDPARTYNOTICE.TXT https://modelmgmtreswcus.azureedge.net/texts/THIRDPARTYNOTICE.TXT; \
+find / -type f -name 'copyright' -print | while read filename; do   \
+libname=$(echo "$filename" | awk -F/ '{ print $(NF-1) }' ) ; \
+echo "" ; \
+echo "---------------------------------------------"; \
+echo "Package - $libname" ; \
+echo "---------------------------------------------"; \
+cat "$filename"; \
+done >> /THIRDPARTYNOTICE.TXT
+
+RUN pip install requests
 
 RUN apt-get update && \
     apt-get install -y libgstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools
