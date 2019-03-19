@@ -3,7 +3,7 @@
 For users already have DLC files, they can build an IoT Edge module **VisionSampleModule** on a local machine, push it to Azure Container Registry (ACR) repository, and deploy it to a device.
 
 ## Setup Build Environment
-1. Download and install Docker from [**Get Started with Docker**](https://www.docker.com/get-started).
+1. Download and install Docker from [**Get Started with Docker**](https://www.docker.com/get-started).  Don't sign in **Docker Desktop**.
 
 2. Install [**Docker Extension**](https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker) to **Visual Studio Code**.
 
@@ -22,7 +22,7 @@ For users already have DLC files, they can build an IoT Edge module **VisionSamp
     REGISTRY_PASSWORD=h51ykq+FxrWLszbFDsJuulP/0yH3XQOh
     ```
 
-4. Sign in to Docker by entering the following command in the **Visual Studio Code** integrated terminal:
+4. Sign in **Azure Container Registry** by entering the following command in the **Visual Studio Code** integrated terminal:
     ```<language>
     docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io  
     ```
