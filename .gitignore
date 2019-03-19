@@ -328,3 +328,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+01-convert-model-containerize.ipynb
+.ipynb_checkpoints/01-convert-model-containerize-checkpoint.ipynb
+machine-learning-reference/*
