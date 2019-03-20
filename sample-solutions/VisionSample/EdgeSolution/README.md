@@ -3,16 +3,16 @@
 For users already have DLC files, they can build an IoT Edge module **VisionSampleModule** on a local machine, push it to Azure Container Registry (ACR) repository, and deploy it to a device.
 
 ## Setup Build Environment
-1. Download and install Docker from [**Get Started with Docker**](https://www.docker.com/get-started).  Don't sign in **Docker Desktop**.
+1. Download and install Docker from [**Get Started with Docker**](https://www.docker.com/get-started).  Don't sign in **Docker Desktop** after Docker installed.
 
 2. Install [**Docker Extension**](https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker) to **Visual Studio Code**.
 
 ## Build a Local VisionSampleModule Image
 
-1. Rename the default **deployment.template.json** file to **deployment.cloud.template.json** file.
-    - **Note:** The content in the default **deployment.template.json** file is used to deploy the container image created by **MachineLearning\scripts\01-convert-model-containerize.py**.
+1. Rename the default **deployment.template.json** file to **cloud-deployment.template.json** file.
+    - **Note:** The default **deployment.template.json** file is used to deploy the container image created by **MachineLearning\scripts\01-convert-model-containerize.py**.
 
-2. Rename **deployment.local.template.json** file to **deployment.template.json** file.
+2. Rename **local-deployment.template.json** file to **deployment.template.json** file.
 
 3. Modify **MODULE_NAME**, **REGISTRY_NAME**, **REGISTRY_USER_NAME**, and **REGISTRY_PASSWORD** 4 settings in **.env** file.  Refer to [**Create a container registry**](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail.  For example:
     ```<language>
@@ -31,7 +31,8 @@ For users already have DLC files, they can build an IoT Edge module **VisionSamp
 6. Open **modules\VisionSampleModule\module.json** file and change **version** setting in **tag** property for creating a new version of the module image.
 
 7. Right-clicking on **deployment.template.json** file and select **[Build and Push IoT Edge Solution]** command to generate a new **deployment.json** file in **config** folder, build a module image, and push the image to the specified ACR repository.
+    - **Note:** Some red warnings "**/usr/bin/find: '/proc/XXX': No such file or directory**" and "**debconf: delaying package configuration, since apt-utils is not installed**" displayed during the building process can be ignored.
 
 8. Right-clicking on **config/deployment.json** file, select **[Create Deployment for Single Device]**, and choose the targeted IoT Edge device to deploy the **VisionSampleModule** Image.
 
-  - **Note:** When your container image is created by **MachineLearning\scripts\01-convert-model-containerize.py**, remember to rename **deployment.template.json** file back to **deployment.local.template.json** and rename **deployment.cloud.template.json** file to **deployment.template.json**.
+**Note:** When your container image is created by **MachineLearning\scripts\01-convert-model-containerize.py**, remember to rename **cloud-deployment.template.json** file back to **deployment.template.json** to generate **deployment.json**.
