@@ -4,7 +4,7 @@ WORKDIR /var/azureml-app
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libboost-python-dev \
-    libcurl4-openssl-dev libssl-dev python3-pip libpython3-dev && \
+    libcurl4-openssl-dev libssl-dev python3-pip libpython3-dev wget && \
     rm -rf /var/lib/apt/lists/* 
 
 RUN pip3 install --upgrade pip 
