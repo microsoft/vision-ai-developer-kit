@@ -14,13 +14,16 @@ MODEL_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "
 
 def train_project(subscription_key):
 
-    trainer = CustomVisionTrainingClient(subscription_key, endpoint=__init__.ENDPOINT)
+    trainer = CustomVisionTrainingClient(subscription_key, endpoint=__init__.TRAINING_ENDPOINT)
 
     # Create a new project
     print("Creating project...")
-    print(__init__.SAMPLE_PROJECT_NAME)
-    project = trainer.create_project(name=__init__.SAMPLE_PROJECT_NAME, domain_id="0732100f-1a38-4e49-a514-c9b44c697ab5")
-    # project = trainer.create_project(name=__init__.SAMPLE_PROJECT_NAME)
+    print(__init__.CUSTOMVISION_PROJECT_NAME)
+    project = trainer.create_project(name=__init__.CUSTOMVISION_PROJECT_NAME, description=__init__.CUSTOMVISION_PROJECT_DESCRIPTION, domain_id=__init__.CUSTOMVISION_PROJECT_DOMAIN_ID)
+    # domains = trainer.get_domains()
+    # for domain in domains:
+    #     print(domain)
+    # project = trainer.create_project(name=__init__.CUSTOMVISION_PROJECT_NAME)
     # Make two tags in the new project
     hemlock_tag = trainer.create_tag(project.id, "Hemlock")
     cherry_tag = trainer.create_tag(project.id, "Japanese Cherry")
@@ -45,6 +48,12 @@ def train_project(subscription_key):
 
     # The iteration is now trained. Make it the default project endpoint
     trainer.update_iteration(project.id, iteration.id, is_default=True)
+    performance = trainer.get_iteration_performance(project.id, iteration.id)
+    print("Performance Precision: " + str(performance.precision))
+    print("Precision STD Deviation: " + str(performance.precision_std_deviation))
+    exports = trainer.get_exports(project.id, iteration.id)
+    for export_type in exports:
+        print(export_type)
     print("Training Done!")
     print("Please downlaod your model from customvisison.ai portal until we GA this build this step need to be done manually ...")
 
@@ -66,7 +75,7 @@ def model_register_convert(ws):
     print("Model File:", MODEL_NAME)
 
     # md = Model.register(ws, model_path=MODEL_FILE_NAME, model_name=MODEL_NAME)
-    md = Model.register(ws, model_path = FILE_ZIPPED,
+    md = Model.register(ws, model_path = MODEL_FOLDER,
                         model_name = MODEL_NAME,
                         description = "Not sure about the description")
     print("Register Model Done!")
@@ -88,12 +97,11 @@ def register_model(ws):
     print ("Register Model Done!")
 
 if __name__ == "__main__":
-    my_project = train_project(__init__.SUBSCRIPTION_KEY_ENV_NAME)
-
-    # trainer = CustomVisionTrainingClient(__init__.SUBSCRIPTION_KEY_ENV_NAME, endpoint=__init__.ENDPOINT)
+    my_project = train_project(__init__.TRAINING_KEY)
+    # trainer = CustomVisionTrainingClient(__init__.TRAINING_KEY, endpoint=__init__.TRAINING_ENDPOINT)
     # trainer.delete_project(my_project.id)
     # from tools import execute_samples
-    # execute_samples(globals(), SUBSCRIPTION_KEY_ENV_NAME)
+    # execute_samples(globals(), TRAINING_KEY)
     # workspace = workspace_create()
     # workspace = workspace_retrieve()
     # register_model(workspace)

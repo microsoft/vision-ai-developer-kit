@@ -1,11 +1,18 @@
 # These are sample values for demo. Users need to change these with real subscription value
 # Values are in a standalone file for easy edit or replace
 
-# Vision Machine Learning AI
-SUBSCRIPTION_KEY_ENV_NAME = ""
-SAMPLE_PROJECT_NAME = "Python Plants"
-ENDPOINT = "https://irisdemo1.azure-api.net/"
-# ENDPOINT = "https://southcentralus.api.cognitive.microsoft.com/"
+# CUSTOM VISION ACCOUNT SETTINGS
+# Copy keys from https://www.customvision.ai/projects OR https://iris-demo1.azurewebsites.net
+TRAINING_KEY = ""
+TRAINING_ENDPOINT = "https://irisdemo1.azure-api.net/"
+# TRAINING_ENDPOINT = "https://southcentralus.api.cognitive.microsoft.com/"
+
+# CUSTOM VISION PROJECT SETTINGS
+CUSTOMVISION_PROJECT_NAME = "Python Plants"
+CUSTOMVISION_PROJECT_DOMAIN_ID = "0732100f-1a38-4e49-a514-c9b44c697ab5"
+CUSTOMVISION_PROJECT_DESCRIPTION = "Train vision to classify plants"
+CUSTOMVISION_PROJECT_CLASSIFICATION_TYPE = None
+CUSTOMVISION_PROJECT_HEADERS = None
 
 # Azure Account
 azure_subscription_id=""
