@@ -31,7 +31,7 @@ For users already have DLC files, they can build an IoT Edge module **VisionSamp
 6. Open **modules\VisionSampleModule\module.json** file and change **version** setting in **tag** property for creating a new version of the module image.
 
 7. Right-clicking on **deployment.template.json** file and select **[Build and Push IoT Edge Solution]** command to generate a new **deployment.json** file in **config** folder, build a module image, and push the image to the specified ACR repository.
-    - **Note:** The "**debconf: delaying package configuration, since apt-utils is not installed**" red warning displayed during building process can be ignored.
+    - **Note:** Some red warnings "**/usr/bin/find: '/proc/XXX': No such file or directory**" and "**debconf: delaying package configuration, since apt-utils is not installed**" displayed during the building process can be ignored.
 
 8. Right-clicking on **config/deployment.json** file, select **[Create Deployment for Single Device]**, and choose the targeted IoT Edge device to deploy the **VisionSampleModule** Image.
 
