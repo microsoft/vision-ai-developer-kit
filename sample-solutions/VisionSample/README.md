@@ -75,3 +75,27 @@
 # Retrain MobileNet V1 SSD Object Detection Model
 
 Refer to **README.md** in **MachineLearning\ssd_sample** folder for more detail.
+
+# Create a Classification Model using Azure Custom Vision Service
+
+* What you will need...
+    * A valid Azure subscription. Create an account for free.
+    * A set of images for use in training your classifier.
+
+1. Using a browser, login to the Azure Custom Vision Service at https://www.customvision.ai.
+    * **Note:** Please review the Teams Wiki for pre-GA access details.
+
+2. Follow these instructions for [How to build a classifier with Custom Vision](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/getting-started-build-a-classifier). When creating a new project, use these recommended settings for the Vision AI Dev Kit hardware.
+    * **Project Type** - [Classification]
+    * **Classification Type** - [Multiclass (Single tag per image)]
+    * **Domain** - [General(compact)]
+
+3. After the model is built, click **Export** button in the Performance tab of the https://www.customvision.ai portal, and **Download** the trained vision model for the **Vision AI DevKit**.
+
+4. Create a folder under **MachineLearning\models**, unpack the model, and move the unpacked model to the folder. 
+
+5. Create a **va-snpe-engine-library_config.json** file for your model (refer to **MachineLearning\models\caffe_v2_fork_scissors\va-snpe-engine-library_config.json**), and put to the folder created in the previous step.
+
+6. Update **MachineLearning\scripts\model_configs\current_config.py** for your model (refer to the config in **MachineLearning\scripts\model_configs\caffe_v2_fork_scissors.py**)
+
+7. Follow **01-convert-model-containerize.py** under **MachineLearning\scripts** to deploy a model container image in VS Code.
