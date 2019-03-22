@@ -19,9 +19,9 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 6. Enter **[Azure: Sign In]** command in the command palette box to sign in Azure account and select your subscription.
 
-7. Create a new IoT Hub and a new IoT Edge device in VS Code as mentioned in Create an IoT hub using the Azure IoT Hub Toolkit for VS Code and Register a new Azure IoT Edge device from VS Code.
+7. Create a new IoT Hub and a new IoT Edge device in VS Code as mentioned in [Create an IoT hub using the Azure IoT Hub Toolkit for VS Code](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-use-iot-toolkit) and [Register a new Azure IoT Edge device from VS Code](https://docs.microsoft.com/en-us/azure/iot-edge/how-to-register-device-vscode#create-a-device).
 
-8. Create a new workspace in VS Code as mentioned in Get started with Azure Machine Learning for VS Code. Or use **00-aml-configuration.py** script described in the next section to create a new resource group and a new workspace.
+8. Create a new workspace in VS Code as mentioned in [Get started with Azure Machine Learning for VS Code](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-vscode-tools#get-started-with-azure-machine-learning). Or use **00-aml-configuration.py** script described in the next section to create a new resource group and a new workspace.
 
     * **Note**: Must use **East US** region.
 
