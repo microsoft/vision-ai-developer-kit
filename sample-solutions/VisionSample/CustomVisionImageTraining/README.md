@@ -36,21 +36,13 @@ This notes provide instructions "How to setup Azure Vision AI Environment"
 	https://code.visualstudio.com/docs/languages/python
 	Tutorial at
 	https://code.visualstudio.com/docs/python/python-tutorial
-	
+
 	4. Open "Windows PowerShell" or "Command Prompt" with "run as administrator"
 	Reference guide can be found at https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial
 	
-	4.1 install AzureML SDK
-	>pip install --upgrade azureml-sdk
-	
-	4.2 install Azure vision libraries, type command
+	install vision AI libraries, type command
 	>pip install --upgrade azure-cognitiveservices-vision-customvision
-	
-	4.2 install Azure vision core libraries, type command https://pypi.org/project/azure-storage/
-	>pip install --upgrade azure-storage
-	
-	4.3 Optional Google Image URL download tool:
-	>pip install --upgrade google_images_download
+
 
 **Linux/iOS:**
 
@@ -88,34 +80,37 @@ This notes provide instructions "How to setup Azure Vision AI Environment"
 
 Part 2 - Training Models
 
-	1. Prepare and Sign in Account:
-	https://www.customvision.ai/projects
-	TRAINING_KEY and TRAINING_ENDPOINT are needed in step 5
-
-	2. Azure Vision Machine Learning API documents and Custom Vision API Document locates at
+	1. Azure Vision Machine Learning API documents and Custom Vision API Document locates at
 	https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/
 
 	How to Create Account and Get Started Guide at
 		https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/getting-started-build-a-classifier
 	
-	3.Prepare Image files
+	2.Prepare Image files
 	Image samples are located at "images" folder
-	![alt text](https://github.com/Microsoft/vision-ai-developer-kit/tree/vision-v-fecui-0319/sample-solutions/VisionSample/CustomVisionImageTraining/images/docs/folder.PNG "Logo Title Text 1")
+
+![alt text](https://github.com/Microsoft/vision-ai-developer-kit/tree/vision-v-fecui-0319/sample-solutions/VisionSample/CustomVisionImageTraining/images/docs/folder.PNG "Logo Title Text 1")
 	
-	4.Start Visual Studio Code and Open folder
+	3.Start Visual Studio Code and Open folder
 	   vision-ai-developer-kit\sample-solutions\VisionSample\CustomVisionImageTraining
 	   Sample python scripts are located at "python" folder
-	
-	5.Azure Machine Learning Environment Setup
-		__init__.py contains azure subscription key
-		TRAINING_KEY = "training id"
+
+	4. Sign in Account and click setting button:
+	   https://www.customvision.ai/projects
+	   Or Testing site: https://iris-demo1.azurewebsites.net/
+
+	   Modify python folder	__init__.py contains vision AI training keys
+		TRAINING_KEY = "place training key here"
 		TRAINING_ENDPOINT = "https://irisdemo1.azure-api.net/"
-		![alt text](https://github.com/Microsoft/vision-ai-developer-kit/tree/vision-v-fecui-0319/sample-solutions/VisionSample/CustomVisionImageTraining/images/docs/project.PNG)
+
+![alt text](https://github.com/Microsoft/vision-ai-developer-kit/tree/vision-v-fecui-0319/sample-solutions/VisionSample/CustomVisionImageTraining/images/docs/project.PNG)
 	
-	6.Save changes and right click - custom_vision_training_sample.py
+	5.Save changes and right click - custom_vision_training_sample.py
 	   Run Python File in Terminal
 
-	7. Go to project:
+	6. Go to project:
 	https://www.customvision.ai/projects
 	download trained model files
 	(Note: DLC file only can be downloaded at test site: https://iris-demo1.azurewebsites.net/ )
+
+	7. Deploy this model on IoTEdgeSolution Project. Please read the project README.md

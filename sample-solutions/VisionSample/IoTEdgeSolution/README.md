@@ -6,10 +6,12 @@ Thursday, March 14, 2019
 Prerequisites:
 	
 	1. Environment Setup - Refer to CustomVisionImageTraining Folder README.md
-	2. Model Train - Refer to CustomVisionImageTraining project
+	2. Model Train - Refer to CustomVisionImageTraining project README.md
 	3. Model Download - Download DLC files and unzip
 	4. Have a Microsoft Account to access https://azure.github.io/Vision-AI-DevKit-Pages/docs/Get_Started/
 	5. Azure Portal Account https://portal.azure.com
+	6. Reference: https://azure.github.io/Vision-AI-DevKit-Pages/docs/Deploy_Model_IoT_Hub/#
+	7. https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module
 
 *** Instructions ***
 
@@ -23,37 +25,31 @@ Prerequisites:
 	
 	4. Connect camera device with IoT Register Container
 	https://azure.github.io/Vision-AI-DevKit-Pages/
-	
-	Android Debug Bridge (ADB) and Fastboot Tools
-	Tools are Included into Android Studio and SDK tool https://developer.android.com/studio
 
 	5. Clone project: https://github.com/Microsoft/vision-ai-developer-kit
 
-	6. Download " Vision AI Dev Kit" model
-    From Custom Vision AI - refer to CustomVisionImage Train project
-    https://iris-demo1.azurewebsites.net/projects/
-
-   	7. copy/move trained model into folder:
+    6. copy/move trained model into folder:
 	   vision-ai-developer-kit\sample-solutions\VisionSample\IoTEdgeSolution\modules\VisionSampleModule\model
 	   The folder contains:
-	   7.1 labels.txt - image tag
-	   7.2 model.dlc - the trained knowledge file
-	   7.3 va-snpe-engine-library_config.json - engine config file
+	   6.1 labels.txt - image tag
+	   6.2 model.dlc - the trained knowledge file
+	   6.3 va-snpe-engine-library_config.json - engine config file
 
-	8. Visual Studio Code open project folder:
-	    vision-ai-developer-kit\sample-solutions\VisionAiDevKit
+	7. Visual Studio Code open project folder:
+	    vision-ai-developer-kit\sample-solutions\IoTEdgeSolution\modules\VisionSampleModule\python_iotcc_sdk\sdk
 	    
-	    8.1 edit modules\VisionSampleModule\.env from Azure IoT Hub
+	    7.1 edit modules\VisionSampleModule\.env from Azure IoT Hub
+	    https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry
 	    Example:
 	    CONTAINER_REGISTRY_USERNAME=""
 	    CONTAINER_REGISTRY_PASSWORD=""
         CONTAINER_REGISTRY_ADDRESS= "xxx.azurecr.io"
     
-        8.2 In the left panel, "Docker Container Register" Login 
-        8.3 Find "deployment.template.json (same folder as README.md)
+        7.2 In the left panel, "Docker Container Register" Login
+        7.3 Find "deployment.template.json (same folder as README.md)
             right click and "Build and Push IoT Solution"
-        8.4 In "config" folder, find the "deployment.json", right click and deploy to device
+        7.4 In "config" folder, find the "deployment.json", right click and deploy to device
     
-    9. Trouble shoot: https://visionaidevkitsupport.azurewebsites.net/
+    8. Trouble shoot: https://visionaidevkitsupport.azurewebsites.net/
         
             

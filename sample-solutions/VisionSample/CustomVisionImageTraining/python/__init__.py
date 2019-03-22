@@ -14,11 +14,3 @@ CUSTOMVISION_PROJECT_DESCRIPTION = "Train vision to classify plants"
 CUSTOMVISION_PROJECT_CLASSIFICATION_TYPE = None
 CUSTOMVISION_PROJECT_HEADERS = None
 
-# Azure Account
-azure_subscription_id=""
-azure_location='eastus'
-azure_resource_group='objectCog'
-
-# Azure Storage/Blob
-azure_storage_account_name=''
-azure_storage_account_key=''
