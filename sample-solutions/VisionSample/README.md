@@ -55,7 +55,7 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 11. Setup the Vision AI Developer Kit to connect to the IoT Edge device and deploy the module image. 
 
-12. Monitor the deployment status for the Vision AI Developer Kit by using platform tools commands: **[adb shell docker ps]** and **[adb shell docker logs edgeAgent]** commands.
+12. Monitor the deployment status for the Vision AI Developer Kit by using platform tools commands: **[adb shell docker ps]** and **[adb shell docker logs edgeAgent -f]** commands.
     * **Note:** The maximum count of images (excluding azureiotedge-hub and azureiotedge-agent) in a device is 3. Use **[adb shell docker images]** command to check the count of container images deployed to the device and use **[adb shell docker rmi <*IMAGE ID*>]** command to delete useless images.
 
 13. Check image classification results: 
@@ -105,6 +105,6 @@ Refer to **MachineLearning\ssd_sample\README.md** for more detail.
 
 4. Copy the exported **model.dlc** and **labels.txt** files to **MachineLearning\BasicEdgeSolution\modules\VisionSampleModule\model** folder.
 
-5. Copy **va-snpe-engine-library_config.json** file from **MachineLearning\models\caffe_v2_fork_scissors** folder o **MachineLearning\BasicEdgeSolution\modules\VisionSampleModule\model** folder.
+5. Copy **va-snpe-engine-library_config.json** file from **MachineLearning\models\caffe_v2_fork_scissors** folder to **MachineLearning\BasicEdgeSolution\modules\VisionSampleModule\model** folder.
 
-6. Refer to **MachineLearning\BasicEdgeSolution\README.md** to deploy the exported Azure Custom Vision model.
+6. Refer to **MachineLearning\BasicEdgeSolution\README.md** to build a local container image and deploy the exported Azure Custom Vision model.
