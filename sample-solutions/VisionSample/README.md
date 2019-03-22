@@ -33,10 +33,8 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 3. Use **[Python: Select Interpreter]** command in the command palette box or click the current **Python interpreter** option on the bottom line to set **python.pythonPath** in .vscode\settings.json. 
 
-4. Close VS Code and launch VS Code again by **Run as administrator**. Select **[Terminal > New Terminal]** command to open a terminal window, change directory to **MachineLearning\scripts**, and execute the following commands to install required Python packages: 
+4. Close VS Code and launch VS Code again by **Run as administrator**. Select **[Terminal > New Terminal]** command to open a terminal window, change directory to **MachineLearning\scripts**, and execute the following command to install required Python packages: 
     ```<language>
-    pip install msgpack==0.6.1
-    pip install --ignore-installed PyYAML==4.2b1
     pip install --upgrade -r requirements.txt
     ```
 
