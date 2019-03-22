@@ -1,5 +1,5 @@
-# Deploy Deep Learning Models to Vision AI DevKit using Visual Studio Code
-This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edge to convert a model, build a container image, and deploy a model image to Vision AI DevKit in Visual Studio Code.
+# Deploy Deep Learning Models to Vision AI Developer Kit Using Visual Studio Code
+This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edge to convert a model, build a container image, and deploy a model image to Vision AI Vision AI Developer Kit in Visual Studio Code.
 
 
 ## Setup Visual Studio Code Development Environment
@@ -23,7 +23,7 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 8. Create a new workspace in VS Code as mentioned in Get started with Azure Machine Learning for VS Code. Or use **00-aml-configuration.py** script described in the next section to create a new resource group and a new workspace.
 
-    * **Note**: Must use the region listed in the [supported regions for Azure Machine Learning service](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=machine-learning-service) to create a new workspace.  Default is **East US** region.
+    * **Note**: Must use **East US** region.
 
 ## Deploy a Model Container Image in VS Code 
 
@@ -33,12 +33,10 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 3. Use **[Python: Select Interpreter]** command in the command palette box or click the current **Python interpreter** option on the bottom line to set **python.pythonPath** in .vscode\settings.json. 
 
-4. Close VS Code and launch VS Code again by **Run as administrator**. Select **[Terminal > New Terminal]** command to open a terminal window, change directory to **MachineLearning\scripts**, and execute the following command to install required Python packages: 
+4. Launch VS Code by **Run as administrator**. Select **[Terminal > New Terminal]** command to open a terminal window, change directory to **MachineLearning\scripts**, and execute the following command to install required Python packages: 
     ```<language>
     pip install --upgrade -r requirements.txt
     ```
-
-    * **Note**: The above installation steps works for the latest Azure Machine Learning SDK version v1.0.8 and Python 3.6.5 installed by [Anaconda with Python version 3.6.5](https://repo.anaconda.com/archive/Anaconda3-5.2.0-Windows-x86_64.exe). If the version of AML SDK, Python, or other packages are changed in the future, you might have to install or upgrade packages manually. 
 
 5. Open **00-aml-configuration.py** under **MachineLearning\scripts** folder and replace the 3 fake settings to your Azure Machine Learning Service Workspace settings.
 
@@ -57,11 +55,12 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 11. Setup the Vision AI Developer Kit to connect to the IoT Edge device and deploy the module image. 
 
-12. Monitor the deployment status for the Vision AI Developer Kit by using platform tools commands: **[adb shell]**, **[docker ps]** and **[docker logs edgeAgent]** commands.   **Note:** The maximum count of images (excluding azureiotedge-hub and azureiotedge-agent) in a device is 3. Use **[adb shell > docker images]** command to check the count of container images deployed to the device and use **[adb shell > docker rmi <*IMAGE ID*>]** command to delete useless images.
+12. Monitor the deployment status for the Vision AI Developer Kit by using platform tools commands: **[adb shell docker ps]** and **[adb shell docker logs edgeAgent]** commands.
+    * **Note:** The maximum count of images (excluding azureiotedge-hub and azureiotedge-agent) in a device is 3. Use **[adb shell docker images]** command to check the count of container images deployed to the device and use **[adb shell docker rmi <*IMAGE ID*>]** command to delete useless images.
 
 13. Check image classification results: 
     * mobilenet-imagenet model can detect 1000 image classes listed in the **MachineLearning\models\mobilenet-imagenet\orig\output_labels.txt**.
-    * Use platform tools commands **[adb shell > docker logs <*image name*>]** to check container image outputs.
+    * Use platform tools commands **[adb shell docker logs <*image name*>]** to check container image outputs.
     * Select **[AZURE IOT HUB DEVICES > … > Select IoT Hub]** command and **[AZURE IOT HUB DEVICES > … > Start Monitoring D2C Message]** command to monitor the messages sent from the Vision AI Developer Kit to Azure IoT Hub.
 
 ## Retrain MobileNet V1 Classification Model
