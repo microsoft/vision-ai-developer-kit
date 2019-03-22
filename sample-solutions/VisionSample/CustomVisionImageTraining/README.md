@@ -89,8 +89,9 @@ Part 2 - Training Models
 	2.Prepare Image files
 	Image samples are located at "images" folder
 
-![alt text](https://github.com/Microsoft/vision-ai-developer-kit/tree/vision-v-fecui-0319/sample-solutions/VisionSample/CustomVisionImageTraining/images/docs/folder.PNG "Logo Title Text 1")
-	
+![alt text](folder.PNG)
+
+
 	3.Start Visual Studio Code and Open folder
 	   vision-ai-developer-kit\sample-solutions\VisionSample\CustomVisionImageTraining
 	   Sample python scripts are located at "python" folder
@@ -103,8 +104,9 @@ Part 2 - Training Models
 		TRAINING_KEY = "place training key here"
 		TRAINING_ENDPOINT = "https://irisdemo1.azure-api.net/"
 
-![alt text](https://github.com/Microsoft/vision-ai-developer-kit/tree/vision-v-fecui-0319/sample-solutions/VisionSample/CustomVisionImageTraining/images/docs/project.PNG)
-	
+![alt text](project.PNG)
+
+
 	5.Save changes and right click - custom_vision_training_sample.py
 	   Run Python File in Terminal
 
