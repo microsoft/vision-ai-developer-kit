@@ -1,27 +1,31 @@
-# Installation
+# Deploy Deep Learning Models to Vision AI DevKit using Visual Studio Code
+This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edge to convert a model, build a container image, and deploy a model image to Vision AI DevKit in Visual Studio Code.
 
-1. Install [Visual Studio Code](https://code.visualstudio.com/Download)
 
-2. Install 64 bit [Anaconda with Python version 3.6.5](https://repo.anaconda.com/archive/Anaconda3-5.2.0-Windows-x86_64.exe), and add Anaconda path to the System PATH environment variable. 
+## Setup Visual Studio Code Development Environment
+
+1. Install [Visual Studio Code (VS Code)](https://code.visualstudio.com/Download).
+
+2. Install 64 bit [Anaconda with Python version 3.7](https://www.anaconda.com/distribution), and add Anaconda path to the System PATH environment variable. 
 
 3. Install the following extensions for VS Code:
     * [Azure Machine Learning](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.vscode-ai) ([Azure Account](https://marketplace.visualstudio.com/items?itemName=ms-vscode.azure-account) and the [Microsoft Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) will be automatically installed)
     * [Azure IoT Hub Toolkit](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.azure-iot-toolkit)
     * [Azure IoT Edge](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.azure-iot-edge) 
 
-4. Restart Visual Studio Code.
+4. Restart VS Code.
 
 5. Select **[View > Command Palette…]** to open the command palette box, then enter **[Python: Select Interpreter]** command in the command palette box to select your Python interpreter.
 
 6. Enter **[Azure: Sign In]** command in the command palette box to sign in Azure account and select your subscription.
 
-7. Create a new IoT Hub and a new IoT Edge device in VS Code as mentioned in Create an IoT hub using the Azure IoT Hub Toolkit for Visual Studio Code and Register a new Azure IoT Edge device from Visual Studio Code. 
+7. Create a new IoT Hub and a new IoT Edge device in VS Code as mentioned in Create an IoT hub using the Azure IoT Hub Toolkit for VS Code and Register a new Azure IoT Edge device from VS Code.
 
-8. Create a new workspace in VS Code as mentioned in Get started with Azure Machine Learning for Visual Studio Code. Or use **00-aml-configuration.py** script described in the next section to create a new resource group and a new workspace.
+8. Create a new workspace in VS Code as mentioned in Get started with Azure Machine Learning for VS Code. Or use **00-aml-configuration.py** script described in the next section to create a new resource group and a new workspace.
 
     * **Note**: Must use the region listed in the [supported regions for Azure Machine Learning service](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=machine-learning-service) to create a new workspace.  Default is **East US** region.
 
-# Deploy a Model Container Image in VS Code 
+## Deploy a Model Container Image in VS Code 
 
 1. Download the latest VS Code sample from https://github.com/Microsoft/vision-ai-developer-kit/tree/master/sample-solutions/VisionSample and expand it. 
 
@@ -43,7 +47,9 @@
 6. Click **[Run Cell]** or **[Run All Cells]** link on the top line of the cell. It will create a new workspace if it doesn’t exist and write a **config.json** file under **aml_config** folder. 
 
 7. Open **01-convert-model-containerize.py** under **MachineLearning\scripts** folder and click **[Run Cell]** or **[Run All Cells]** link to register model, convert model, create container image, and write settings related to the container image to **.env** file under **EdgeSolution** folder.
-    * **Note:** **01-convert-model-containerize.py** script will import settings from **current_config.py** file in **MachineLearning\scripts\model_configs** folder.  So, this script can be reused to create container image for different model by changing **current_config.py**'s content.
+    * **Note:**
+      * **01-convert-model-containerize.py** script will import settings from **current_config.py** file in **MachineLearning\scripts\model_configs** folder.  So, this script can be reused to create container image for different model by changing **current_config.py**'s content.
+      * When change to process a different model, remember to click **Restart** button on the top line in **Python Interactive** window to restart **iPython kernel** to prevent unexpected cache error.
 
 8. Right click **deployment.template.json** file under **EdgeSolution** folder and select **[Generate IoT Edge Deployment Manifest]** command to create a new **deployment.json** file under **EdgeSolution\config** folder.
 
@@ -60,23 +66,31 @@
     * Use platform tools commands **[adb shell > docker logs <*image name*>]** to check container image outputs.
     * Select **[AZURE IOT HUB DEVICES > … > Select IoT Hub]** command and **[AZURE IOT HUB DEVICES > … > Start Monitoring D2C Message]** command to monitor the messages sent from the Vision AI Developer Kit to Azure IoT Hub.
 
-# Retrain MobileNet V1 Classification Model
+## Retrain MobileNet V1 Classification Model
 
 1. Retrain **MobileNet V1** model with **soda_cans** dataset on cloud:
     * Open **02-mobilenet-transfer-learning-cloud.py** and click **[Run All Cells]** link to retrain a new MobileNet V1 model on cloud with **soda_cans** dataset in **MachineLearning\data\soda_cans** folder.
-    * After the script execution finished, it will write a **va-snpe-engine-library_config.json** config file to **MachineLearning\models\mobilenet-retrain-cloud/outputs** folder and overwrite **current_config.py** by **mobilenet_retrain_cloud_config.py** in **MachineLearning\scripts\model_configs** folder.
-    * Repeat step 7 and 8 in the above section to open and execute **01-convert-model-containerize.py** to convert model, create container image, and generate **deployment.json** for deploying the new MobileNet V1 model retrained on **soda_cans** dataset.
+    * After the script execution finished, it will write a **va-snpe-engine-library_config.json** config file to **MachineLearning\models\mobilenet-retrain-cloud/outputs** folder and overwrite **current_config.py** content by **mobilenet_retrain_cloud_config.py** in **MachineLearning\scripts\model_configs** folder.
+    * Repeat step 7 and 8 in [**Deploy a Model Container Image in VS Code**] section to open and execute **01-convert-model-containerize.py** to convert model, create container image, and generate **deployment.json** for deploying the new MobileNet V1 model retrained on **soda_cans** dataset.
 
 2. Retrain **MobileNet V1** model with **poker6** dataset on a local machine:
     * Open **03-mobilenet-transfer-learning-local.py** and click **[Run All Cells]** link to retrain a new MobileNet V1 model on a local machine with **poker6** dataset in **MachineLearning\data** folder.
-    * After the script execution finished, it will write a **va-snpe-engine-library_config.json** config file to **MachineLearning\models\mobilenet-retrain-local** folder and overwrite **current_config.py** by **mobilenet_retrain_local_config.py** in **MachineLearning\scripts\model_configs** folder.
-    * Repeat step 7 and 8 in the above section to open and execute **01-convert-model-containerize.py** to convert model, create container image, and generate **deployment.json** for deploying the new MobileNet V1 model retrained on **poker6** dataset.
+    * After the script execution finished, it will write a **va-snpe-engine-library_config.json** config file to **MachineLearning\models\mobilenet-retrain-local** folder and overwrite **current_config.py** content by **mobilenet_retrain_local_config.py** in **MachineLearning\scripts\model_configs** folder.
+    * Repeat step 7 and 8 in [**Deploy a Model Container Image in VS Code**] section to open and execute **01-convert-model-containerize.py** to convert model, create container image, and generate **deployment.json** for deploying the new MobileNet V1 model retrained on **poker6** dataset.
 
-# Retrain MobileNet V1 SSD Object Detection Model
+## Retrain MobileNet V1 SSD Object Detection Model
 
-Refer to **README.md** in **MachineLearning\ssd_sample** folder for more detail.
+Refer to **MachineLearning\ssd_sample\README.md** for more detail.
 
-# Create a Classification Model using Azure Custom Vision Service
+## Deploy a Caffe2 Model
+
+1. A Caffe2 model sample in **MachineLearning\models\caffe_v2_fork_scissors**.
+
+2. Overwrite **current_config.py** content by **caffe_v2_fork_scissors.py** in **MachineLearning\scripts\model_configs** folder.
+
+3. Repeat step 7 and 8 in [**Deploy a Model Container Image in VS Code**] section to open and execute **01-convert-model-containerize.py** to convert model, create container image, and generate **deployment.json** for deploying the Caffe2 model.
+
+## Develop and Deploy a Classification Model using Azure Custom Vision Service
 
 * What you will need...
     * A valid Azure subscription. Create an account for free.
@@ -92,10 +106,8 @@ Refer to **README.md** in **MachineLearning\ssd_sample** folder for more detail.
 
 3. After the model is built, click **Export** button in the Performance tab of the https://www.customvision.ai portal, and **Download** the trained vision model for the **Vision AI DevKit**.
 
-4. Create a folder under **MachineLearning\models**, unpack the model, and move the unpacked model to the folder. 
+4. Copy the exported **model.dlc** and **labels.txt** files to **MachineLearning\BasicEdgeSolution\modules\VisionSampleModule\model** folder.
 
-5. Create a **va-snpe-engine-library_config.json** file for your model (refer to **MachineLearning\models\caffe_v2_fork_scissors\va-snpe-engine-library_config.json**), and put to the folder created in the previous step.
+5. Copy **va-snpe-engine-library_config.json** file from **MachineLearning\models\caffe_v2_fork_scissors** folder o **MachineLearning\BasicEdgeSolution\modules\VisionSampleModule\model** folder.
 
-6. Update **MachineLearning\scripts\model_configs\current_config.py** for your model (refer to the config in **MachineLearning\scripts\model_configs\caffe_v2_fork_scissors.py**)
-
-7. Follow **01-convert-model-containerize.py** under **MachineLearning\scripts** to deploy a model container image in VS Code.
+6. Refer to **MachineLearning\BasicEdgeSolution\README.md** to deploy the exported Azure Custom Vision model.
