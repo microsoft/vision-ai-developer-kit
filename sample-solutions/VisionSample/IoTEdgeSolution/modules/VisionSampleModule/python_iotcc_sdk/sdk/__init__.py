@@ -25,7 +25,7 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__path__ = __import__('pkgutil').extend_path(__path__, __name__)
+# __path__ = __import__('pkgutil').extend_path(__path__, __name__)
 import logging
 import logging.config
 from os import path

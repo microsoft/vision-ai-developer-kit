@@ -53,7 +53,7 @@ def transferdlc(model_name = None):
         dirpath = os.getcwd()
         src = os.path.join(dirpath,"model")
         dst = os.path.abspath("/app/vam_model_folder")
-
+        print(src)
         # find model files
         vamconfig_file = find_file(src, "va-snpe-engine-library_config.json")
         with open(vamconfig_file) as f:

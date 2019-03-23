@@ -6,11 +6,10 @@ import argparse
 import sys
 import time
 import subprocess
-
 import os
 
 from camera import CameraClient
-
+from training_images import Train_Images
 import utility
 import traceback
 
@@ -33,16 +32,17 @@ def main(protocol=None):
     password = args.password
 
     #Please change this address to camer ip address can be found by using adb shell -> ifconfig
-    ip_addr = '192.168.0.104'
+    ip_addr = 'localhost'
     #hub_manager = iot.HubManager()
-    utility.transferdlc()
+    #utility.transferdlc()
     with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
-      
+        # camera_client.set_preview_state("off")
         #this call we set the camera to dispaly over HDMI 
         print(camera_client.configure_preview(resolution="1080P",display_out=1))
         # this call turns on the camera and start transmetting over RTSP and HDMI a stream from camera 
         camera_client.set_preview_state("on")
        
+        #camera_client.logout()
         #rtsp stream address 
         
         rtsp_stream_addr = str(camera_client.preview_url)
@@ -66,6 +66,19 @@ def main(protocol=None):
                 print_inferences(results, camera_client)
         except:
             print("Stopping")
+
+
+def capture(camera, nums, tag):
+        time.sleep(5)
+
+        print("Start capture images: " + str(nums))
+        for x in range(nums):
+            if camera.captureImageWithFolder('pictures', tag):
+                print("capture well and image index:" + str(x))
+            else:
+                print("image capture error and image index:" + str(x))
+        print("capture end!")
+        time.sleep(5)
 
 
 def print_inferences(results=None, camera_client=None):
@@ -97,4 +110,36 @@ def print_inferences(results=None, camera_client=None):
             print("No results")
 
 if __name__ == '__main__':
-    main()
+    #main()
+    print("\nPython %s\n" % sys.version)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p','--pushmodel',help ='sets whether to push the model and required files to device or not', default=True)
+    parser.add_argument('--ip', help='ip address of the camera', default=utility.getWlanIp())
+    parser.add_argument('--username', help='username of the camera', default='admin')
+    parser.add_argument('--password', help='password of the camera', default='admin')
+    args = parser.parse_args()
+    if args.pushmodel is not None:
+        mypushmodel = args.pushmodel
+        print("setting value from argu -p pushmodel to :: %s" % mypushmodel)
+    ip_addr = args.ip
+    username = args.username
+    password = args.password
+
+    #Please change this address to camer ip address can be found by using adb shell -> ifconfig
+    ip_addr = 'localhost'
+    #hub_manager = iot.HubManager()
+    #utility.transferdlc()
+    with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
+        # camera_client.set_preview_state("off")
+        #this call we set the camera to dispaly over HDMI 
+        print(camera_client.configure_preview(resolution="1080P",display_out=1))
+        # this call turns on the camera and start transmetting over RTSP and HDMI a stream from camera 
+        camera_client.set_preview_state("on")    
+        rtsp_stream_addr = str(camera_client.preview_url)
+        print("rtsp stream is :: " + rtsp_stream_addr)
+
+        capture(camera_client, nums=10, tag='room1')
+        capture(camera_client, nums=11, tag='room2')
+
+    trainer = Train_Images()
+    trainer.train_project()
