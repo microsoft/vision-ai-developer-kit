@@ -26,6 +26,7 @@ def train_project(subscription_key):
     cherry_tag = trainer.create_tag(project.id, "Japanese Cherry")
 
     print("Adding images...")
+    # Change folder and tag to user's training image folder and tag - example here
     hemlock_dir = os.path.join(IMAGES_FOLDER, "Hemlock")
     for image in os.listdir(hemlock_dir):
         with open(os.path.join(hemlock_dir, image), mode="rb") as img_data: 

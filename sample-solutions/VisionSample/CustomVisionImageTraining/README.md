@@ -5,13 +5,12 @@
 
 ** Part 2: Instruction for Training Vision Models using Azure Machine Learning Vision Cognitive **
 
-Thursday, March 14, 2019
-2:16 PM
-
 Note: This is a demo project to show you how to create custom vision model files
 
 Prerequisites: Account at
 https://www.customvision.ai/projects
+Instruction:
+https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial
 
 **Part 1: Vision AI Environment Setup**
 
@@ -115,4 +114,4 @@ Part 2 - Training Models
 	download trained model files
 	(Note: DLC file only can be downloaded at test site: https://iris-demo1.azurewebsites.net/ )
 
-	7. Deploy this model on IoTEdgeSolution Project. Please read the project README.md
+	7. Deploy this model on IoTEdgeSolution Project. Please read the project IoTEdgeSolution/README.md
