@@ -53,7 +53,7 @@ def train_project(subscription_key):
     for export_type in exports:
         print(export_type)
     print("Training Done!")
-    print("Please downlaod your model from customvisison.ai portal until we GA this build this step need to be done manually ...")
+    print("Please download your model from custom vision AI portal until we GA this build this step need to be done manually ...")
 
     return project
 
