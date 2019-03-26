@@ -24,19 +24,28 @@ def ChangeDir(new_dir):
     try:
         os.chdir(new_dir)
     except:
-        pass
+        return False
+    return True
 
 # Set current, scripts, src directories
 current_dir = os.getcwd()
-scripts_dir = os.path.join(current_dir, 'MachineLearning/scripts')
-src_dir = os.path.join(current_dir, 'MachineLearning/src')
+print('The current directory is {}.' .format(current_dir))
+
+scripts_dir = os.path.join(current_dir, 'MachineLearning\\scripts')
+src_dir = os.path.join(current_dir, 'MachineLearning\\src')
 
 # Import model settings from current_config.py
-ChangeDir(scripts_dir)
-from model_configs.current_config import cfg
-print('Model Path: {}' .format(cfg.MODEL_PATH))
-print('Model Input Node: {}' .format(cfg.MODEL_INPUT_NODE))
-ChangeDir(current_dir)
+if ChangeDir(scripts_dir):
+    from model_configs.current_config import cfg
+    print('Model Path: {}' .format(cfg.MODEL_PATH))
+    ChangeDir(current_dir)
+else:
+    raise Exception('Fail to import current_config.py file \
+caused by cannot change directory to {}.\n\
+Please check whether the current directory opened by \
+[Open Folder] command is VisionSample directory or not.  \
+Refer to README.md for more detail.' .format(scripts_dir))
+
 
 #%% [markdown]
 # ## Connect Workspace
@@ -114,7 +123,6 @@ print(converted_model.name, converted_model.url, converted_model.version, conver
 # ## Build Container Image
 
 #%%
-# NEW version of main.py
 from azureml.core.image import Image
 from azureml.contrib.iot import IotContainerImage
 

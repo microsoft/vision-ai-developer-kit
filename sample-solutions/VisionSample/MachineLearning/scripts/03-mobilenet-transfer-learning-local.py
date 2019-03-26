@@ -59,7 +59,7 @@ finally:
     os.chdir(current_dir)
 
 #%% [markdown]
-# ### Retrain a new model by soda_cans dataset on a local machine
+# ### Retrain a new MobileNet V1 model with poker6 dataset on a local machine
 
 #%%
 # Retrain mobilenet model by run command
