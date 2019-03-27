@@ -1,4 +1,3 @@
-
 {
   "modulesContent": {
     "$edgeAgent": {
@@ -9,11 +8,12 @@
           "settings": {
             "minDockerVersion": "v1.25",
             "loggingOptions": "",
-            "registryCredentials": {"amlvdaik10491222845": {
-			"username": "amlvdaik10491222845",
-			"password":"SjdV7uqA+ByKoBSuD+TGy50F+rq2eo2Q",
-			"address":"amlvdaik10491222845.azurecr.io",
-		}
+            "registryCredentials": {
+              "amlvdaik10491222845": {
+                "username": "amlvdaik10491222845",
+                "password": "SjdV7uqA+ByKoBSuD+TGy50F+rq2eo2Q",
+                "address": "amlvdaik10491222845.azurecr.io",
+              }
             }
           }
         },

@@ -1,117 +1,99 @@
 
 # The README Instruction
 
-** Part 1: Vision AI Environment Setup **
+> Note: This is a demo project to show you how to create custom vision model files
 
-** Part 2: Instruction for Training Vision Models using Azure Machine Learning Vision Cognitive **
+## Prerequisites
 
-Note: This is a demo project to show you how to create custom vision model files
+Account at <https://www.customvision.ai/projects>.
+Instructions at <https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial>.
 
-Prerequisites: Account at
-https://www.customvision.ai/projects
-Instruction:
-https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial
-
-**Part 1: Vision AI Environment Setup**
+## Part 1: Vision AI Environment Setup
 
 This notes provide instructions "How to setup Azure Vision AI Environment"
 
-**Windows 10:**
+### Windows 10
 
-	1. Install Python 3.7+
-	Download Python 3.7+ software at https://www.python.org
-	How to document at https://docs.python.org/3/
-	
-	2. Install Git
-	Download Git software at https://git-scm.com/downloads
-	How to install in windows exe at
-	https://git-scm.com/download/win
-	Optional instruction:
-	https://www.onlinetutorialspoint.com/git/how-to-install-git-windows-10-operating-system.html
-	https://cs.hofstra.edu/docs/pages/guides/git_win_install.html
+1. Install Python 3.7+
+   - Download Python 3.7+ software at <https://www.python.org>.
+   - "How to" document at <https://docs.python.org/3/>.
+1. Install Git
+   - Download Git software at <https://git-scm.com/downloads>.
+   - "How to" install in windows exe at <https://git-scm.com/download/win>.
+   - Optional instructions:
+      - <https://www.onlinetutorialspoint.com/git/how-to-install-git-windows-10-operating-system.html>.
+      - <https://cs.hofstra.edu/docs/pages/guides/git_win_install.html>.
+1. Python Visual Studio Code
+   - <https://code.visualstudio.com/docs/languages/python>.
+   - Tutorial at <https://code.visualstudio.com/docs/python/python-tutorial>.
+1. Open "Windows PowerShell" or "Command Prompt" with "Run as administrator"
+   - Reference guide can be found at <https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial>.
 
+To install the vision AI libraries, type `pip install --upgrade azure-cognitiveservices-vision-customvision`.
 
-	3. Python Visual Studio Code
-	https://code.visualstudio.com/docs/languages/python
-	Tutorial at
-	https://code.visualstudio.com/docs/python/python-tutorial
+### Linux/iOS
 
-	4. Open "Windows PowerShell" or "Command Prompt" with "run as administrator"
-	Reference guide can be found at https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial
-	
-	install vision AI libraries, type command
-	>pip install --upgrade azure-cognitiveservices-vision-customvision
+1. Login to Ubuntu or Ubuntu VM version 18.04.
+1. Install and configure development software.
+   1. Install the build tools.
 
+      ```terminal
+      sudo apt-get install build-essential checkinstall
+      sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev
+         \ libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
+      sudo apt-get install libffi-dev
+      ```
 
-**Linux/iOS:**
+   1. Download Python 3.7.2.
 
+      ```terminal
+      cd /usr/src
+      sudo wget https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
+      ```
 
-	1. Login Ubuntu or Ubuntu VM version 18.04;
+   1. Extract tgz: `sudo tar xzf Python-3.7.2.tgz`
+   1. Compile.
 
-	2.Default Python maybe 3.5 or 3.6. Install Python 3.7.2:
-	    2.1 install build tools:
-		$sudo apt-get install build-essential checkinstall
-		$sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev \
-		    	libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
-		$sudo apt-get install libffi-dev
-	
-	    2.2 Download python 3.7.2:
-		$cd /usr/src
-		$sudo wget https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
+      ```terminal
+      cd Python-3.7.2
+      sudo ./configure --enable-optimizations
+      sudo make altinstall
+      ```
 
-	    2.3 Extract tgz:
-		$sudo tar xzf Python-3.7.2.tgz
-	
-	    2.4 Compile:
-		$cd Python-3.7.2
-		$sudo ./configure --enable-optimizations
-		$sudo make altinstall
-	
-	    2.5 Add alias into ~/.bashrc
-		alias python='/usr/local/bin/python3.7m'
-	 3. Install pip:
-		$curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-		$sudo python get-pip.py
-		$sudo pip install --upgrade pip
-	
-	 4. Following steps same as Windows users (use sudo for admin users)
-		Optional use PyCharm or Intellij Community SDK
+   1. Add alias into ~/.bashrc: `alias python='/usr/local/bin/python3.7m'`
+   1. Install pip:
 
-Part 2 - Training Models
+       ```terminal
+       curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+       sudo python get-pip.py
+       sudo pip install --upgrade pip
+       ```
 
-	1. Azure Vision Machine Learning API documents and Custom Vision API Document locates at
-	https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/
+The following steps are the same as Windows users (use sudo for admin users). Optionally use PyCharm or Intellij Community SDK
 
-	How to Create Account and Get Started Guide at
-		https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/getting-started-build-a-classifier
-	
-	2.Prepare Image files
-	Image samples are located at "images" folder
+## Part 2 - Training Models
 
-![alt text](folder.PNG)
+1. Azure Vision Machine Learning API documents and Custom Vision API Document locates at <https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/>.
+   - How to Create Account and Get Started Guide at <https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/getting-started-build-a-classifier>.
+1. Prepare Image files
+   - Image samples are located in the **images** folder
 
+   ![alt text](folder.PNG)
+1. Start VS Code and open folder **vision-ai-developer-kit/sample-solutions/VisionSample/CustomVisionImageTraining**
+   - Sample python scripts are located in the **python** folder
+1. Sign in at <https://www.customvision.ai/projects> and click the settings icon to get your training key and endpoint
+   - Or use the testing site at <https://iris-demo1.azurewebsites.net/>
+   - Modify **__init__.py** in the python folder (contains vision AI training keys)
 
-	3.Start Visual Studio Code and Open folder
-	   vision-ai-developer-kit\sample-solutions\VisionSample\CustomVisionImageTraining
-	   Sample python scripts are located at "python" folder
+      ```python
+      TRAINING_KEY = "<place training key here>"
+      TRAINING_ENDPOINT = "<e.g. https://irisdemo1.azure-api.net/customvision/v3.0/Training/>"
+      ```
 
-	4. Sign in Account and click setting button:
-	   https://www.customvision.ai/projects
-	   Or Testing site: https://iris-demo1.azurewebsites.net/
-
-	   Modify python folder	__init__.py contains vision AI training keys
-		TRAINING_KEY = "place training key here"
-		TRAINING_ENDPOINT = "https://irisdemo1.azure-api.net/"
-
-![alt text](project.PNG)
-
-
-	5.Save changes and right click - custom_vision_training_sample.py
-	   Run Python File in Terminal
-
-	6. Go to project:
-	https://www.customvision.ai/projects
-	download trained model files
-	(Note: DLC file only can be downloaded at test site: https://iris-demo1.azurewebsites.net/ )
-
-	7. Deploy this model on IoTEdgeSolution Project. Please read the project IoTEdgeSolution/README.md
+   ![alt text](project.PNG)
+1. Save changes and right click - custom_vision_training_sample.py
+   - Run Python File in Terminal
+1. Go to project <https://www.customvision.ai/projects>
+   - Download trained model files
+   > Note: DLC file can only be downloaded at test site <https://iris-demo1.azurewebsites.net/>
+1. Deploy this model on the IoTEdgeSolution Project. Please read the project [../IoTEdgeSolution/README.md](../IoTEdgeSolution/README.md)

@@ -1,4 +1,3 @@
-
 {
   "modulesContent": {
     "$edgeAgent": {
@@ -9,11 +8,12 @@
           "settings": {
             "minDockerVersion": "v1.25",
             "loggingOptions": "",
-            "registryCredentials": {"tedwayamacrivjlqded": {
-			"username": "tedwayamacrivjlqded",
-			"password":"Ik1prTaWTALE5QcIAwJqijW0zAH/u4qb",
-			"address":"tedwayamacrivjlqded.azurecr.io",
-		}
+            "registryCredentials": {
+              "tedwayamacrivjlqded": {
+                "username": "tedwayamacrivjlqded",
+                "password": "Ik1prTaWTALE5QcIAwJqijW0zAH/u4qb",
+                "address": "tedwayamacrivjlqded.azurecr.io",
+              }
             }
           }
         },

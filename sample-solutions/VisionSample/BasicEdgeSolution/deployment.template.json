@@ -1,4 +1,3 @@
-
 {
   "modulesContent": {
     "$edgeAgent": {
@@ -12,8 +11,8 @@
             "registryCredentials": {
               "${REGISTRY_NAME}": {
                 "username": "${REGISTRY_USER_NAME}",
-                "password":"${REGISTRY_PASSWORD}",
-                "address":"${REGISTRY_NAME}.azurecr.io"
+                "password": "${REGISTRY_PASSWORD}",
+                "address": "${REGISTRY_NAME}.azurecr.io"
               }
             }
           }
