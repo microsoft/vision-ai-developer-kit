@@ -39,16 +39,16 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 1. Click **[Run Cell]** or **[Run All Cells]** link on the top line of the cell. It will create a new workspace if it doesn’t exist and write a config.json file under the aml_config folder.
 
-1. Open **01-convert-model-containerize.py** under the MachineLearning\scripts folder and click **[Run Cell]** or **[Run All Cells]** link to register the model, convert the model, create a container image, and write settings related to the container image to the .env file under the EdgeSolution folder.
+1. Open **01-convert-model-containerize.py** under the MachineLearning\scripts folder and click **[Run Cell]** or **[Run All Cells]** link to register the model, convert the model, create a container image, and write settings related to the container image to the .env file under the DeployContainerFromAML folder.
     > Note:
     >   * **01-convert-model-containerize.py** script will import settings from **current_config.py** file in **MachineLearning\scripts\model_configs** folder.  So, this script can be reused to create container image for different model by changing **current_config.py**'s content.
     >   * When change to process a different model, remember to click **Restart** button on the top line in **Python Interactive** window to restart **iPython kernel** to prevent unexpected cache error.
 
-1. Right-click **deployment.template.json** file under the EdgeSolution folder and select **[Generate IoT Edge Deployment Manifest]** command to create a new deployment.json file under the EdgeSolution\config folder.
+1. Right-click **deployment.template.json** file under the DeployContainerFromAML folder and select **[Generate IoT Edge Deployment Manifest]** command to create a new deployment.json file under the DeployContainerFromAML\config folder.
 
 1. Click **[Explorer]** icon, click **[…]** at **[AZURE IOT HUB DEVICES]** section right side, and select **[Select IoT Hub]** command to select an IoT Hub.
 
-1. Expand **[AZURE IOT HUB DEVICES]** section, right-click an IoT Edge device, select **[Create Deployment for Single Device]** command, select **deployment.json** file under the EdgeSolution\config folder, and click the **[Select Edge Deployment Manifest]** button to deploy the container image to the IoT Edge device.
+1. Expand **[AZURE IOT HUB DEVICES]** section, right-click an IoT Edge device, select **[Create Deployment for Single Device]** command, select **deployment.json** file under the DeployContainerFromAML\config folder, and click the **[Select Edge Deployment Manifest]** button to deploy the container image to the IoT Edge device.
 
 1. Setup the Vision AI Developer Kit to connect to the IoT Edge device and deploy the module image.
 
@@ -100,8 +100,8 @@ Refer to [MachineLearning/ssd_sample/README.md](./MachineLearning/ssd_sample/REA
 
 1. After the model is built, click **Export** button in the Performance tab of the <https://www.customvision.ai> portal, and download the trained vision model for the Vision AI DevKit.
 
-1. Copy the exported **model.dlc** and **labels.txt** files to the MachineLearning\BasicEdgeSolution\modules\VisionSampleModule\model folder.
+1. Copy the exported **model.dlc** and **labels.txt** files to the MachineLearning\CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
 
-1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\caffe_v2_fork_scissors folder to the MachineLearning\BasicEdgeSolution\modules\VisionSampleModule\model folder.
+1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\caffe_v2_fork_scissors folder to the MachineLearning\CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
 
-1. Refer to [MachineLearning/BasicEdgeSolution/README.md](./MachineLearning/BasicEdgeSolution/README.md) to build a local container image and deploy the exported Azure Custom Vision model.
+1. Refer to [MachineLearning/CreateAndDeployEdgeContainer/README.md](./MachineLearning/CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the exported Azure Custom Vision model.
