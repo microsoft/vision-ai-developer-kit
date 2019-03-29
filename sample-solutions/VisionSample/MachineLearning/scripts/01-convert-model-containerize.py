@@ -177,7 +177,7 @@ username = result.username
 password = result.passwords[0].value
 
 #%%
-with open('EdgeSolution/.env', 'w') as env_file:
+with open('DeployContainerFromAML/.env', 'w') as env_file:
     env_file.write("MODULE_NAME={}\n" .format(cfg.MODULE_NAME))
     env_file.write("REGISTRY_NAME={}\n" .format(reg_name))
     env_file.write("REGISTRY_USER_NAME={}\n" .format(username))
