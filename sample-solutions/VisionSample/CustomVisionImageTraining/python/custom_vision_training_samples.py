@@ -1,6 +1,6 @@
 import os, __init__
 import time
-
+import urllib.request
 from azure.cognitiveservices.vision.customvision.training import CustomVisionTrainingClient
 
 MODEL_NAME = "plant"
@@ -12,11 +12,15 @@ MODEL_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "
 def train_project(subscription_key):
 
     trainer = CustomVisionTrainingClient(subscription_key, endpoint=__init__.TRAINING_ENDPOINT)
-
+    platform = ["VAIDK", "TensorFlow", "DockerFile", "CoreML"]
     # Create a new project
     print("Creating project...")
     print(__init__.CUSTOMVISION_PROJECT_NAME)
-    project = trainer.create_project(name=__init__.CUSTOMVISION_PROJECT_NAME, description=__init__.CUSTOMVISION_PROJECT_DESCRIPTION, domain_id=__init__.CUSTOMVISION_PROJECT_DOMAIN_ID)
+    project = trainer.create_project(name=__init__.CUSTOMVISION_PROJECT_NAME,
+                                     description=__init__.CUSTOMVISION_PROJECT_DESCRIPTION,
+                                     domain_id=__init__.CUSTOMVISION_PROJECT_DOMAIN_ID,
+                                     classification_type='Multiclass',
+                                     target_export_platforms=platform)
     # domains = trainer.get_domains()
     # for domain in domains:
     #     print(domain)
@@ -45,15 +49,23 @@ def train_project(subscription_key):
         time.sleep(1)
 
     # The iteration is now trained. Make it the default project endpoint
-    trainer.update_iteration(project.id, iteration.id, is_default=True)
+    trainer.update_iteration(project.id, iteration.id, name=iteration.id)
     performance = trainer.get_iteration_performance(project.id, iteration.id)
     print("Performance Precision: " + str(performance.precision))
     print("Precision STD Deviation: " + str(performance.precision_std_deviation))
-    exports = trainer.get_exports(project.id, iteration.id)
-    for export_type in exports:
-        print(export_type)
-    print("Training Done!")
-    print("Please download your model from custom vision AI portal until we GA this build this step need to be done manually ...")
+    export = trainer.export_iteration(project.id, iteration.id, "VAIDK")
+    print("export: " + str(export) + "\n" +
+          "project id: " + project.id + "\n" +
+          "iteration id: " + iteration.id)
+
+    exported_iterations = trainer.get_exports(project.id, iteration.id)
+    while exported_iterations[0].status != "Done":
+        time.sleep(1)
+        exported_iterations = trainer.get_exports(project.id, iteration.id)
+
+    print(exported_iterations[0].status, exported_iterations[0].platform, exported_iterations[0].download_uri)
+    urllib.request.urlretrieve(exported_iterations[0].download_uri, __init__.CUSTOMVISION_PROJECT_NAME+".zip")
+    print("Training Done!" + __init__.CUSTOMVISION_PROJECT_NAME + ".zip downloaded at current folder.")
 
     return project
 
