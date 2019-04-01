@@ -26,10 +26,12 @@ This notes provide instructions "How to setup Azure Vision AI Environment"
 1. Python Visual Studio Code
    - <https://code.visualstudio.com/docs/languages/python>.
    - Tutorial at <https://code.visualstudio.com/docs/python/python-tutorial>.
-1. Open "Windows PowerShell" or "Command Prompt" with "Run as administrator"
-   - Reference guide can be found at <https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial>.
 
-To install the vision AI libraries, type `pip install --upgrade azure-cognitiveservices-vision-customvision`.
+1. Open "Windows PowerShell" or "Command Prompt" with "Run as administrator"
+   - Reference guide can be found at <https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial>
+   - pip package: https://pypi.org/project/azure-cognitiveservices-vision-customvision/1.0.0/
+
+  To install the vision AI libraries, type `pip install azure-cognitiveservices-vision-customvision==1.0.0`
 
 ### Linux/iOS
 
