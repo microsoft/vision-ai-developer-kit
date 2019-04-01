@@ -3,9 +3,8 @@
 
 # CUSTOM VISION ACCOUNT SETTINGS
 # Copy keys from https://www.customvision.ai/projects OR https://iris-demo1.azurewebsites.net
-TRAINING_KEY = ""
-TRAINING_ENDPOINT = "https://irisdemo1.azure-api.net/"
-# TRAINING_ENDPOINT = "https://southcentralus.api.cognitive.microsoft.com/"
+TRAINING_KEY = "training key"
+TRAINING_ENDPOINT = "https://southcentralus.api.cognitive.microsoft.com/"
 
 # CUSTOM VISION PROJECT SETTINGS
 CUSTOMVISION_PROJECT_NAME = "Python Plants"
