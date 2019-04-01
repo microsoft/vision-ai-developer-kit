@@ -37,9 +37,9 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 1. Open **00-aml-configuration.py** under the MachineLearning\scripts folder and replace the 3 fake settings to your Azure Machine Learning Service Workspace settings.
 
-1. Click **[Run Cell]** or **[Run All Cells]** link on the top line of the cell. It will create a new workspace if it doesn’t exist and write a config.json file under the aml_config folder.
+1. Click **[Run Below]** link on the top line of 00-aml-configuration.py. It will create a new workspace or a new resource group if they don’t exist, and it will write a config.json file under the aml_config folder.
 
-1. Open **01-convert-model-containerize.py** under the MachineLearning\scripts folder and click **[Run Cell]** or **[Run All Cells]** link to register the model, convert the model, create a container image, and write settings related to the container image to the .env file under the DeployContainerFromAML folder.
+1. Open **01-convert-model-containerize.py** under the MachineLearning\scripts folder and click **[Run Cell | Run Above | Run Below]** link to register the model, convert the model, create a container image, and write settings related to the container image to the .env file under the DeployContainerFromAML folder.
     > Note:
     >   * **01-convert-model-containerize.py** script will import settings from **current_config.py** file in **MachineLearning\scripts\model_configs** folder.  So, this script can be reused to create container image for different model by changing **current_config.py**'s content.
     >   * When change to process a different model, remember to click **Restart** button on the top line in **Python Interactive** window to restart **iPython kernel** to prevent unexpected cache error.
@@ -63,12 +63,12 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 ## Retrain MobileNet V1 Classification Model
 
 1. Retrain the MobileNet V1 model with the soda_cans dataset on cloud:
-    * Open **02-mobilenet-transfer-learning-cloud.py** and click **[Run All Cells]** link to retrain a new MobileNet V1 model on cloud with soda_cans dataset in the MachineLearning\data\soda_cans folder.
+    * Open **02-mobilenet-transfer-learning-cloud.py** and click **[Run Cell | Run Above | Run Below]** link to retrain a new MobileNet V1 model on cloud with soda_cans dataset in the MachineLearning\data\soda_cans folder.
     * After the script execution finished, it will write a va-snpe-engine-library_config.json config file to the MachineLearning\models\mobilenet-retrain-cloud/outputs folder and overwrite current_config.py content by mobilenet_retrain_cloud_config.py in the MachineLearning\scripts\model_configs folder.
     * Repeat step 7 and 8 in **[Deploy a Model Container Image in VS Code]** section to open and execute `01-convert-model-containerize.py` to convert model, create container image, and generate deployment.json for deploying the new MobileNet V1 model retrained on soda_cans dataset.
 
 1. Retrain the MobileNet V1 model with poker6 dataset on a local machine:
-    * Open **03-mobilenet-transfer-learning-local.py** and click **[Run All Cells]** link to retrain a new MobileNet V1 model on a local machine with poker6 dataset in the MachineLearning\data folder.
+    * Open **03-mobilenet-transfer-learning-local.py** and click **[Run Cell | Run Above | Run Below]** link to retrain a new MobileNet V1 model on a local machine with poker6 dataset in the MachineLearning\data folder.
     * After the script execution finished, it will write a va-snpe-engine-library_config.json config file to the MachineLearning\models\mobilenet-retrain-local folder and overwrite current_config.py content by mobilenet_retrain_local_config.py in the MachineLearning\scripts\model_configs folder.
     * Repeat step 7 and 8 in **[Deploy a Model Container Image in VS Code]** section to open and execute `01-convert-model-containerize.py` to convert the model, create container image, and generate deployment.json for deploying the new MobileNet V1 model retrained on poker6 dataset.
 
