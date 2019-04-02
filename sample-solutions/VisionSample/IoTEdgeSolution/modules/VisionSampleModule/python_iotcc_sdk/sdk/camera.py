@@ -550,7 +550,7 @@ class CameraClient():
         return response["status"]
 
     @contextmanager
-    def captureimage(self):
+    def captureimage(self, folder='pictures', prefix='orange'):
         """
         This method is for taking a snapshot.
 
@@ -569,8 +569,13 @@ class CameraClient():
         if response["Error"] != "none":
             self.logger.error(response["Error"])
             return False
-
-        file_name = os.path.join(os.path.dirname(os.path.abspath(__name__)), 'snapshot_' + str(response["Timestamp"])+ '.jpg')
+        picture_folder = os.path.join(os.path.dirname(os.path.abspath(__name__)), folder)
+        if not os.path.exists(picture_folder):
+            os.makedirs(picture_folder)
+        tag_folder = os.path.join(os.path.dirname(os.path.abspath(__name__)), folder, prefix)
+        if not os.path.exists(tag_folder):
+            os.makedirs(tag_folder)
+        file_name = os.path.join(os.path.dirname(os.path.abspath(__name__)), prefix + '_' + str(response["Timestamp"])+ '.jpg')
         self.logger.info("Storing snapshot: {}".format(file_name))
         with open(file_name,"wb") as f:
             f.write(base64.b64decode(response["Data"]))
