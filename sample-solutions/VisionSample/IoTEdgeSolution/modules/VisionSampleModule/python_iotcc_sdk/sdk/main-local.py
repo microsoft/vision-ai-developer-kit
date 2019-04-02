@@ -20,7 +20,7 @@ from cv2 import cv2
 def main(protocol=None):
     print("\nPython %s\n" % sys.version)
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p','--pushmodel',help ='sets whether to push the model and required files to device or not', default=True)
+    parser.add_argument('-p', '--pushmodel', help ='sets whether to push the model and required files to device or not', default=True)
     parser.add_argument('--ip', help='ip address of the camera', default=utility.getWlanIp())
     parser.add_argument('--username', help='username of the camera', default='admin')
     parser.add_argument('--password', help='password of the camera', default='admin')
@@ -32,32 +32,32 @@ def main(protocol=None):
     username = args.username
     password = args.password
 
-    #Please change this address to camer ip address can be found by using adb shell -> ifconfig
+    # Please change this address to camer ip address can be found by using adb shell -> ifconfig
     ip_addr = '192.168.0.104'
-    #hub_manager = iot.HubManager()
+    # hub_manager = iot.HubManager()
     utility.transferdlc()
     with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
       
-        #this call we set the camera to dispaly over HDMI 
+        # this call we set the camera to dispaly over HDMI
         print(camera_client.configure_preview(resolution="1080P",display_out=1))
         # this call turns on the camera and start transmetting over RTSP and HDMI a stream from camera 
         camera_client.set_preview_state("on")
        
-        #rtsp stream address 
+        # rtsp stream address
         
         rtsp_stream_addr = str(camera_client.preview_url)
         print("rtsp stream is :: " + rtsp_stream_addr)
 
-       #if not camera_client.captureimage():
-            #print("captureimage failed")
-        #Vam(Video analytics engine ) this will take the model and run on thee device 
+        # if not camera_client.captureimage():
+            # print("captureimage failed")
+        # Vam(Video analytics engine ) this will take the model and run on thee device
         camera_client.set_analytics_state("on")
         print(camera_client.vam_url)
         
         # this will set the frames to be overlayed with information recieved from inference results ffrom your model
         camera_client.configure_overlay("inference")
 
-        #Turning overlay to Truse to see inferencing frame overlayed with inference results
+        # Turning overlay to Truse to see inferencing frame overlayed with inference results
         camera_client.set_overlay_state("on")
 
         # heer we will use gstreamer to get the inference results from camera into thsi module and then send them up to cloud or another module
@@ -84,9 +84,9 @@ def print_inferences(results=None, camera_client=None):
                 print("label={}".format(label))
                 confidence = object.confidence
                 print("confidence={}".format(confidence))
-                #if int(confidence) >= 90:
-                    #if not camera_client.captureimage():
-                        #print("captureimage failed for {}".format(label))
+                # if int(confidence) >= 90:
+                    # if not camera_client.captureimage():
+                        # print("captureimage failed for {}".format(label))
                 x = object.position.x
                 y = object.position.y
                 w = object.position.width

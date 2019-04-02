@@ -577,38 +577,6 @@ class CameraClient():
         return True
 
     @contextmanager
-    def captureImageWithFolder(self, folder, tag1):
-        """
-        This method is for taking a snapshot.
-
-        The snapshot is taken and stored as snapshot_<timestamp>.jpg
-        when the call is successful.
-
-        Returns
-        -------
-        bool
-            True if the request was successful. False on failure.
-
-        """
-        path = "/captureimage"
-        payload = '{ }'
-        response = self.ipc_provider.post(path, payload)
-        if response["Error"] != "none":
-            self.logger.error(response["Error"])
-            return False
-        picture_folder = os.path.join(os.path.dirname(os.path.abspath(__name__)), folder)
-        if not os.path.exists(picture_folder):
-            os.makedirs(picture_folder)
-        tag_folder = os.path.join(os.path.dirname(os.path.abspath(__name__)), folder, tag1)
-        if not os.path.exists(tag_folder):
-            os.makedirs(tag_folder)
-        file_name = os.path.join(tag_folder, tag1 + str(response["Timestamp"])+ '.jpg')
-        self.logger.info("Storing snapshot: {}".format(file_name))
-        with open(file_name,"wb") as f:
-            f.write(base64.b64decode(response["Data"]))
-        return True
-
-    @contextmanager
     def logout(self):
         """
         This method is for logging out from the camera.
