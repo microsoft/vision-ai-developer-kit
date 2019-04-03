@@ -6,7 +6,6 @@ import argparse
 import sys
 import time
 import subprocess
-
 import os
 
 from camera import CameraClient
@@ -33,9 +32,9 @@ def main(protocol=None):
     password = args.password
 
     #Please change this address to camer ip address can be found by using adb shell -> ifconfig
-    ip_addr = '192.168.0.104'
+    ip_addr = '192.168.0.103'
     #hub_manager = iot.HubManager()
-    utility.transferdlc()
+    #utility.transferdlc()
     with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
       
         #this call we set the camera to dispaly over HDMI 
@@ -48,8 +47,8 @@ def main(protocol=None):
         rtsp_stream_addr = str(camera_client.preview_url)
         print("rtsp stream is :: " + rtsp_stream_addr)
 
-       #if not camera_client.captureimage():
-            #print("captureimage failed")
+        if not camera_client.captureimage():
+            print("captureimage failed")
         #Vam(Video analytics engine ) this will take the model and run on thee device 
         camera_client.set_analytics_state("on")
         print(camera_client.vam_url)
