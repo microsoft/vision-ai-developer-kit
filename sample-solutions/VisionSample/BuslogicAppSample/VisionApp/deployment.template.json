@@ -83,7 +83,7 @@
     "BusLogicModule": {
       "properties.desired":{
         "ObjectOfInterest":"person",
-        "EmailToSendNotification" : "initmahesh@gmail.com"
+        "EmailToSendNotification" : "tomyaicamera@gmail.com"
       }
     }
   }
