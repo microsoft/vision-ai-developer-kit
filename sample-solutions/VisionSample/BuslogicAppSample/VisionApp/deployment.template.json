@@ -11,9 +11,9 @@
             "loggingOptions": "",
             "registryCredentials": {
               "mycapreg": {
-                "username": "$CONTAINER_REGISTRY_USERNAME_mycapreg",
-                "password": "$CONTAINER_REGISTRY_PASSWORD_mycapreg",
-                "address": "mycapreg.azurecr.io"
+                "username": "$CONTAINER_REGISTRY_USERNAME",
+                "password": "$CONTAINER_REGISTRY_PASSWORD",
+                "address": "$CONTAINER_REGISTRY_ADDRESS"
               }
             }
           }
