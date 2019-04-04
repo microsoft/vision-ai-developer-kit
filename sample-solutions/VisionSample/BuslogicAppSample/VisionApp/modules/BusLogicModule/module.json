@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "mycapreg.azurecr.io/buslogicmodule",
+        "repository": "$CONTAINER_REGISTRY_ADDRESS/buslogicmodule",
         "tag": {
             "version": "0.0.4",
             "platforms": {
