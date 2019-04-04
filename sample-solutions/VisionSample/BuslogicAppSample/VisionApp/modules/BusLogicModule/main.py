@@ -23,7 +23,7 @@ from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubE
 MESSAGE_TIMEOUT = 10000
 OBJECT_OF_INTEREST = "person"
 OBJECT_CONFIDENCE = 65
-Email_To_SendNotification = "initmahesh@gmail.com"
+Email_To_SendNotification = "tomyaicamera@gmail.com"
 TWIN_CALLBACKS = 0
 
 # global counters
