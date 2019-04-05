@@ -26,12 +26,7 @@ def main(protocol=None):
 
     with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
         #transferring model files to device
-        isTransfer = str(os.getenv("TRANSFER_DLC_MODEL", "True"))
-        if isTransfer == "True":
-            utility.transferdlc()
-            print('Transfer dlc model files to device: YES.')
-        else:
-            print('Transfer dlc model files to device: NO.')
+        utility.transferdlc()
 
         print(camera_client.configure_preview(display_out=1))
 
