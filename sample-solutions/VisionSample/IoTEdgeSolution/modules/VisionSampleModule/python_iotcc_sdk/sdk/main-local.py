@@ -13,8 +13,8 @@ from camera import CameraClient
 import utility
 import traceback
 
-import numpy as np
-from cv2 import cv2
+#import numpy as np
+#from cv2 import cv2
 
 def main(protocol=None):
     print("\nPython %s\n" % sys.version)
