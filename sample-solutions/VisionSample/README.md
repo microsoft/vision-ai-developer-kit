@@ -1,12 +1,12 @@
 # Deploy Deep Learning Models to Vision AI Developer Kit Using Visual Studio Code
 
-This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edge to convert a model, build a container image, and deploy a model image to Vision AI Vision AI Developer Kit in Visual Studio Code.
+This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edge to convert a model, build a container image, and deploy a model image to Vision AI Developer Kit in Visual Studio Code.
 
 ## Setup Visual Studio Code Development Environment
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/Download) (VS Code).
 
-1. Install 64 bit [Anaconda with Python version 3.7](https://www.anaconda.com/distribution), and add Anaconda path to the System PATH environment variable.
+1. Install 64 bit [Anaconda with Python version 3.7](https://www.anaconda.com/distribution).
 
 1. Install the following extensions for VS Code:
     * [Azure Machine Learning](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.vscode-ai) ([Azure Account](https://marketplace.visualstudio.com/items?itemName=ms-vscode.azure-account) and the [Microsoft Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) will be automatically installed)
@@ -100,8 +100,8 @@ Refer to [MachineLearning/ssd_sample/README.md](./MachineLearning/ssd_sample/REA
 
 1. After the model is built, click **Export** button in the Performance tab of the <https://www.customvision.ai> portal, and download the trained vision model for the Vision AI DevKit.
 
-1. Copy the exported **model.dlc** and **labels.txt** files to the MachineLearning\CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+1. Copy the exported **model.dlc** and **labels.txt** files to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
 
-1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\caffe_v2_fork_scissors folder to the MachineLearning\CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\caffe_v2_fork_scissors folder to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
 
-1. Refer to [vision-ai-developer-kit/CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the exported Azure Custom Vision model.
+1. Refer to [CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the exported Azure Custom Vision model.
