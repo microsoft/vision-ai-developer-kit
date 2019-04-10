@@ -1,7 +1,7 @@
 
 # Vision AI Developer Kit
 
-This repo contains the pieces needed to use the Vision AI Developer kit (VAI DevKit) to develop Neural Network models which can be deployed to the VAI DevKit reference hardware. Manufactured through a partnership between [Altek](http://www.altek.com.tw/en-global/news/detail/127) and [eInfochips](https://www.einfochips.com/partnerships-and-alliances/digital-partnerships/microsoft/), the VAI DevKit is based on the [Qualcomm QCS603](https://www.qualcomm.com/products/vision-intelligence-300-platform) chipset, which is a member of the [Qualcomm Vision Intelligence Platform](https://developer.qualcomm.com/hardware/vertical-platforms/vision-intelligence-platform).
+This repo contains the pieces needed to use the Vision AI Developer kit (VAI DevKit) to develop Neural Network models which can be deployed to the Vision AI DevKit hardware. Manufactured through a partnership between [Altek](http://www.altek.com.tw/en-global/news/detail/127) and [eInfochips](https://www.einfochips.com/partnerships-and-alliances/digital-partnerships/microsoft/), the VAI DevKit is based on the [Qualcomm QCS603](https://www.qualcomm.com/products/vision-intelligence-300-platform) chipset, which is a member of the [Qualcomm Vision Intelligence Platform](https://developer.qualcomm.com/hardware/vertical-platforms/vision-intelligence-platform).
 
 # Contributing
 
