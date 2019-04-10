@@ -105,3 +105,5 @@ Refer to [MachineLearning/ssd_sample/README.md](./MachineLearning/ssd_sample/REA
 1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\caffe_v2_fork_scissors folder to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
 
 1. Refer to [CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the exported Azure Custom Vision model.
+
+1. If you want to use the Custom Vision SDK with Python to build an image classification model and an object detection model, please refer to [Quickstart: Create an image classification project with the Custom Vision Python SDK](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial) for a classification model and [Quickstart: Create an object detection project with the Custom Vision Python SDK](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial-od) for an object detection model.
