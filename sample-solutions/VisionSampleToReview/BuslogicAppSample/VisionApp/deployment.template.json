@@ -1,0 +1,90 @@
+{
+  "$schema-template": "1.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "mycapreg": {
+                "username": "$CONTAINER_REGISTRY_USERNAME",
+                "password": "$CONTAINER_REGISTRY_PASSWORD",
+                "address": "$CONTAINER_REGISTRY_ADDRESS"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": "{\"User\":\"root\",\"HostConfig\":{\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}], \"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}",
+              "env": {
+                "UpstreamProtocol": {
+                    "value": "MQTT "
+                },
+                "OptimizeForPerformance": {
+                  "value": "false"
+              }
+            }
+            }
+          }
+        },
+        "modules": {
+          "VisionSampleModule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/aivision/visionsamplemodule:1.0.7_SSD-arm32v7",
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/data/misc/camera:/app/vam_model_folder\"],\"NetworkMode\":\"host\"},\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"Cmd\":[\"-p True\"]}"
+            }
+          },
+          "BusLogicModule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.BusLogicModule.arm32v7}",
+              "createOptions": "{\"User\":\"root\"}"
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "BusLogicModuleToIoTHub": "FROM /messages/modules/BusLogicModule/outputs/output1/* INTO $upstream",
+          "sensorToBusLogicModule": "FROM /messages/modules/VisionSampleModule/outputs/* INTO BrokeredEndpoint(\"/modules/BusLogicModule/inputs/input1\")"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    },
+    "BusLogicModule": {
+      "properties.desired":{
+        "ObjectOfInterest":"person",
+        "EmailToSendNotification" : "tomyaicamera@gmail.com"
+      }
+    }
+  }
+}
