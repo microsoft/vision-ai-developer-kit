@@ -45,10 +45,10 @@ modules\\**BusinessLogicModule** folder includes:
    * **main.py** file: implements a business logic to send a detected message received from VisionSampleModule with adding an extra property ["MessageSender", "BusinessLogicModule"] to IoT Hub while detecting a target object, for example: “scissors”.  
 Refer to [Tutorial: Deploy Azure functions as IoT Edge modules](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-deploy-function) for more detail about business logic.
    * **module.json** file: config file for this module.
-   *  **requirements.txt** file: required to be installed Python packages.
+   *  **requirements.txt** file: Python packages required to be installed .
 
 1. Overwrite **deployment.template.json**'s content by **02-visionsample-deployment.template.json** file.  It includes two modules: VisionSampleModule and BusinessLogicModule.
-Base on the model copied to the **modules\VisionSampleModule\model** folder to change the setting **ObjectOfInterest** at the end of this file to the object class you want to send a detected messgae to Azure IoT Hub.
+Base on the model copied to the **modules\VisionSampleModule\model** folder to change the setting **ObjectOfInterest** at the end of deployment.template.json file to the object label you want to send a detected messgae to Azure IoT Hub.
 
 2. Use the same build steps listed in [Build a Local Container Image with a Single Module: VisionSampleModule] sction to build a local container image with two modules.
 
