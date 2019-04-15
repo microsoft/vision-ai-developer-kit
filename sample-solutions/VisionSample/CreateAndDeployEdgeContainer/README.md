@@ -6,7 +6,7 @@ For users already have DLC files, they can build an IoT Edge module **VisionSamp
 
 1. Refer to [**Setup Visual Studio Code Development Environment**] section in [VisionSample README.md](../README.md) to setup build environment.
 
-1. Install [**Docker Community Edition (CE)**](https://docs.docker.com/install/).  Don't sign in **Docker Desktop** after Docker CE installed.
+1. Install [**Docker Community Edition (CE)**](https://docs.docker.com/install/#supported-platforms).  Don't sign in **Docker Desktop** after Docker CE installed.
 
 1. Install [**Docker Extension**](https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker) to **Visual Studio Code**.
 
