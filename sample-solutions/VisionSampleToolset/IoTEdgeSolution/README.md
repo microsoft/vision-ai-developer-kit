@@ -4,12 +4,16 @@ This solution is used to build and deploy a new VisionSampleModule developed by 
 
 ## Setup Build Environment
 
-Refer to [Setup Visual Studio Code Development Environment] section in [VisionSample README.md](../../VisionSample/README.md) to setup build environment.
+1. Refer to [**Setup Visual Studio Code Development Environment**] section in [VisionSample README.md](../../VisionSample/README.md) to setup build environment.
+
+1. Install [**Docker Community Edition (CE)**](https://docs.docker.com/install/).  Don't sign in **Docker Desktop** after Docker CE installed.
+
+1. Install [**Docker Extension**](https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker) to **Visual Studio Code**.
+
 
 ## Develop a New VisionSampleModule
 
 Refer to [modules/VisionSampleModule/python_iotcc_sdk/README.md](modules/VisionSampleModule/python_iotcc_sdk/README.md) to develop and test source code for a new **VisionSampleModule**.
-
 
 ## Build a Local Container Image for VisionSampleModule
 
