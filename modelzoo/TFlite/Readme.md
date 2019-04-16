@@ -1,1 +1,0 @@
-# This folder contain tested models for TFlite those are validated to work on the camera
