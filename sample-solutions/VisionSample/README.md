@@ -27,13 +27,13 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
 
 ## Deploy a Model Container Image in VS Code
 
-1. Download the latest VS Code sample from <https://github.com/Microsoft/vision-ai-developer-kit/tree/master/sample-solutions/VisionSample> and expand it.
+1. Clone or download the latest [Vision AI Developer Kit GitHub](https://github.com/Microsoft/vision-ai-developer-kit).
 
-1. Launch VS Code, and select **[File > Open Folder…]** command to open the **VisionSample** directory as workspace root.
+1. Launch VS Code, and select **[File > Open Folder…]** command to open this **VisionSample** directory as workspace root.
 
-1. Use **[Python: Select Interpreter]** command in the command palette box or click the current **Python interpreter** option on the bottom line to set **python.pythonPath** in .vscode\settings.json.
+1. Press F1 button in VS Code and type **[Python: Select Interpreter]** command in the command palette box or click the current **Python interpreter** option on the bottom line to select your default Python interpreter version and set **python.pythonPath** in .vscode\settings.json.
 
-1. Launch VS Code by "Run as administrator". Select **[Terminal > New Terminal]** command to open a terminal window, change directory to **MachineLearning\scripts**, and execute `pip install --upgrade -r requirements.txt` to install required Python packages.
+1. Launch VS Code again by "Run as administrator".  Press F1 button in VS Code, type **[Terminal: Select Default Shell]** command in the command palette box, and select **[Command Prompt]** to set your default terminal shell to be **cmd**.  Select **[Terminal > New Terminal]** command to open a terminal window, change directory to **MachineLearning\scripts**, and execute `pip install --upgrade -r requirements.txt` to install required Python packages.
 
 1. Open **00-aml-configuration.py** under the MachineLearning\scripts folder and replace the 3 fake settings to your Azure Machine Learning Service Workspace settings.
 
