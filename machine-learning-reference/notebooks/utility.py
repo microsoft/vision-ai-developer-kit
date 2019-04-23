@@ -54,7 +54,7 @@ def transferdlc(model_name = None):
 
         # find root folders
         dirpath = os.getcwd()
-        src = os.path.join(dirpath,"var","azureml-app","azureml-models", model_path)
+        src = os.path.join(dirpath,"azureml-models", model_path)
         dst = os.path.abspath("/app/vam_model_folder")
 
         # find model files
