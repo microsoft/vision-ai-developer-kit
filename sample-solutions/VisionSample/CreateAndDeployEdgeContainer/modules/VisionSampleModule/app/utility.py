@@ -70,7 +70,11 @@ def transferdlc(model_name = None):
         with open(vamconfig_file) as f:
             vamconfig = json.load(f)
 
-        dlc_file = find_file(src, vamconfig["DLC_NAME"])
+        if "MODEL_FILENAME" in vamconfig:
+            dlc_file = find_file(src, vamconfig["MODEL_FILENAME"])
+        else:
+            dlc_file = find_file(src, vamconfig["DLC_NAME"])
+        
         label_file = find_file(src, vamconfig["LABELS_NAME"])
         files = [vamconfig_file, dlc_file, label_file]
         print("Found model files: %s in %s" % (files, src))
