@@ -1,0 +1,25 @@
+{
+    "FrameworkType":1,
+    "Engine": 0,
+    "NetworkIO": 0,
+    "ScaleWidth": 300,
+    "ScaleHeight": 300,
+    "PixelNorm": 0,
+    "BlueMean": 0,
+    "GreenMean": 0,
+    "RedMean": 0,
+    "TargetFPS": 10,
+    "ConfThreshold": 0.0,
+    "DLC_NAME": "",
+    "LABELS_NAME": "labels_mobilenet_quant_v1_224.txt",
+    "InputLayers": "data",
+    "OutputLayers": [
+        "detection_out"
+    ],
+    "ResultLayers": [
+        "detection_out"
+    ],
+    "Runtime": 1,
+    "MODEL_FILENAME":"mobilenet_v1_0.25_128_quant.tflite",
+    "NUM_THREADS":2
+}
