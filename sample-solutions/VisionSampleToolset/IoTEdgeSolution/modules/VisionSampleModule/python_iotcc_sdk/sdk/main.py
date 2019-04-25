@@ -12,6 +12,9 @@ import iot
 
 from camera import CameraClient
 
+# Handle SIGTERM signal when docker stops the current VisionSampleModule container
+import signal
+IsTerminationSignalReceived = False
 
 def main(protocol=None):
     print("\nPython %s\n" % sys.version)
@@ -82,6 +85,8 @@ def main(protocol=None):
         camera_client.set_preview_state("off")
 
 def print_inferences(results=None, camera_client=None,hub_manager=None):
+    global IsTerminationSignalReceived
+
     print("")
     for result in results:
         if result is not None and result.objects is not None and len(result.objects):
@@ -107,5 +112,15 @@ def print_inferences(results=None, camera_client=None,hub_manager=None):
         else:
             print("No results")
 
+        # Handle SIGTERM signal
+        if (IsTerminationSignalReceived == True):  
+            break
+
+# Handle SIGTERM signal when docker stops the current VisionSampleModule container
+def receive_termination_signal():
+    global IsTerminationSignalReceived
+    IsTerminationSignalReceived = True
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGTERM, receive_termination_signal)  # Handle SIGTERM signal
     main()
