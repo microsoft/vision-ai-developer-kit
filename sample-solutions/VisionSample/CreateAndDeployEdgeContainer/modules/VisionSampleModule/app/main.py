@@ -11,6 +11,10 @@ import os
 import iot
 from camera import CameraClient
 
+# Handle SIGTERM signal when docker stops the current VisionSampleModule container
+import signal
+IsTerminationSignalReceived = False
+
 def main(protocol=None):
     print("\nPython %s\n" % sys.version)
     parser = argparse.ArgumentParser()
@@ -65,6 +69,7 @@ def get_model_config():
 
 
 def print_inferences(hub_manager,results=None):
+    global IsTerminationSignalReceived
     print("")
    
     for result in results:
@@ -92,5 +97,15 @@ def print_inferences(hub_manager,results=None):
         else:
             print("No results")
 
+        # Handle SIGTERM signal
+        if (IsTerminationSignalReceived == True):  
+            break
+
+# Handle SIGTERM signal when docker stops the current VisionSampleModule container
+def receive_termination_signal():
+    global IsTerminationSignalReceived
+    IsTerminationSignalReceived = True
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGTERM, receive_termination_signal)  # Handle SIGTERM signal
     main()

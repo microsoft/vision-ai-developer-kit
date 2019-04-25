@@ -70,7 +70,7 @@ def transferdlc(model_name = None):
         with open(vamconfig_file) as f:
             vamconfig = json.load(f)
 
-        if "MODEL_FILENAME" in vamconfig:
+        if ("FrameworkType" in vamconfig) and (vamconfig["FrameworkType"] == 1) and ("MODEL_FILENAME" in vamconfig):
             dlc_file = find_file(src, vamconfig["MODEL_FILENAME"])
         else:
             dlc_file = find_file(src, vamconfig["DLC_NAME"])
