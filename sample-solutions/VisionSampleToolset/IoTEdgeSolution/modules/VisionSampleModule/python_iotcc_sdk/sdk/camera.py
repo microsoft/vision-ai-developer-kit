@@ -340,6 +340,8 @@ class CameraClient():
         payload = {'switchStatus' : status}
         response = self.ipc_provider.post(path, payload)
         self.preview_running = response["status"]
+        if status and self.preview_running:
+            self._get_preview_info()
         return self.preview_running
 
     @contextmanager
@@ -356,9 +358,8 @@ class CameraClient():
         path = "/preview"
         payload = '{ }'
         response = self.ipc_provider.get(path, payload)
-        if self.preview_running:
-            self.preview_url = response["url"]
-            self.logger.info('preview url: ' + self.preview_url)
+        self.preview_url = response["url"]
+        self.logger.info('preview url: ' + self.preview_url)
         return self.preview_url
 
     @contextmanager
@@ -407,9 +408,8 @@ class CameraClient():
         path = "/vam"
         payload = '{ }'
         response = self.ipc_provider.get(path, payload)
-        if self.vam_running:
-            self.vam_url = response["url"]
-            self.logger.info('vam url: ' + self.preview_url)
+        self.vam_url = response["url"]
+        self.logger.info('vam url: ' + self.preview_url)
         return self.vam_url
 
     @contextmanager
@@ -575,7 +575,6 @@ class CameraClient():
         with open(file_name,"wb") as f:
             f.write(base64.b64decode(response["Data"]))
         return True
-
     @contextmanager
     def captureImageWithFolder(self, folder, tag1):
         """
@@ -606,8 +605,7 @@ class CameraClient():
         self.logger.info("Storing snapshot: {}".format(file_name))
         with open(file_name,"wb") as f:
             f.write(base64.b64decode(response["Data"]))
-        return True
-
+        return True    
     @contextmanager
     def logout(self):
         """

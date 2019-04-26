@@ -31,9 +31,10 @@ This module provides iterator for getting frame and inference.
 
 import json
 import logging
+import os
 import subprocess
 import time
-from itertools import repeat
+import sys
 
 class CameraInference(object):
     """
@@ -141,7 +142,7 @@ class VideoInferenceIterator(object):
         self._sub_proc = None
         self.logger = logging.getLogger('iotccsdk')
 
-    '''def start(self, result_src):
+    def start(self, result_src):
         """
         This is the inference generator method
 
@@ -164,23 +165,27 @@ class VideoInferenceIterator(object):
             Any exception that occurs during inference handling.
 
         """
-        cmd = ['gst-launch-1.0', '-q', 'rtspsrc', 'location=' + result_src, 'protocols=tcp',
-               '!', "application/x-rtp, media=application", '!', 'fakesink', 'dump=true']
+        cmd = ['gst-launch-1.0 ', ' -q ', ' rtspsrc ', ' location=' + result_src, ' protocols=tcp ',
+               ' ! ', " application/x-rtp, media=application ", ' ! ', ' fakesink ', ' dump=true']
         cmd = ''.join(cmd)
         self.logger.info('result_src: ' + result_src)
         self.logger.info('gstreamer cmd: ' + str(cmd))
+        platform = sys.platform
+        platform = platform.lower()
+        self.logger.info('Platform: ' + platform)
+        if 'win' in platform:
+            data_idx = 78
+        elif 'linux' in platform:
+            data_idx = 72
+
         try:
             self._sub_proc = subprocess.Popen(
-                cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=False)
-            #for line in iter(self._sub_proc.stdout.readline, ''):
-            for _ in repeat(None):
-                line = self._sub_proc.stdout.readline()
-                #if 'ERROR' in line or 'error' in line:
-                    #raise Exception(line)
-                l_str = line[70:-1]
-                l_str = l_str.decode('utf-8')
-                l_str = l_str.strip()
-
+                cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True)
+            for line in self._sub_proc.stdout:
+                if 'ERROR' in line or 'error' in line:
+                    raise Exception(line)
+                l_str = line[data_idx:]
+                l_str = l_str.strip(os.linesep)
                 self.logger.debug(l_str)
                 if ":[" in self._json_str and "] }" in self._json_str + l_str:
                     # Only yield if objects are present in the inferences
@@ -192,65 +197,14 @@ class VideoInferenceIterator(object):
                     result = self._get_inference_result()
                     self._json_str = ""
                     yield result
-                elif ":[" not in self._json_str and '{ "' in self._json_str and " }" in self._json_str + 'l_str':
+                elif ":[" not in self._json_str and '{ "' in self._json_str and " }" in self._json_str + l_str:
                     self._json_str = ""
                 else:
                     self._json_str = self._json_str + l_str
         except (Exception, subprocess.CalledProcessError) as e:
             self.logger.exception(e)
             raise
-    '''
-    def start(self, result_src):
-        """
-        This is the inference generator method
-        
-        It gets inferences from the RTSP VA stream from the camera.
 
-        Parameters
-        ----------
-        result_src : str
-            VA RTSP stream url.
-
-        Yields
-        ------
-        CameraInference
-            An object of CameraInference type.
-            Which has timestamp and list of CameraInferenceObject objects.
-
-        """
-        cmd = ['gst-launch-1.0 ', ' -q ', ' rtspsrc ', ' location=' + result_src, ' protocols=tcp ',
-               ' ! ', " application/x-rtp, media=application ", ' ! ', ' fakesink ', ' dump=true ']
-        cmd = ''.join(cmd)
-        #cmd = "gst-launch-1.0 -q rtspsrc location=rtsp://192.168.1.84:8902/live protocols=tcp ! application/x-rtp, media=application ! fakesink dump=true "
-        print(cmd)
-        try:
-            self._sub_proc = subprocess.Popen(
-                cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=False)
-            #for x in range(10000):
-            for _ in repeat(None):
-                line = self._sub_proc.stdout.readline()
-                #print("entered!!")
-                l_str = line[70:-1]
-                l_str = l_str.decode('utf-8')
-                l_str = l_str.strip()
-                #print(l_str)
-                if ":[" in self._json_str and "] }" in self._json_str + l_str:
-                    # Only yield if objects are present in the inferences
-                    self._json_str = self._json_str + l_str
-                    s_idx = self._json_str.index('{ "')
-                    e_idx = self._json_str.index("] }") + 3
-                    self._json_str = self._json_str[s_idx:e_idx]
-                    #print(self._json_str)
-                    result = self._get_inference_result()
-                    self._json_str = ""
-                    yield result
-                elif ":[" not in self._json_str and '{ "' in self._json_str and " }" in self._json_str + 'l_str':
-                    self._json_str = ""
-                else:
-                    self._json_str = self._json_str + l_str
-                pass    
-        except subprocess.CalledProcessError as e:
-            print(e)
     def stop(self):
         """
         This method stops the inference generator.
@@ -278,7 +232,6 @@ class VideoInferenceIterator(object):
             j = json.loads(self._json_str)
             objects = []
             for object in j["objects"]:
-                #TODO preview resolution should be fetched from webserver
                 x = (object["position"]["x"] * self.preview_width) / 10000
                 y = (object["position"]["y"] * self.preview_height) / 10000
                 w = (object["position"]["width"] * self.preview_width) / 10000

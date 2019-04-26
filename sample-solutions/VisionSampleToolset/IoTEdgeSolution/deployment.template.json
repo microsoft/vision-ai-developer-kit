@@ -12,7 +12,7 @@
               "mycapreg": {
                 "username": "${REGISTRY_USER_NAME}",
                 "password": "${REGISTRY_PASSWORD}",
-                "address": "${REGISTRY_NAME}.azurecr.io"
+                "address": "${REGISTRY_NAME}"
               }
             }
           }
