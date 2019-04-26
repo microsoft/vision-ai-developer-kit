@@ -72,8 +72,8 @@ def main(protocol=None):
             print("Stopping")
         try:
             print("inside infinite loop now")
-            while(True):
-                time.sleep(2)
+            #while(True):
+                #time.sleep(2)
         except KeyboardInterrupt:
             print("Stopping")
 
@@ -113,11 +113,12 @@ def print_inferences(results=None, camera_client=None,hub_manager=None):
             print("No results")
 
         # Handle SIGTERM signal
-        if (IsTerminationSignalReceived == True):  
+        if (IsTerminationSignalReceived == True):
+            print('!!! SIGTERM signal is received  !!!')
             break
 
 # Handle SIGTERM signal when docker stops the current VisionSampleModule container
-def receive_termination_signal():
+def receive_termination_signal(signum, frame):
     global IsTerminationSignalReceived
     IsTerminationSignalReceived = True
 
