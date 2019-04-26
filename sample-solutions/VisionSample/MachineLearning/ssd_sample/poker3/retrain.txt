@@ -1,4 +1,4 @@
-python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2\ --num_train_steps=6000 --sample_1_of_n_eval_examples=3  --alsologtostderr
+python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2\ --num_train_steps=8000 --sample_1_of_n_eval_examples=3  --alsologtostderr
 
-python export_inference_graph.py --input_type=image_tensor --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2\model.ckpt-6000 --output_directory=c:\tf\poker3\frozen_graph
+python export_inference_graph.py --input_type=image_tensor --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2\model.ckpt-8000 --output_directory=c:\tf\poker3\frozen_graph
 

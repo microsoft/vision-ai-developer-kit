@@ -49,12 +49,12 @@
     1. Copy **poker3** folder to **c:\tf** folder.
     1. Launch **Anaconda Prompt**, change directory to **c:\tf\models\research\objection_detection** and execute the following command to retrain a new **ssd_mobilenet_v2** model with **poker3** dataset:
         ```<language>
-        python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2\ --num_train_steps=6000 --sample_1_of_n_eval_examples=3 --alsologtostderr
+        python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2\ --num_train_steps=8000 --sample_1_of_n_eval_examples=3 --alsologtostderr
         ```
        >**Note**: Refer to [Running Locally](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/running_locally.md) for more detail about how to train an object detection model on a local machine.
-    1. Launch **Anaconda Prompt**, change directory to **C:\tf\models\research\objection_detection** and execute the following command to generate a new **frozen_inference_graph.pb** in **c:\tf\poker3\frozen_graph** folder (rename **model.ckpt-6000** to be the **model.ckpt-xxx** file generated in **c:\tf\poker3\models\ssd_mobilenet_v2** folder):
+    1. Launch **Anaconda Prompt**, change directory to **C:\tf\models\research\objection_detection** and execute the following command to generate a new **frozen_inference_graph.pb** in **c:\tf\poker3\frozen_graph** folder (rename **model.ckpt-8000** to be the **model.ckpt-xxx** file generated in **c:\tf\poker3\models\ssd_mobilenet_v2** folder):
         ```<language>
-        python export_inference_graph.py --input_type=image_tensor --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2\model.ckpt-6000 --output_directory=c:\tf\poker3\frozen_graph
+        python export_inference_graph.py --input_type=image_tensor --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2\model.ckpt-8000 --output_directory=c:\tf\poker3\frozen_graph
         ```
        >**Note**: Refer to [Exporting a trained model for inference](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/exporting_models.md) for more detail about how to export a trained model to a TensorFlow graph proto.
   - Deploy the new **ssd_mobilenet_v2_retrain_poker3** model:
