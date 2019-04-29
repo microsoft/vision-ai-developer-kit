@@ -7,7 +7,7 @@
     "BlueMean":104,
     "GreenMean":117,
     "RedMean":123,
-    "TargetFPS":15,
+    "TargetFPS":10,
     "ConfThreshold":0.5,
     "DLC_NAME":"model.dlc",
     "LABELS_NAME":"coco_labels.txt",
