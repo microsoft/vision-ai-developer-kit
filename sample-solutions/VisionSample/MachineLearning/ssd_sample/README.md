@@ -63,5 +63,7 @@
     - Launch **Visual Studio Code** and execute **01-convert-model-containerize.py** in **VisionSample\MachineLearning\scripts** folder to convert model, create a container image and generate **deployment.json** for deploying the new **ssd_mobilenet_v2_retrain_poker3** model.
 
 
+### Retrain TensorFlow Object Detection Models on Linux and MacOS
 
+Refer to [Tensorflow Object Detection API](https://github.com/tensorflow/models/blob/master/research/object_detection/README.md) for more detail.
     
