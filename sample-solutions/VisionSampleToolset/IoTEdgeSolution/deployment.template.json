@@ -9,10 +9,10 @@
             "minDockerVersion": "v1.25",
             "loggingOptions": "",
             "registryCredentials": {
-              "mycapreg": {
+              "registryName": {
                 "username": "${REGISTRY_USER_NAME}",
                 "password": "${REGISTRY_PASSWORD}",
-                "address": "${REGISTRY_NAME}"
+                "address": "${REGISTRY_ADDRESS}"
               }
             }
           }
