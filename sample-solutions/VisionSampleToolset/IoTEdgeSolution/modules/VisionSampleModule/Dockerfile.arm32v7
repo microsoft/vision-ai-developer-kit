@@ -45,5 +45,5 @@ COPY . .
 
 ENTRYPOINT [ "python3", "-u", "./python_iotcc_sdk/sdk/main.py"]
 # Sets the flag "TRUE" to send dlc file to device else False
-CMD ["-p True"]
+CMD ["-p False"]
 
