@@ -91,19 +91,59 @@ Refer to [MachineLearning/ssd_sample/README.md](./MachineLearning/ssd_sample/REA
   * A set of images for use in training your classifier.
 
 1. Using a browser, login to the Azure Custom Vision Service at <https://www.customvision.ai>.
-    > Note: Please review the Teams Wiki for pre-GA access details.
 
-1. Follow these instructions for [How to build a classifier with Custom Vision](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/getting-started-build-a-classifier). When creating a new project, use these recommended settings for the Vision AI Dev Kit hardware.
+1. Follow these instructions for [How to build a classifier with Custom Vision](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/getting-started-build-a-classifier).  Create a new project, using these recommended settings:
    * Project Type - [Classification]
    * Classification Type - [Multiclass (Single tag per image)]
    * Domain - [General(compact)]
+   * Export Capabilities - [Vision AI Dev Kit]
 
-1. After the model is built, click **Export** button in the Performance tab of the <https://www.customvision.ai> portal, and download the trained vision model for the Vision AI DevKit.
+1. After the model is trained, click **Export** button in the Performance tab, and download the trained vision model for the Vision AI DevKit.
 
-1. Copy the exported **model.dlc** and **labels.txt** files to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
-
-1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\caffe_v2_fork_scissors folder to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+1. Copy the exported **model.dlc**, **labels.txt**, and **va-snpe-engine-library_config.json** files to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
 
 1. Refer to [CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the exported Azure Custom Vision model.
 
-1. If you want to use the Custom Vision SDK with Python to build an image classification model and an object detection model, please refer to [Quickstart: Create an image classification project with the Custom Vision Python SDK](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial) for a classification model and [Quickstart: Create an object detection project with the Custom Vision Python SDK](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial-od) for an object detection model.
+1. If you want to use the Custom Vision SDK with Python to build an image classification model, please refer to [Quickstart: Create an image classification project with the Custom Vision Python SDK](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial).
+
+## Develop and Deploy a Object Detection Model using Azure Custom Vision Service
+
+* What you will need...
+  * A valid Azure subscription. Create an account for free.
+  * A set of images for use in training your objection detection model.
+
+1. Using a browser, login to the Azure Custom Vision Service at <https://www.customvision.ai>.
+
+1. Create a new project, using these recommended settings:
+   * Project Type - [Object Detection]
+   * Domain - [General(compact)]
+   * Export Capabilities - [Vision AI Dev Kit]
+
+1. After the model is trained, click **Export** button in the Performance tab, and download the trained vision model for the Vision AI DevKit.
+
+1. Copy the exported **model.dlc**, **labels.txt**, and **va-snpe-engine-library_config.json** files to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+
+1. Refer to [CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the exported Azure Custom Vision model.
+
+1. If you want to use the Custom Vision SDK with Python to build an object detection model, please refer to [Quickstart: Create an object detection project with the Custom Vision Python SDK](https://docs.microsoft.com/en-us/azure/cognitive-services/custom-vision-service/python-tutorial-od).
+
+## Sample to Deploy a TensorFlow Lite Classification Model
+
+1. Download a TensorFlow Lite Classification Model sample [**mobilenet_v1_1.0_224_quant_and_labels.zip**](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_1.0_224_quant_and_labels.zip) from [TensorFlow Lite Image classification](https://www.tensorflow.org/lite/models/image_classification/overview).
+
+1. Copy the extracted **mobilenet_v1_1.0_224_quant.tflite** and **labels_mobilenet_quant_v1_224.txt** files to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+
+1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\tflite_classification folder to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+
+1. Refer to [CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the TensorFlow Lite Classification Model.
+
+## Sample to Deploy a TensorFlow Lite Object Detection Model
+
+1. Download a TensorFlow Lite Object Detection Model sample [**coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip**](http://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip) from [TensorFlow Lite Object detection Starter model](https://www.tensorflow.org/lite/models/object_detection/overview#starter_model).
+
+1. Copy the extracted **detect.tflite** and **labelmap.txt** files to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+
+1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\tflite_detection folder to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
+
+1. Refer to [CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the TensorFlow Lite Object Detection Model.
+ 
