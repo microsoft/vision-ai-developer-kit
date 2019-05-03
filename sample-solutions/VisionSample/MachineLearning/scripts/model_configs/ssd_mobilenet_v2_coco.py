@@ -29,7 +29,7 @@ __BASE.IMAGE_TAGS = ["mobilenetssd"]
 __BASE.IMAGE_DESCRIPTION = "MobileNet V2 SSD COCO 2018"
 
 # Settings used in deployment.json
-__BASE.MODULE_NAME = "VisionSampleImagenetSSD_V2_COCO_2018"
+__BASE.MODULE_NAME = "VisionSample_SSD_V2_COCO_2018"
 
 # Settings used in SnpeConverter API (TensorFlow / Caffe)
 __BASE.SNPECONVERTER_TYPE = "TensorFlow"

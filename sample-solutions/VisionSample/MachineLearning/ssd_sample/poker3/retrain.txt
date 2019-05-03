@@ -1,4 +1,18 @@
-python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2\ --num_train_steps=8000 --sample_1_of_n_eval_examples=3  --alsologtostderr
+#########################################################
+  Retrain and export a quantized MobileNet SSD v2 Model
+#########################################################
 
-python export_inference_graph.py --input_type=image_tensor --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_coco.config --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2\model.ckpt-8000 --output_directory=c:\tf\poker3\frozen_graph
+python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\ --num_train_steps=4000 --sample_1_of_n_eval_examples=3  --alsologtostderr
+
+python export_inference_graph.py --input_type=image_tensor --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 --output_directory=c:\tf\poker3\frozen_graph
+
+
+################################
+  Export TensorFlow Lite Model
+################################
+
+python export_tflite_ssd_graph.py  --pipeline_config_path=C:\tf\poker3\frozen_graph\pipeline.config  --trained_checkpoint_prefix=C:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000  --output_directory=C:\tf\poker3\tflite  --add_postprocessing_op=true
+
+
+toco --graph_def_file=C:\tf\poker3\tflite\tflite_graph.pb  --output_file=C:\tf\poker3\tflite\detect.tflite --output_format=TFLITE --input_shapes=1,300,300,3  --input_arrays=normalized_input_image_tensor --output_arrays=TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3   --inference_type=QUANTIZED_UINT8  --mean_values=128  --std_dev_values=128  --change_concat_input_ranges=false  --allow_custom_ops --allow_nonexistent_arrays
 
