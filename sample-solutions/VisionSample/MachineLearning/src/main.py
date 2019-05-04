@@ -9,7 +9,14 @@ import subprocess
 import utility
 import os
 import iot
+import datetime
 from camera import CameraClient
+
+# tracking the last image label, so we only send message when there is a change
+lastLabel = None
+
+# setting the minimum confidence for an image
+minConfidence = 90
 
 # Handle SIGTERM signal when docker stops the current VisionSampleModule container
 import signal
@@ -70,7 +77,7 @@ def get_model_config():
 
 
 def print_inferences(hub_manager,results=None):
-    global IsTerminationSignalReceived
+    global IsTerminationSignalReceived, lastLabel, minConfidence
     print("")
    
     for result in results:
@@ -93,8 +100,14 @@ def print_inferences(hub_manager,results=None):
                 print("confidence={}".format(confidence))
                 print("Position(x,y,w,h)=({},{},{},{})".format(x, y, w, h))
                 print("")
-                hub_manager.SendMsgToCloud("I see " + str(label) + " with confidence :: " + str(confidence))
-                time.sleep(1)
+                if label != lastLabel and confidence >= minConfidence:
+                    messageToSend = "{\"timestamp\":\"" + str(timestamp) + "\","
+                    messageToSend += "\"dateTime\":\"" + str(datetime.datetime.now()) + "\","
+                    messageToSend += "\"label\":\"" + label + "\","
+                    messageToSend += "\"confidence\":" + str(confidence) + "}"
+                    hub_manager.SendMsgToCloud(messageToSend)
+                    lastLabel = label
+                    time.sleep(1)
         else:
             print("No results")
 
