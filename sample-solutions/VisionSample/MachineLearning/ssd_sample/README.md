@@ -42,7 +42,20 @@
     ```
 1. Launch **Anaconda Prompt**, change directory to **c:\tf\models\research**, and execute the following commands:
     ```<language>
-    protoc --python_out=. .\object_detection\protos\anchor_generator.proto .\object_detection\protos\argmax_matcher.proto .\object_detection\protos\bipartite_matcher.proto .\object_detection\protos\box_coder.proto .\object_detection\protos\box_predictor.proto .\object_detection\protos\calibration.proto .\object_detection\protos\eval.proto .\object_detection\protos\faster_rcnn.proto .\object_detection\protos\faster_rcnn_box_coder.proto .\object_detection\protos\graph_rewriter.proto .\object_detection\protos\grid_anchor_generator.proto .\object_detection\protos\hyperparams.proto .\object_detection\protos\image_resizer.proto .\object_detection\protos\input_reader.proto  .\object_detection\protos\keypoint_box_coder.proto .\object_detection\protos\losses.proto .\object_detection\protos\matcher.proto .\object_detection\protos\mean_stddev_box_coder.proto .\object_detection\protos\model.proto .\object_detection\protos\multiscale_anchor_generator.proto .\object_detection\protos\optimizer.proto .\object_detection\protos\pipeline.proto .\object_detection\protos\post_processing.proto .\object_detection\protos\preprocessor.proto .\object_detection\protos\region_similarity_calculator.proto .\object_detection\protos\square_box_coder.proto .\object_detection\protos\ssd.proto .\object_detection\protos\ssd_anchor_generator.proto .\object_detection\protos\string_int_label_map.proto .\object_detection\protos\train.proto
+    protoc --python_out=. .\object_detection\protos\anchor_generator.proto .\object_detection\protos\argmax_matcher.proto ^
+    .\object_detection\protos\bipartite_matcher.proto .\object_detection\protos\box_coder.proto .\object_detection\protos\box_predictor.proto ^
+    .\object_detection\protos\calibration.proto .\object_detection\protos\eval.proto ^
+    .\object_detection\protos\faster_rcnn.proto .\object_detection\protos\faster_rcnn_box_coder.proto ^
+    .\object_detection\protos\graph_rewriter.proto .\object_detection\protos\grid_anchor_generator.proto ^
+    .\object_detection\protos\hyperparams.proto .\object_detection\protos\image_resizer.proto .\object_detection\protos\input_reader.proto ^
+    .\object_detection\protos\keypoint_box_coder.proto .\object_detection\protos\losses.proto ^
+    .\object_detection\protos\matcher.proto .\object_detection\protos\mean_stddev_box_coder.proto ^
+    .\object_detection\protos\model.proto .\object_detection\protos\multiscale_anchor_generator.proto ^
+    .\object_detection\protos\optimizer.proto .\object_detection\protos\pipeline.proto .\object_detection\protos\post_processing.proto ^
+    .\object_detection\protos\preprocessor.proto .\object_detection\protos\region_similarity_calculator.proto ^
+    .\object_detection\protos\square_box_coder.proto .\object_detection\protos\ssd.proto ^
+    .\object_detection\protos\ssd_anchor_generator.proto .\object_detection\protos\string_int_label_map.proto ^
+    .\object_detection\protos\train.proto
     ```
     ```<language>
     python setup.py build
@@ -53,19 +66,39 @@
 1. Copy **poker3** folder to **c:\tf** folder.
 1. Launch **Anaconda Prompt**, change directory to **c:\tf\models\research\objection_detection** and execute the following command to retrain a new **ssd_mobilenet_v2_quantized** model with **poker3** dataset:
     ```<language>
-    python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\ --num_train_steps=4000 --sample_1_of_n_eval_examples=3  --alsologtostderr 
+    python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config ^
+                         --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\ ^
+                         --num_train_steps=4000 ^
+                         --sample_1_of_n_eval_examples=3 ^
+                         --alsologtostderr 
     ```
     >**Note**: Refer to [Running Locally](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/running_locally.md) for more detail about how to train an object detection model on a local machine.
 1. Launch **Anaconda Prompt**, change directory to **C:\tf\models\research\objection_detection** and execute the following command to generate a new **frozen_inference_graph.pb** in **c:\tf\poker3\frozen_graph** folder (rename **model.ckpt-4000** to be the **model.ckpt-xxx** file generated in **c:\tf\poker3\models\ssd_mobilenet_v2_quantized** folder):
     ```<language>
-    python export_inference_graph.py --input_type=image_tensor --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 --output_directory=c:\tf\poker3\frozen_graph 
+    python export_inference_graph.py --input_type=image_tensor ^
+                                     --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config ^
+                                     --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 ^
+                                     --output_directory=c:\tf\poker3\frozen_graph 
     ```
     >**Note**: Refer to [Exporting a trained model for inference](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/exporting_models.md) for more detail about how to export a trained model to a TensorFlow graph proto.
 1. Launch **Anaconda Prompt**, change directory to **C:\tf\models\research\objection_detection** and execute the following 2 commands to generate a new TensorFlow Lite model file **detect.tflite** in **c:\tf\poker3\tflite** folder (rename **model.ckpt-4000** to be the **model.ckpt-xxx** file generated in **c:\tf\poker3\models\ssd_mobilenet_v2_quantized** folder):
     ```<language>
-    python export_tflite_ssd_graph.py  --pipeline_config_path=C:\tf\poker3\frozen_graph\pipeline.config  --trained_checkpoint_prefix=C:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000  --output_directory=C:\tf\poker3\tflite  --add_postprocessing_op=true 
+    python export_tflite_ssd_graph.py  --pipeline_config_path=C:\tf\poker3\frozen_graph\pipeline.config ^
+                                       --trained_checkpoint_prefix=C:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 ^
+                                       --output_directory=C:\tf\poker3\tflite ^
+                                       --add_postprocessing_op=true 
 
-    toco --graph_def_file=C:\tf\poker3\tflite\tflite_graph.pb  --output_file=C:\tf\poker3\tflite\detect.tflite --output_format=TFLITE --input_shapes=1,300,300,3  --input_arrays=normalized_input_image_tensor --output_arrays=TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3   --inference_type=QUANTIZED_UINT8  --mean_values=128  --std_dev_values=128  --change_concat_input_ranges=false  --allow_custom_ops --allow_nonexistent_arrays 
+    toco --graph_def_file=C:\tf\poker3\tflite\tflite_graph.pb ^
+         --output_file=C:\tf\poker3\tflite\detect.tflite ^
+         --output_format=TFLITE --input_shapes=1,300,300,3  ^
+         --input_arrays=normalized_input_image_tensor ^
+         --output_arrays=TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3 ^
+         --inference_type=QUANTIZED_UINT8 ^
+         --mean_values=128 ^
+         --std_dev_values=128 ^
+         --change_concat_input_ranges=false ^
+         --allow_custom_ops ^
+         --allow_nonexistent_arrays 
     ```
     >**Note**: Refer to [Training and serving a real-time mobile object detector in 30 minutes](https://medium.com/tensorflow/training-and-serving-a-realtime-mobile-object-detector-in-30-minutes-with-cloud-tpus-b78971cf1193) for more detail about how to export a trained TensorFlow Lite model.
 
