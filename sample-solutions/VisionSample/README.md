@@ -72,7 +72,7 @@ This is a sample showing how to use Azure Machine Learning SDK and Azure IoT Edg
     * After the script execution finished, it will write a va-snpe-engine-library_config.json config file to the MachineLearning\models\mobilenet-retrain-local folder and overwrite current_config.py content by mobilenet_retrain_local_config.py in the MachineLearning\scripts\model_configs folder.
     * Repeat step 7 and 8 in **[Deploy a Model Container Image in VS Code]** section to open and execute `01-convert-model-containerize.py` to convert the model, create container image, and generate deployment.json for deploying the new MobileNet V1 model retrained on poker6 dataset.
 
-## Retrain MobileNet V1 SSD Object Detection Model
+## Retrain MobileNet V2 SSD Object Detection Model
 
 Refer to [MachineLearning/ssd_sample/README.md](./MachineLearning/ssd_sample/README.md) for more detail.
 
@@ -146,4 +146,7 @@ Refer to [MachineLearning/ssd_sample/README.md](./MachineLearning/ssd_sample/REA
 1. Copy **va-snpe-engine-library_config.json** file from MachineLearning\models\tflite_detection folder to the CreateAndDeployEdgeContainer\modules\VisionSampleModule\model folder.
 
 1. Refer to [CreateAndDeployEdgeContainer/README.md](./CreateAndDeployEdgeContainer/README.md) to build a local container image and deploy the TensorFlow Lite Object Detection Model.
- 
+
+## Retrain TensorFlow Lite Model
+
+Refer to [Training and serving a real-time mobile object detector in 30 minutes](https://medium.com/tensorflow/training-and-serving-a-realtime-mobile-object-detector-in-30-minutes-with-cloud-tpus-b78971cf1193) or [MachineLearning/ssd_sample/README.md](./MachineLearning/ssd_sample/README.md) for more detail.
