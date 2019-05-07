@@ -24,16 +24,16 @@
 1. Create a new Windows 10 v1809 Azure VM or prepare a clean installed Windows 10 environment.
 1. Install [Anaconda Python 3.7 for Windows version](https://www.anaconda.com/distribution/).
 1. Launch **Anaconda Prompt** and execute the following commands:
-        ```<language>
-        conda install tensorflow
-        ```
+    ```<language>
+    conda install tensorflow
+    ```
 1. Install COCO API for Windows version.  Refer to [COCO API support Windows build](https://github.com/philferriere/cocoapi) for more detail.
-        * Install [git for Windows version](https://git-scm.com/download/win).
-        * Install [Visual C++ 2015 build tools](https://go.microsoft.com/fwlink/?LinkId=691126).
-        * Launch **Anaconda Prompt** and install COCO API for Windows version by executing the following command:
-          ```<language>
-          pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
-          ```
+    * Install [git for Windows version](https://git-scm.com/download/win).
+    * Install [Visual C++ 2015 build tools](https://go.microsoft.com/fwlink/?LinkId=691126).
+    * Launch **Anaconda Prompt** and install COCO API for Windows version by executing the following command:
+      ```<language>
+      pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
+      ```
 1. Download or clone [TensorFlow Models](https://github.com/tensorflow/models/).
 1. Add a new directory to the root directory of C drive named "**c:\tf**", rename the extracted directory named **models-master** to **models**, and copy or move the full **models** directory to **c:\tf** directory.
 1. Add the following system environment variable:
