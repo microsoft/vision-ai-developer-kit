@@ -88,11 +88,11 @@
     python export_tflite_ssd_graph.py ^
            --pipeline_config_path=C:\tf\poker3\frozen_graph\pipeline.config ^
            --trained_checkpoint_prefix=C:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 ^
-           --output_directory=C:\tf\poker3\tflite ^
+           --output_directory=C:\tf\poker3\tflite_graph\ ^
            --add_postprocessing_op=true 
     ```
     ```<language>
-    toco --graph_def_file=C:\tf\poker3\tflite\tflite_graph.pb ^
+    toco --graph_def_file=C:\tf\poker3\tflite_graph\tflite_graph.pb ^
          --output_file=C:\tf\poker3\tflite\detect.tflite ^
          --output_format=TFLITE --input_shapes=1,300,300,3 ^
          --input_arrays=normalized_input_image_tensor ^
