@@ -12,7 +12,9 @@ import shutil
 import socket
 import logging
 import json
-
+import urllib.request as urllib2
+from urllib.request import urlopen
+import glob
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -52,35 +54,87 @@ def prepare_folder(folder):
     else:
         os.makedirs(folder, exist_ok=True)
 
-# thsi function pushes a new model to device to location /data/misc/camera mounted at /app/vam_model_folder
-def transferdlc(model_name = None):
+""" def reporthook(count, block_size, total_size): 
+    if int(count * block_size * 100 / total_size) == 100:
+        print('Download completed!')"""
 
+def WaitForFileDownload(FileName):
+    # ----------------------------------------------------
+    # Wait until the end of the download
+    # ----------------------------------------------------
+    valid=0
+    while valid==0:
+        try:
+            with open(FileName):valid=1
+        except IOError:
+            time.sleep(1)
+    print("Got it ! File Download Complete !")
+def GetFile(ModelUrl) :
+    #adding code to fix issue where the file name may not be part of url details here 
+    #
+    remotefile = urlopen(ModelUrl)
+    myurl = remotefile.url
+    FileName = myurl.split("/")[-1]
+    if FileName:
         # find root folders
         dirpath = os.getcwd()
-        src = os.path.join(dirpath,"model")
+        #src = os.path.join(dirpath,"model")
         dst = os.path.abspath("/app/vam_model_folder")
+        print("Downloading File ::" + FileName)
+        urllib2.urlretrieve(ModelUrl, filename=(os.path.join(dst,FileName)))
+        WaitForFileDownload(os.path.join(dst,FileName))
+        return True
+    else:
+        print("Cannot extract file name from URL")
+        return False
 
-        # find model files
-        vamconfig_file = find_file(src, "va-snpe-engine-library_config.json")
-        with open(vamconfig_file) as f:
-            vamconfig = json.load(f)
+# thsi function pushes a new model to device to location /data/misc/camera mounted at /app/vam_model_folder
+def transferdlc(pushmodel=None):
 
-        if ("FrameworkType" in vamconfig) and (vamconfig["FrameworkType"] == 1) and ("MODEL_FILENAME" in vamconfig):
-            dlc_file = find_file(src, vamconfig["MODEL_FILENAME"])
+    if pushmodel.find("True") == -1 :
+            # checking and transferring model if the devie does not have any tflite or .dlc file on it..
+        if(checkmodelexist()):
+                print("Not transferring model as transfer from container is disabled by settting pushmodel to False")
+                return
         else:
-            dlc_file = find_file(src, vamconfig["DLC_NAME"])
+                print(" transferring model as the device does not have any model on it even if pushmodel is set to False")
+    else:
+        print("transferring model ,label and va config file as set in create option with -p %s passed" % pushmodel)  
+    # find root folders
+    dirpath = os.getcwd()
+    src = os.path.join(dirpath,"model")
+    dst = os.path.abspath("/app/vam_model_folder")
 
-        label_file = find_file(src, vamconfig["LABELS_NAME"])
-        files = [vamconfig_file, dlc_file, label_file]
-        print("Found model files: %s in %s" % (files, src))
+    # find model files
+    vamconfig_file = find_file(src, "va-snpe-engine-library_config.json")
+    with open(vamconfig_file) as f:
+        vamconfig = json.load(f)
 
-        # clean up
-        prepare_folder(dst)
+    dlc_file = find_file(src, vamconfig["DLC_NAME"])
+    label_file = find_file(src, vamconfig["LABELS_NAME"])
+    files = [vamconfig_file, dlc_file, label_file]
+    print("Found model files: %s in %s" % (files, src))
 
-        # copy across
-        for filename in files:
-            print("transfering file :: " + filename)
-            shutil.copy(os.path.join(filename),dst)
+    # clean up
+    prepare_folder(dst)
+
+    # copy across
+    for filename in files:
+        print("transfering file :: " + filename)
+        shutil.copy(os.path.join(filename),dst)
+def checkmodelexist():
+    #for file in os.listdir(os.path.abspath("/app/vam_model_folder")):
+        #if file.endswith(".dlc") or file.endswith(".tflite"):
+        if(glob.glob('/app/vam_model_folder/*.dlc')):
+            return True
+        else:
+            print("No dlc or tflit model on device")
+            return False
+
+def CallSystemCmd(cmd):
+    print('Command we are sending is ::' + cmd)
+    returnedvalue = sp.call(cmd,shell=True)
+    print('returned-value is:' + str(returnedvalue))
 
 # this function will find the required files to be transferred to the device 
 def find_file(input_path, suffix):

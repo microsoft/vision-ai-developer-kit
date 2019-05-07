@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "${REGISTRY_NAME}.azurecr.io/visionsamplemodule",
+        "repository": "${REGISTRY_ADDRESS}/visionsamplemodule",
         "tag": {
             "version": "1.7.0",
             "platforms": {
