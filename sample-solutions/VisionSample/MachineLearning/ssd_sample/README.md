@@ -35,10 +35,10 @@
       pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
       ```
 1. Download or clone [TensorFlow Models](https://github.com/tensorflow/models/).
-1. Add a new directory to the root directory of C drive named "**c:\tf**", rename the extracted directory named **models-master** to **models**, and copy or move the full **models** directory to **c:\tf** directory.
+1. Add a new **tf** subfolder under **c:\\**, rename the extracted directory named **models-master** to **models**, and copy the full **models** directory to **c:\tf** directory.
 1. Add the following system environment variable:
     ```<language>
-    PYTHONPATH=c:\tf\models;c:\tf\models\research;c:\tf\models\research\slim`
+    PYTHONPATH=c:\tf\models;c:\tf\models\research;c:\tf\models\research\slim 
     ```
 1. Launch **Anaconda Prompt**, change directory to **c:\tf\models\research**, and execute the following commands:
     ```<language>
