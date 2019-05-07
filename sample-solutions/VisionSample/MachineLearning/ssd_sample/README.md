@@ -66,27 +66,30 @@
 1. Copy **poker3** folder to **c:\tf** folder.
 1. Launch **Anaconda Prompt**, change directory to **c:\tf\models\research\object_detection** and execute the following command to retrain a new **ssd_mobilenet_v2_quantized** model with **poker3** dataset:
     ```<language>
-    python model_main.py --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config ^
-                         --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\ ^
-                         --num_train_steps=4000 ^
-                         --sample_1_of_n_eval_examples=3 ^
-                         --alsologtostderr 
+    python model_main.py ^
+           --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config ^
+           --model_dir=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\ ^
+           --num_train_steps=4000 ^
+           --sample_1_of_n_eval_examples=3 ^
+           --alsologtostderr 
     ```
     >**Note**: Refer to [Running Locally](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/running_locally.md) for more detail about how to train an object detection model on a local machine.
 1. Launch **Anaconda Prompt**, change directory to **C:\tf\models\research\object_detection** and execute the following command to generate a new **frozen_inference_graph.pb** in **c:\tf\poker3\frozen_graph** folder (rename **model.ckpt-4000** to be the **model.ckpt-xxx** file generated in **c:\tf\poker3\models\ssd_mobilenet_v2_quantized** folder):
     ```<language>
-    python export_inference_graph.py --input_type=image_tensor ^
-                                     --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config ^
-                                     --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 ^
-                                     --output_directory=c:\tf\poker3\frozen_graph 
+    python export_inference_graph.py ^
+           --input_type=image_tensor ^
+           --pipeline_config_path=c:\tf\poker3\config\ssd_mobilenet_v2_quantized_300x300_coco.config ^
+           --trained_checkpoint_prefix=c:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 ^
+           --output_directory=c:\tf\poker3\frozen_graph 
     ```
     >**Note**: Refer to [Exporting a trained model for inference](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/exporting_models.md) for more detail about how to export a trained model to a TensorFlow graph proto.
 1. Launch **Anaconda Prompt**, change directory to **C:\tf\models\research\object_detection** and execute the following 2 commands to generate a new TensorFlow Lite model file **detect.tflite** in **c:\tf\poker3\tflite** folder (rename **model.ckpt-4000** to be the **model.ckpt-xxx** file generated in **c:\tf\poker3\models\ssd_mobilenet_v2_quantized** folder):
     ```<language>
-    python export_tflite_ssd_graph.py  --pipeline_config_path=C:\tf\poker3\frozen_graph\pipeline.config ^
-                                       --trained_checkpoint_prefix=C:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 ^
-                                       --output_directory=C:\tf\poker3\tflite ^
-                                       --add_postprocessing_op=true 
+    python export_tflite_ssd_graph.py ^
+           --pipeline_config_path=C:\tf\poker3\frozen_graph\pipeline.config ^
+           --trained_checkpoint_prefix=C:\tf\poker3\models\ssd_mobilenet_v2_quantized\model.ckpt-4000 ^
+           --output_directory=C:\tf\poker3\tflite ^
+           --add_postprocessing_op=true 
     ```
     ```<language>
     toco --graph_def_file=C:\tf\poker3\tflite\tflite_graph.pb ^
