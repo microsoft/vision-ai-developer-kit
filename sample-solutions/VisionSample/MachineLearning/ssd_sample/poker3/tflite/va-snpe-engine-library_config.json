@@ -1,0 +1,25 @@
+{
+    "FrameworkType":1,
+    "Engine": 1,
+    "NetworkIO": 0,
+    "ScaleWidth": 300,
+    "ScaleHeight": 300,
+    "PixelNorm": 0,
+    "BlueMean": 0,
+    "GreenMean": 0,
+    "RedMean": 0,
+    "TargetFPS": 10,
+    "ConfThreshold": 0.5,
+    "DLC_NAME": "",
+    "LABELS_NAME": "labelmap.txt",
+    "InputLayers": "data",
+    "OutputLayers": [
+        "detection_out"
+    ],
+    "ResultLayers": [
+        "detection_out"
+    ],
+    "Runtime": 0,
+    "MODEL_FILENAME":"detect.tflite",
+    "NUM_THREADS":2
+}
