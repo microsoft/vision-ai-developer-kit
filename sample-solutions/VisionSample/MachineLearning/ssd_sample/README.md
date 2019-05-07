@@ -62,7 +62,7 @@
     python setup.py install
     ```
 1. Download and expand [**ssd_mobilenet_v2_quantized_coco model**](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.tar.gz).
-1. Copy the extracted **ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03** folder to **c:\tf\models\research\objection_detection** folder.
+1. Copy the extracted **ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03** folder to **c:\tf\models\research\object_detection** folder.
 1. Copy **poker3** folder to **c:\tf** folder.
 1. Launch **Anaconda Prompt**, change directory to **c:\tf\models\research\object_detection** and execute the following command to retrain a new **ssd_mobilenet_v2_quantized** model with **poker3** dataset:
     ```<language>
