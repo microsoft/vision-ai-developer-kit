@@ -33,12 +33,12 @@ def getWlanIp():
         IP = s.getsockname()[0]
         if IP.split('.')[0] == '172':
             print("Ip address detected is :: " + IP )
-            IP = '127.0.0.1'
+            IP = '172.17.0.1'
             print("Ip address changed to :: " + IP + "to avoid docker interface")
         print("Ip address detected is :: " + IP )
         
     except:
-        IP = '127.0.0.1'
+        IP = '172.17.0.1'
     finally:
         s.close()
     return IP
