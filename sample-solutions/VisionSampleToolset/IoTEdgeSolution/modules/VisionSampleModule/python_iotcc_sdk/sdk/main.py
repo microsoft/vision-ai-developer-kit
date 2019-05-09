@@ -25,7 +25,6 @@ def main(protocol=None):
     parser.add_argument('--ip', help='ip address of the camera', default=utility.getWlanIp())
     parser.add_argument('--username', help='username of the camera', default='admin')
     parser.add_argument('--password', help='password of the camera', default='admin')
-
     args = parser.parse_args()
     if args.pushmodel is not None:
         mypushmodel = args.pushmodel
@@ -122,12 +121,12 @@ def print_inferences(results=None, camera_client=None,hub_manager=None):
                 else:
                     logging.debug("skipping sending msg to cloud until :: " + str(iot.FreqToSendMsg - ((time.time() - startTime))))
                 logging.debug("")
-            else:
-                logging.debug("No results")
-                if iot.restartCamera :
-                    logging.info(iot.restartCamera)
-                    restartInference(camera_client,hub_manager)
-                    return
+        else:
+            logging.debug("No results")
+            if iot.restartCamera :
+                logging.info(iot.restartCamera)
+                restartInference(camera_client,hub_manager)
+                return
 
 def restartInference(camera_client = None,hub_manager = None) :
     iot.restartCamera = False

@@ -59,7 +59,8 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.VisionSampleModule.arm32v7}",
-              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/data/misc/camera:/app/vam_model_folder\",\"/run/systemd:/run/systemd\"],\"NetworkMode\":\"host\"},\"NetworkingConfig\":{\"EndpointsConfig\":{\"host\":{}}},\"Cmd\":[\"-p False\"]}"
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/data/misc/camera:/app/vam_model_folder\",\"/run/systemd:/run/systemd\"]},\"Cmd\":[\"-p False\"]}"
+              
             }
           }
         }
