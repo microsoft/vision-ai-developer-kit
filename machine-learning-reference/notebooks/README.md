@@ -13,7 +13,7 @@ Setup a NotebookVM in Azure Machine Learning Workspace.
    - Select __+New__ to create a notebook VM.
    - Provide a name for your VM and select __Create__.
    - Wait approximately 4-5 minutes until the status changes to __Running__
-3. Launch the Jupyter wed interface in your Notebook VM
+3. Launch the Jupyter web interface in your Notebook VM
    - Select __Jupyter__ in the __URI__ column for your VM.
    - On the Jupyter notebook webpage, the top foldername is your username.
    
