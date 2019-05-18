@@ -18,7 +18,7 @@ modules\\**VisionSampleModule** folder includes:
    * **Dockerfile.arm32v7** file: instructions used to build this module image.
    * **module.json** file: config file for this module.
 
-1. Overwrite **deployment.template.json**'s content by **01-visionsample-deployment.template.json** file.  It only includes one modeule: VisionSampleModule.
+1. Overwrite **deployment.template.json**'s content by **01-visionsample-deployment.template.json** file.  It only includes one module: VisionSampleModule.
 
 2.  Update the **.env** file with the values for your container image name and container registry.  Refer to [**Create a container registry**](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
      ```<language>
@@ -45,7 +45,7 @@ modules\\**VisionSampleModule** folder includes:
 
 modules\\**BusinessLogicModule** folder includes:
    * **Dockerfile.arm32v7** file: instructions used to build this module image.
-   * **main.py** file: implements a business logic to send a detected message received from VisionSampleModule with adding an extra property ["MessageSender", "BusinessLogicModule"] to IoT Hub while detecting a target object, for example: ìscissorsî.  
+   * **main.py** file: implements a business logic to send a detected message received from VisionSampleModule with adding an extra property ["MessageSender", "BusinessLogicModule"] to IoT Hub while detecting a target object, for example: ‚Äúscissors‚Äù.  
 Refer to [Tutorial: Deploy Azure functions as IoT Edge modules](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-deploy-function) for more detail about business logic.
    * **module.json** file: config file for this module.
    *  **requirements.txt** file: Python packages required to be installed .
