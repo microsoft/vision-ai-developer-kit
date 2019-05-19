@@ -1,0 +1,3 @@
+pip>=9.0.0
+requests
+setuptools-git
