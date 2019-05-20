@@ -79,11 +79,11 @@
     },
     "VisionSampleModule": {
       "properties.desired":{
-          "ModelUrl":"",
-          "LabelUrl":"",
-          "ConfigUrl":"",
-          "FreqToSendMsg": 12,
-          "ObjectOfInterest":"ALL"
+          "model_url":"",
+          "label_url":"",
+          "config_url":"",
+          "msg_per_minute": 5,
+          "object_of_interest":"ALL"
       }
     }
   }

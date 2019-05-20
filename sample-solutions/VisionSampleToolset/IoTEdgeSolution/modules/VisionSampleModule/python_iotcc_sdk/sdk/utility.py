@@ -69,10 +69,10 @@ def WaitForFileDownload(FileName):
         except IOError:
             time.sleep(1)
     print("Got it ! File Download Complete !")
-def GetFile(ModelUrl) :
+def get_file(url) :
     #adding code to fix issue where the file name may not be part of url details here 
     #
-    remotefile = urlopen(ModelUrl)
+    remotefile = urlopen(url)
     myurl = remotefile.url
     FileName = myurl.split("/")[-1]
     if FileName:
@@ -81,7 +81,7 @@ def GetFile(ModelUrl) :
         #src = os.path.join(dirpath,"model")
         dst = os.path.abspath("/app/vam_model_folder")
         print("Downloading File ::" + FileName)
-        urllib2.urlretrieve(ModelUrl, filename=(os.path.join(dst,FileName)))
+        urllib2.urlretrieve(url, filename=(os.path.join(dst,FileName)))
         WaitForFileDownload(os.path.join(dst,FileName))
         return True
     else:
@@ -131,7 +131,7 @@ def checkmodelexist():
             print("No dlc or tflit model on device")
             return False
 
-def CallSystemCmd(cmd):
+def send_system_cmd(cmd):
     print('Command we are sending is ::' + cmd)
     returnedvalue = sp.call(cmd,shell=True)
     print('returned-value is:' + str(returnedvalue))

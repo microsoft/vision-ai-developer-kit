@@ -4,7 +4,7 @@
     "image": {
         "repository": "${REGISTRY_ADDRESS}/visionsamplemodule",
         "tag": {
-            "version": "1.7.2",
+            "version": "1.7.7",
             "platforms": {
                 "amd64": "./Dockerfile.amd64",
                 "arm32v7": "./Dockerfile.arm32v7"
