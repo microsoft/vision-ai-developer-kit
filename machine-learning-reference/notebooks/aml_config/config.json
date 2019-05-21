@@ -1,5 +1,5 @@
 {
-    "subscription_id": "75f78a03-482f-4fd8-8c71-5ddc08f92726",
-    "resource_group": "tedway-vienna1-rg",
-    "workspace_name": "aml-vdaik-1"
+    "subscription_id": "subscription ID goes here",
+    "resource_group": "resource group goes here",
+    "workspace_name": "workspace name goes here"
 }
