@@ -25,39 +25,38 @@ class ModelUtility:
 
         print("Clean up model folder.")
         self.__prepare_target_folder(VAM_MODEL_DIR)
-        
+
         dest_dir = os.path.abspath(VAM_MODEL_DIR)
         dest_file_name = os.path.join(dest_dir, file_name)
-        
-        print("Downloading File: %s" % file_name)
+        print("Downloading file: %s" % file_name)
         urllib2.urlretrieve(model_url, dest_file_name)
         self.__wait_for_file_download(dest_file_name)
-        
+
         print("Unzip the model files.")
         self.__unzip_model_file(dest_file_name, dest_dir)
 
     def restart_service(self, service_name):
-        self.__call_system_command('systemctl restart %s' % service_name)
+        self.__call_system_command("systemctl restart %s" % service_name)
         time.sleep(1)
 
     def restart_device(self):
-        self.__call_system_command('systemctl reboot')
+        self.__call_system_command("systemctl reboot")
 
     # this function returns the device ip address if it is public ip else 127.0.0.1
     def getWlanIp(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             # doesn't even have to be reachable
-            s.connect(('10.255.255.255', 1))
+            s.connect(("10.255.255.255", 1))
             ip_address = s.getsockname()[0]
-            print('Found IP: %s' % ip_address)
-            if ip_address.split('.')[0] == '172':
-                ip_address = '172.17.0.1'
-                print('Ip set to: %s to avoid docker interface', ip_address)
+            print("Found IP: %s" % ip_address)
+            if ip_address.split(".")[0] == "172":
+                ip_address = "172.17.0.1"
+                print("IP set to: %s to avoid docker interface" % ip_address)
 
-        except Exception:
-            log_unknown_exception("Error retrieving ip address")
-            ip_address = '172.17.0.1'
+        except Exception as ex:
+            log_unknown_exception("Error retrieving IP address: %s" % ex)
+            ip_address = "172.17.0.1"
         finally:
             s.close()
         return ip_address
@@ -70,7 +69,7 @@ class ModelUtility:
         self.__prepare_target_folder(VAM_MODEL_DIR)
 
         for file_name in self.__get_model_files():
-            print("transfering file %s" % file_name)
+            print("Transfering file %s" % file_name)
             str_file = str(file_name)
             file_dest = os.path.join(VAM_MODEL_DIR, os.path.basename(str_file))
             print("File destination: %s" % file_dest)
@@ -79,7 +78,7 @@ class ModelUtility:
     def restart_camera(self, camera_client=None):
         try:
             self.restart_device()
-            print("turning camera off and log out")
+            print("Turning camera off and log out")
             if camera_client is not None:
                 camera_client.logout()
                 camera_client = None
@@ -89,12 +88,12 @@ class ModelUtility:
             log_unknown_exception("Camera restart failed. Restart the device")
 
     def __call_system_command(self, cmd):
-        print('Command we are sending is ::' + cmd)
+        print("Command we are sending is: %s" % cmd)
         returnedvalue = sp.call(cmd, shell=True)
-        print('returned-value is:' + str(returnedvalue))
+        print("Returned-value is: %s" % str(returnedvalue))
 
     def __check_model_exists(self):
-        if(len(list(Path("/app/vam_model_folder").glob('*.dlc'))) > 0):
+        if len(list(Path("/app/vam_model_folder").glob("*.dlc"))) > 0:
             return True
         else:
             print("No dlc or tflit model on device")
@@ -102,11 +101,10 @@ class ModelUtility:
 
     def __find_file(self, input_path, file_name):
         # search the input path and all sub-directories for file_name
-        selected_files = list(Path(input_path).glob('**/%s' % file_name))
+        selected_files = list(Path(input_path).glob("**/%s" % file_name))
 
         if len(selected_files) != 1:
-            print('Expected 1 file %s in %s got %s' %
-                  (file_name, input_path, selected_files))
+            print("Expected 1 file %s in %s but got %s" % (file_name, input_path, selected_files))
             return
         return selected_files[0]
 
@@ -115,8 +113,8 @@ class ModelUtility:
         remote_file_url = remote_file.url
         split_url = remote_file_url.split("/")
 
-        if len(split_url) == 0:
-            print("Cannot extract file name from URL")
+        if not split_url:
+            print("Cannot extract file name from URL: %s" % remote_file_url)
             return None
 
         return split_url[-1]
@@ -133,7 +131,7 @@ class ModelUtility:
         return [config_file, dlc_file, label_file]
 
     def __prepare_target_folder(self, folder):
-        if(not os.path.isdir(folder)):
+        if (not os.path.isdir(folder)):
             os.makedirs(folder, exist_ok=True)
             return
 
@@ -142,7 +140,7 @@ class ModelUtility:
             # ignore the debugging file
             if "aecWarm" in str_file:
                 continue
-            print('deleting file %s...' % str_file)
+            print("Deleting file %s..." % str_file)
             os.chmod(str_file, 0o777)
             os.remove(str_file)
 
@@ -159,4 +157,4 @@ class ModelUtility:
                     valid = 1
             except IOError:
                 time.sleep(1)
-        print("Got it! File Download Complete!")
+        print("File download is complete!")
