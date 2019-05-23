@@ -139,11 +139,9 @@ class CameraProperties:
                                             display_out=self.__display_out)
 
             print("set preview state (%s)" % self.__preview_state)
-            camera_client.set_preview_state(self.__preview_state)
-            if camera_client.preview_running is not self.preview_state:
-                print("Preview state is: %s" % camera_client.preview_running)
-                print("Expected preview state is: %s" % self.preview_state)
-                raise CameraClientError("preview in bad state")
+            if not camera_client.set_preview_state(self.__preview_state):
+                raise CameraClientError(
+                    "failed to set the preview state to %s" % self._CameraProperties__preview_state)
 
             # set overlay config then turn it on/off
             print("configure_overlay(%s)" % self.overlay_config)
@@ -151,12 +149,12 @@ class CameraProperties:
             print("configure_overlay_state(%s)" % self.__overlay_state)
             camera_client.set_overlay_state(self.__overlay_state)
 
-        if self.analytics_state:
-            print("set_analytics_state(%s)" % self.__analytics_state)
-            camera_client.set_analytics_state(self.__analytics_state)
-            if not camera_client.vam_running:
-                raise CameraClientError(
-                    "VAM failed to start in configure_camera_client")
+        print("set_analytics_state(%s)" % self.__analytics_state)
+        if not camera_client.set_analytics_state(self.__analytics_state):
+            print("failed to set vam_running state to: %s" %
+                  self.analytics_state)
+            raise CameraClientError(
+                "VAM failed to start in configure_camera_client")
 
         # update properties from the camera
         self.update_camera_properties(camera_client)
@@ -235,13 +233,13 @@ class CameraProperties:
             count += 1
             time.sleep(5)
 
-        # count = 0
-        # print("turn analytics off")
-        # while camera_client.vam_running and count < 5:
-        #     print("retrying analytics off: %s" % count)
-        #     camera_client.set_analytics_state("off")
-        #     count += 1
-        #     time.sleep(1)
+        count = 0
+        print("turn analytics off")
+        while camera_client.vam_running and count < 5:
+            print("retrying analytics off: %s" % count)
+            camera_client.set_analytics_state("off")
+            count += 1
+            time.sleep(1)
 
     # update property and return bool to indicate if changed
     def __update_analytics_state(self, data):

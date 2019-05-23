@@ -46,12 +46,12 @@ class ModelUtility:
             ip_address = s.getsockname()[0]
             print('Found IP: %s' % ip_address)
             if ip_address.split('.')[0] == '172':
-                ip_address = '127.0.0.1'
+                ip_address = '172.17.0.1'
                 print('Ip set to: %s to avoid docker interface', ip_address)
 
         except Exception:
             log_unknown_exception("Error retrieving ip address")
-            ip_address = '127.0.0.1'
+            ip_address = '172.17.0.1'
         finally:
             s.close()
         return ip_address

@@ -69,13 +69,7 @@
                   "Binds": [
                     "/data/misc/camera:/app/vam_model_folder",
                     "/run/systemd:/run/systemd"
-                  ],
-                  "NetworkMode": "host"
-                },
-                "NetworkingConfig": {
-                  "EndpointsConfig": {
-                    "host": {}
-                  }
+                  ]
                 }
               }
             }
