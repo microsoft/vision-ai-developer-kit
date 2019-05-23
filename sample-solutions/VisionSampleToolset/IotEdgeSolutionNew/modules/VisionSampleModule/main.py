@@ -17,7 +17,6 @@ from . properties import Properties
 from . model_utility import ModelUtility
 from . inference import Inference
 from iotccsdk import CameraClient
-# pylint: disable=E0611
 from iothub_client import IoTHubModuleClient, IoTHubTransportProvider, IoTHubError
 from iothub_client import IoTHubMessage, DeviceMethodReturnValue
 import time
@@ -142,7 +141,8 @@ def update_model_and_config():
         camera_props.configure_camera_client(camera_client, is_model_changed)
         properties.report_properties_to_hub(hub_manager)
     except Exception as ex:
-        log_unknown_exception("Error raised while handling update callback", hub_manager)
+        log_unknown_exception(
+            "Error raised while handling update callback", hub_manager)
         raise ex
         model_util.restart_camera(camera_client)
 
@@ -210,12 +210,17 @@ def main(protocol):
                 hub_manager.subscribe_to_events()
                 while True:
                     try:
-                        with camera_client.get_inferences() as results:
-                            for result in results:
-                                last_time = print_inference(
-                                    result, hub_manager, last_time)
+                        while camera_client.vam_running:
+                            with camera_client.get_inferences() as results:
+                                for result in results:
+                                    last_time = print_inference(
+                                        result, hub_manager, last_time)
+                    except EOFError:
+                        print("current vam state: %s" %
+                              camera_client.vam_running)
                     except Exception:
-                        log_unknown_exception("exception from get inferences", hub_manager)
+                        log_unknown_exception(
+                            "exception from get inferences", hub_manager)
                         continue
             except CameraClientError:
                 print("Got camera error will try to continue")
@@ -232,11 +237,12 @@ def main(protocol):
                 return
             finally:
                 print("try to clean up before the end")
-                camera_client.set_overlay_state("off")
-                camera_client.set_analytics_state("off")
-                camera_client.set_preview_state("off")
-                status = camera_client.logout()
-                print("logout with status: %s" % status)
+                if camera_client is not None:
+                    camera_client.set_overlay_state("off")
+                    camera_client.set_analytics_state("off")
+                    camera_client.set_preview_state("off")
+                    status = camera_client.logout()
+                    print("logout with status: %s" % status)
 
 
 if __name__ == '__main__':

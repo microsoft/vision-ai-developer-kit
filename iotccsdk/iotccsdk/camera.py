@@ -33,8 +33,6 @@ This module contains the high level client APIs.
 import base64
 import logging
 import os
-import sys
-import time
 from contextlib import contextmanager
 from .ipcprovider import IpcProvider
 from .frame_iterators import VideoInferenceIterator
@@ -201,7 +199,8 @@ class CameraClient():
             inference_iterator.stop()
 
     @contextmanager
-    def configure_preview(self, resolution=None, encode=None, bitrate=None, framerate=None, display_out=None):
+    def configure_preview(self, resolution=None, encode=None,
+                          bitrate=None, framerate=None, display_out=None):
         """
         This method is for setting preview params.
 
@@ -241,9 +240,9 @@ class CameraClient():
         else:
             fps = self.framerates.index(self.cur_framerate)
 
-        if display_out is None or not display_out in [0,1]:
+        if display_out is None or display_out not in [0, 1]:
             self.logger.error(
-                "Invalid value: display_out should 0/1, using current display_out:{}".format(self.display_out))
+                "Invalid value: display_out should 0/1 using current display_out: %s" % (self.display_out))
             display_out = self.display_out
 
         path = "/video"
@@ -346,10 +345,10 @@ class CameraClient():
         path = "/preview"
         payload = {'switchStatus': status}
         response = self.ipc_provider.post(path, payload)
-        self.preview_running = response["status"]
-        if status and self.preview_running:
-            self._get_preview_info()
-        return self.preview_running
+        self.logger.info("response was: %s" % response)
+        was_success = response["status"]
+        self._get_preview_info()
+        return was_success
 
     @contextmanager
     def _get_preview_info(self):
@@ -365,8 +364,12 @@ class CameraClient():
         path = "/preview"
         payload = '{ }'
         response = self.ipc_provider.get(path, payload)
-        self.preview_url = response["url"]
-        self.logger.info('preview url: ' + self.preview_url)
+        if "url" in response:
+            self.preview_url = response["url"]
+        else:
+            self.preview_url = None
+        self.logger.info('preview url: %s' % self.preview_url)
+        self.preview_running = response["status"]
         return self.preview_url
 
     @contextmanager
@@ -396,10 +399,9 @@ class CameraClient():
         payload = {"switchStatus": status, "vamconfig": "MD"}
         path = "/vam"
         response = self.ipc_provider.post(path, payload)
-        self.vam_running = response["status"]
-        if status and self.vam_running:
-            self._get_vam_info()
-        return self.vam_running
+        was_success = response["status"]
+        self._get_vam_info()
+        return was_success
 
     @contextmanager
     def _get_vam_info(self):
@@ -415,9 +417,14 @@ class CameraClient():
         path = "/vam"
         payload = '{ }'
         response = self.ipc_provider.get(path, payload)
-        self.vam_url = response["url"]
-        self.logger.info('vam url: ' + self.preview_url)
-        return self.vam_url
+        if "url" in response:
+            self.vam_url = response["url"]
+        else:
+            self.vam_url = None
+
+        self.vam_running = response["status"]
+        self.logger.info('vam url: %s' % self.vam_url)
+        return
 
     @contextmanager
     def set_recording_state(self, state):
@@ -442,7 +449,7 @@ class CameraClient():
         elif state.lower() == "off":
             status = False
         else:
-            self.logger.error("Invalid state: " + state + " should be on/off")
+            self.logger.error("Invalid state: %s should be on/off" % state)
         path = "/recording"
         payload = {'switchStatus': status}
         response = self.ipc_provider.post(path, payload)
@@ -550,7 +557,7 @@ class CameraClient():
         elif state.lower() == "off":
             status = False
         else:
-            self.logger.error("Invalid state: " + state + " should be on/off")
+            self.logger.error("Invalid state: %s should be on/off" % state)
         path = "/overlay"
         payload = {"switchStatus": status}
         response = self.ipc_provider.post(path, payload)
@@ -578,7 +585,7 @@ class CameraClient():
             return False
 
         file_name = os.path.join(os.path.dirname(os.path.abspath(
-            __name__)), 'snapshot_' + str(response["Timestamp"]) + '.jpg')
+            __name__)), 'snapshot_%s.jpg' % str(response["Timestamp"]))
         self.logger.info("Storing snapshot: {}".format(file_name))
         with open(file_name, "wb") as f:
             f.write(base64.b64decode(response["Data"]))
