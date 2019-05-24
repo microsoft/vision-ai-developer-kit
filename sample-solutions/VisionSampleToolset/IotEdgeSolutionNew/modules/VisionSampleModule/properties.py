@@ -1,7 +1,10 @@
 import json
 import time
-from .error_utils import log_unknown_exception, CameraClientError
-from .model_utility import ModelUtility
+from . error_utils import log_unknown_exception, CameraClientError
+from . model_utility import ModelUtility
+from . constants import SETTING_ON, \
+    SETTING_OFF, \
+    MINIMUM_MESSAGE_DELAY_IN_SECONDS
 
 
 MODEL_ZIP_URL_PROP = "ModelZipUrl"
@@ -47,7 +50,7 @@ PROPERTY_NAME_MAP = {
 class CameraProperties:
 
     def __init__(self):
-        print("init CameraProperties")
+        print("Init CameraProperties")
         self.bitrate = "1.5Mbps"
         self.codec = "AVC/H.264"
         self.data_rtsp_url = ""
@@ -55,10 +58,10 @@ class CameraProperties:
         self.overlay_config = "inference"
         self.resolution = "1080P"
         self.video_rtsp_url = ""
-        self.__analytics_state = "on"
+        self.__analytics_state = SETTING_ON
         self.__display_out = 1
-        self.__overlay_state = "on"
-        self.__preview_state = "on"
+        self.__overlay_state = SETTING_ON
+        self.__preview_state = SETTING_ON
         self.__supported_bitrates = ""
         self.__supported_config_overlay = ["text", "inference"]
         self.__supported_encoding = ""
@@ -68,15 +71,15 @@ class CameraProperties:
 
     @property
     def analytics_state(self):
-        return True if self.__analytics_state == "on" else False
+        return self.__analytics_state == SETTING_ON
 
     @analytics_state.setter
     def analytics_state(self, value):
-        self.__analytics_state = "on" if value else "off"
+        self.__analytics_state = SETTING_ON if value else SETTING_OFF
 
     @property
     def display_out(self):
-        return True if self.__display_out == 1 else False
+        return self.__display_out == 1
 
     @display_out.setter
     def display_out(self, value):
@@ -84,19 +87,19 @@ class CameraProperties:
 
     @property
     def overlay_state(self):
-        return True if self.__overlay_state == "on" else False
+        return self.__overlay_state == SETTING_ON
 
     @overlay_state.setter
     def overlay_state(self, value):
-        self.__overlay_state = "on" if value else "off"
+        self.__overlay_state = SETTING_ON if value else SETTING_OFF
 
     @property
     def preview_state(self):
-        return True if self.__preview_state == "on" else False
+        return self.__preview_state == SETTING_ON
 
     @preview_state.setter
     def preview_state(self, value):
-        self.__preview_state = "on" if value else "off"
+        self.__preview_state = SETTING_ON if value else SETTING_OFF
 
     @property
     def supported_encoding(self):
@@ -125,36 +128,43 @@ class CameraProperties:
         if camera_client is None:
             raise ValueError("camera_client is None")
 
-        print("(re)configure camera_client")
+        print("Configuring camera_client")
 
         self.__turn_camera_off(camera_client)
 
         # set up preview plus overlay
         if self.preview_state:
-            print("configure preview (%s, %s, %s, %s, %s)" % (self.resolution, self.codec,
-                                                              self.bitrate, self.framerate,
-                                                              self.__display_out))
-            camera_client.configure_preview(resolution=self.resolution, encode=self.codec,
-                                            bitrate=self.bitrate, framerate=self.framerate,
-                                            display_out=self.__display_out)
+            print(
+                "Configure preview (%s, %s, %s, %s, %s)",
+                self.resolution,
+                self.codec,
+                self.bitrate,
+                self.framerate,
+                self.__display_out)
 
-            print("set preview state (%s)" % self.__preview_state)
+            camera_client.configure_preview(
+                resolution=self.resolution,
+                encode=self.codec,
+                bitrate=self.bitrate,
+                framerate=self.framerate,
+                display_out=self.__display_out)
+
+            print("set preview state: %s" % self.__preview_state)
             if not camera_client.set_preview_state(self.__preview_state):
                 raise CameraClientError(
-                    "failed to set the preview state to %s" % self._CameraProperties__preview_state)
+                    ("failed to set the preview state to %s"
+                        % self._CameraProperties__preview_state))
 
             # set overlay config then turn it on/off
-            print("configure_overlay(%s)" % self.overlay_config)
+            print("configure_overlay: %s" % self.overlay_config)
             camera_client.configure_overlay(self.overlay_config)
-            print("configure_overlay_state(%s)" % self.__overlay_state)
+            print("configure_overlay_state: %s" % self.__overlay_state)
             camera_client.set_overlay_state(self.__overlay_state)
 
         print("set_analytics_state(%s)" % self.__analytics_state)
         if not camera_client.set_analytics_state(self.__analytics_state):
-            print("failed to set vam_running state to: %s" %
-                  self.analytics_state)
-            raise CameraClientError(
-                "VAM failed to start in configure_camera_client")
+            print("Failed to set vam_running state to: %s" % self.analytics_state)
+            raise CameraClientError("VAM failed to start in configure_camera_client")
 
         # update properties from the camera
         self.update_camera_properties(camera_client)
@@ -223,21 +233,21 @@ class CameraProperties:
 
     # turn off preview, overlay and analytics
     def __turn_camera_off(self, camera_client):
-        camera_client.set_overlay_state("off")
+        camera_client.set_overlay_state(SETTING_OFF)
 
         count = 0
-        print("turn preview off")
+        print("Turning preview off")
         while camera_client.preview_running and count < 5:
-            print("retrying preview off: %s" % count)
-            camera_client.set_preview_state("off")
+            print("Retrying turning preview off: %s", count)
+            camera_client.set_preview_state(SETTING_OFF)
             count += 1
             time.sleep(5)
 
         count = 0
-        print("turn analytics off")
+        print("Turning analytics off")
         while camera_client.vam_running and count < 5:
-            print("retrying analytics off: %s" % count)
-            camera_client.set_analytics_state("off")
+            print("Retrying analytics off: %s", count)
+            camera_client.set_analytics_state(SETTING_OFF)
             count += 1
             time.sleep(1)
 
@@ -268,8 +278,7 @@ class CameraProperties:
     # update property and return bool to indicate if changed
     def __update_display_out(self, data):
         new_value = Properties.get_twin_property(data, DISPLAY_OUT_PROP)
-        if (new_value is None
-                or new_value is self.display_out):
+        if (new_value is None or new_value is self.display_out):
             return False
         self.display_out = new_value
         return True
@@ -315,15 +324,12 @@ class CameraProperties:
         return True
 
     def __list_to_delimited(self, input_list):
-        value_string = ""
-        for value in input_list:
-            value_string += ("%s | " % value)
-        return value_string[:-3]
+        return ' | '.join(input_list)
 
 
 class ModelProperties:
     def __init__(self):
-        print("init ModelProperties")
+        print("Init ModelProperties")
         self.model_zip_url = ""
         self.message_delay_sec = 6
         self.objects_of_interest = ["All"]
@@ -346,8 +352,7 @@ class ModelProperties:
         props = list()
         props.append({MODEL_ZIP_URL_PROP: self.model_zip_url})
         props.append({MESSAGE_DELAY_SECS_PROP: self.message_delay_sec})
-        props.append(
-            {OBJS_OF_INTEREST_PROP: json.dumps(self.objects_of_interest)})
+        props.append({OBJS_OF_INTEREST_PROP: json.dumps(self.objects_of_interest)})
         return props
 
     def update_inference_model(self):
@@ -363,28 +368,25 @@ class ModelProperties:
             return False
 
     def __handle_model_updates(self, data):
-        new_zip_url = Properties.get_twin_property(
-            data, MODEL_ZIP_URL_PROP) or self.model_zip_url
+        new_zip_url = Properties.get_twin_property(data, MODEL_ZIP_URL_PROP) or self.model_zip_url
 
         if (self.model_zip_url.lower != new_zip_url.lower):
             self.model_zip_url = new_zip_url
             self.has_model_changed = True
 
     def __update_objects_of_interest(self, data):
-        objects_json = Properties.get_twin_property(
-            data, OBJS_OF_INTEREST_PROP)
+        objects_json = Properties.get_twin_property(data, OBJS_OF_INTEREST_PROP)
         if objects_json is not None:
             self.objects_of_interest = json.loads(objects_json)
 
     def __update_message_delay(self, data):
         delay = Properties.get_twin_property(data, MESSAGE_DELAY_SECS_PROP)
         try:
-            if delay < 6:
-                delay = 6
+            if delay < MINIMUM_MESSAGE_DELAY_IN_SECONDS:
+                delay = MINIMUM_MESSAGE_DELAY_IN_SECONDS
         except Exception:
-            log_unknown_exception(
-                "Message delay must be a number got %s" % delay)
-            delay = 6
+            log_unknown_exception("Message delay must be a number got %s" % delay)
+            delay = MINIMUM_MESSAGE_DELAY_IN_SECONDS
         self.message_delay_sec = delay
 
 
@@ -392,7 +394,7 @@ class Properties:
     SEND_REPORTED_STATE_CONTEXT = 0
 
     def __init__(self):
-        print("init Properties")
+        print("Init Properties")
         self.camera_properties = CameraProperties()
         self.model_properties = ModelProperties()
 
@@ -414,30 +416,29 @@ class Properties:
 
     def __report_property(self, prop, hub_manager):
         json_prop = json.dumps(prop)
-        print("Send prop : %s" % json_prop)
+        print("Send prop: %s" % json_prop)
         hub_manager.client.send_reported_state(
             json_prop,
             len(json_prop),
             Properties.send_reported_state_callback,
-            self.SEND_REPORTED_STATE_CONTEXT
-        )
+            self.SEND_REPORTED_STATE_CONTEXT)
 
     @staticmethod
     def get_twin_property(data, property_name):
         result = None
-        if "desired" in data and property_name in data["desired"]:
-            result = data["desired"][property_name]
+        DESIRED_PROPERTY = "desired"
+
+        if DESIRED_PROPERTY in data and property_name in data[DESIRED_PROPERTY]:
+            result = data[DESIRED_PROPERTY][property_name]
 
         if property_name in data:
             result = data[property_name]
 
-        if result == '' or result is None:
+        if result is None or result == "":
             return None
 
         return result
 
     @staticmethod
     def send_reported_state_callback(status_code, user_context):
-        print("")
-        print("Confirmation for reported state called with:")
-        print("    status_code: %d" % status_code)
+        print("\nConfirmation for reported state called with status_code: %d" % status_code)
