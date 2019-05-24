@@ -355,7 +355,7 @@ class ModelProperties:
             return False
         try:
             model_util = ModelUtility()
-            model_util.get_file(self.model_zip_url)
+            model_util.replace_model_files(self.model_zip_url)
             self.has_model_changed = False
             return True
         except Exception:

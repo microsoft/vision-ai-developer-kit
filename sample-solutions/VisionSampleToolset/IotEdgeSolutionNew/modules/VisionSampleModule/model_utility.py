@@ -18,16 +18,22 @@ class ModelUtility:
     def __init__(self):
         pass
 
-    def get_file(self, model_url):
+    def replace_model_files(self, model_url):
         file_name = self.__get_file_name(model_url)
         if file_name is None:
             return False
 
+        print("Clean up model folder.")
+        self.__prepare_target_folder(VAM_MODEL_DIR)
+        
         dest_dir = os.path.abspath(VAM_MODEL_DIR)
         dest_file_name = os.path.join(dest_dir, file_name)
-        print("Downloading File ::" + file_name)
+        
+        print("Downloading File: %s" % file_name)
         urllib2.urlretrieve(model_url, dest_file_name)
         self.__wait_for_file_download(dest_file_name)
+        
+        print("Unzip the model files.")
         self.__unzip_model_file(dest_file_name, dest_dir)
 
     def restart_service(self, service_name):
@@ -140,9 +146,10 @@ class ModelUtility:
             os.chmod(str_file, 0o777)
             os.remove(str_file)
 
-    def __unzip_model_file(self, zip_file):
-        with ZipFile(zip_file) as archive:
-            archive.extractall()
+    def __unzip_model_file(self, zip_file, destination):
+        print("Extract from file: %s" % zip_file)
+        with ZipFile(zip_file, 'r') as archive:
+            archive.extractall(destination)
 
     def __wait_for_file_download(self, file_name):
         valid = 0
@@ -152,4 +159,4 @@ class ModelUtility:
                     valid = 1
             except IOError:
                 time.sleep(1)
-        print("Got it ! File Download Complete !")
+        print("Got it! File Download Complete!")
