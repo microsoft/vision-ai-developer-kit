@@ -15,6 +15,7 @@ import json
 import urllib.request as urllib2
 from urllib.request import urlopen
 import glob
+import zipfile
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,9 +55,6 @@ def prepare_folder(folder):
     else:
         os.makedirs(folder, exist_ok=True)
 
-""" def reporthook(count, block_size, total_size): 
-    if int(count * block_size * 100 / total_size) == 100:
-        print('Download completed!')"""
 
 def WaitForFileDownload(FileName):
     # ----------------------------------------------------
@@ -69,7 +67,7 @@ def WaitForFileDownload(FileName):
         except IOError:
             time.sleep(1)
     print("Got it ! File Download Complete !")
-def get_file(url) :
+def get_file(url,dst_folder="/app/vam_model_folder") :
     #adding code to fix issue where the file name may not be part of url details here 
     #
     remotefile = urlopen(url)
@@ -79,7 +77,7 @@ def get_file(url) :
         # find root folders
         dirpath = os.getcwd()
         #src = os.path.join(dirpath,"model")
-        dst = os.path.abspath("/app/vam_model_folder")
+        dst = os.path.abspath(dst_folder)
         print("Downloading File ::" + FileName)
         urllib2.urlretrieve(url, filename=(os.path.join(dst,FileName)))
         WaitForFileDownload(os.path.join(dst,FileName))
@@ -88,10 +86,48 @@ def get_file(url) :
         print("Cannot extract file name from URL")
         return False
 
-# thsi function pushes a new model to device to location /data/misc/camera mounted at /app/vam_model_folder
-def transferdlc(pushmodel=None):
+def get_file_zip(url,dst_folder="vam_model_folder") :
+    #adding code to fix issue where the file name may not be part of url details here 
+    #
+    remotefile = urlopen(url)
+    myurl = remotefile.url
+    FileName = myurl.split("/")[-1]
+    if FileName:
+        # find root folders
+        dirpath = os.getcwd()
+        dirpath_file = os.path.join(dirpath,dst_folder)
+        src = os.path.abspath(dirpath_file)
+        src_file_path = os.path.join(src,FileName)
+        logger.info("location to download is ::" + src_file_path)
+        prepare_folder(dirpath_file)
+        print("Downloading File ::" + FileName)
 
-    if pushmodel.find("True") == -1 :
+        urllib2.urlretrieve(url, filename=src_file_path)
+        WaitForFileDownload(src_file_path)
+        result=unzip_and_move(src_file_path)
+
+        return result
+    else:
+        print("Cannot extract file name from URL")
+        return False
+
+def unzip_and_move(file_path=None,):
+    zip_ref = zipfile.ZipFile(file_path,'r')
+    dirpath = os.getcwd()
+    dirpath_file = os.path.join(dirpath,"twin_provided_model")
+    zip_ref.extractall(dirpath_file)
+    zip_ref.close()
+    logger.info("files unzipped to : " + dirpath_file)
+    transferdlc(True,"twin_provided_model")
+    return True
+
+
+
+# thsi function pushes a new model to device to location /data/misc/camera mounted at /app/vam_model_folder
+def transferdlc(pushmodel=None,src_folder="model"):
+
+    #if pushmodel.find("True") == -1 :
+    if not pushmodel:
             # checking and transferring model if the devie does not have any tflite or .dlc file on it..
         if(checkmodelexist()):
                 print("Not transferring model as transfer from container is disabled by settting pushmodel to False")
@@ -102,7 +138,7 @@ def transferdlc(pushmodel=None):
         print("transferring model ,label and va config file as set in create option with -p %s passed" % pushmodel)  
     # find root folders
     dirpath = os.getcwd()
-    src = os.path.join(dirpath,"model")
+    src = os.path.join(dirpath,src_folder)
     dst = os.path.abspath("/app/vam_model_folder")
 
     # find model files
@@ -140,7 +176,7 @@ def send_system_cmd(cmd):
 def find_file(input_path, suffix):
     files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_path) for f in filenames if f == suffix]
     if len(files) != 1:
-        raise ValueError("Expecting one ending with %s file as input, found %s in %s. Files: %s" % (suffix, len(files), input_path, files))
+        raise ValueError("Expecting a file ending with %s file as input. Found %s in %s. Files: %s" % (suffix, len(files), input_path, files))
     return os.path.join(input_path, files[0])
 
 #get the model path from confgiuartion file only used by Azure machine learning service path 
@@ -169,8 +205,9 @@ def getmodelpath(model_name):
 
     return model_path
 
-# if __name__ == "__main__":
-#     transferdlc()
+#if __name__ == "__main__":
+     #get_file_zip("https://yadavsrorageaccount01.blob.core.windows.net/visionstoragecontainer/a5719e7549c044fcaf83381a22e3d0b2.VAIDK.zip","twin_provided_model")
+
 
 
 
