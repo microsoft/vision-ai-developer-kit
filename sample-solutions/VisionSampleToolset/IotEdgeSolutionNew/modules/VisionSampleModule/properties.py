@@ -135,7 +135,7 @@ class CameraProperties:
         # set up preview plus overlay
         if self.preview_state:
             print(
-                "Configure preview (%s, %s, %s, %s, %s)",
+                "Configure preview (%s, %s, %s, %s, %s)" %
                 self.resolution,
                 self.codec,
                 self.bitrate,
@@ -161,7 +161,7 @@ class CameraProperties:
             print("configure_overlay_state: %s" % self.__overlay_state)
             camera_client.set_overlay_state(self.__overlay_state)
 
-        print("set_analytics_state(%s)" % self.__analytics_state)
+        print("set_analytics_state: %s" % self.__analytics_state)
         if not camera_client.set_analytics_state(self.__analytics_state):
             print("Failed to set vam_running state to: %s" % self.analytics_state)
             raise CameraClientError("VAM failed to start in configure_camera_client")
@@ -238,7 +238,7 @@ class CameraProperties:
         count = 0
         print("Turning preview off")
         while camera_client.preview_running and count < 5:
-            print("Retrying turning preview off: %s", count)
+            print("Retrying turning preview off: %s" % count)
             camera_client.set_preview_state(SETTING_OFF)
             count += 1
             time.sleep(5)
@@ -246,7 +246,7 @@ class CameraProperties:
         count = 0
         print("Turning analytics off")
         while camera_client.vam_running and count < 5:
-            print("Retrying analytics off: %s", count)
+            print("Retrying analytics off: %s" % count)
             camera_client.set_analytics_state(SETTING_OFF)
             count += 1
             time.sleep(1)
