@@ -8,7 +8,7 @@ from . constants import SETTING_ON, \
 
 
 MODEL_ZIP_URL_PROP = "ModelZipUrl"
-MESSAGE_DELAY_SECS_PROP = "MinMessageDelaySeconds"
+MESSAGE_DELAY_SECS_PROP = "TimeBetweenMessagesInSeconds"
 OBJS_OF_INTEREST_PROP = "ObjectsOfInterest"
 OVERLAY_STATE_PROP = "ShowVideoOverlay"
 OVERLAY_CONFIG_PROP = "VideoOverlayConfig"
@@ -136,11 +136,11 @@ class CameraProperties:
         if self.preview_state:
             print(
                 "Configure preview (%s, %s, %s, %s, %s)" %
-                self.resolution,
-                self.codec,
-                self.bitrate,
-                self.framerate,
-                self.__display_out)
+                (self.resolution,
+                 self.codec,
+                 self.bitrate,
+                 self.framerate,
+                 self.__display_out))
 
             camera_client.configure_preview(
                 resolution=self.resolution,
@@ -163,8 +163,10 @@ class CameraProperties:
 
         print("set_analytics_state: %s" % self.__analytics_state)
         if not camera_client.set_analytics_state(self.__analytics_state):
-            print("Failed to set vam_running state to: %s" % self.analytics_state)
-            raise CameraClientError("VAM failed to start in configure_camera_client")
+            print("Failed to set vam_running state to: %s" %
+                  self.analytics_state)
+            raise CameraClientError(
+                "VAM failed to start in configure_camera_client")
 
         # update properties from the camera
         self.update_camera_properties(camera_client)
@@ -324,7 +326,7 @@ class CameraProperties:
         return True
 
     def __list_to_delimited(self, input_list):
-        return ' | '.join(input_list)
+        return ' | '.join(map(str, input_list))
 
 
 class ModelProperties:
@@ -352,7 +354,8 @@ class ModelProperties:
         props = list()
         props.append({MODEL_ZIP_URL_PROP: self.model_zip_url})
         props.append({MESSAGE_DELAY_SECS_PROP: self.message_delay_sec})
-        props.append({OBJS_OF_INTEREST_PROP: json.dumps(self.objects_of_interest)})
+        props.append(
+            {OBJS_OF_INTEREST_PROP: json.dumps(self.objects_of_interest)})
         return props
 
     def update_inference_model(self):
@@ -368,14 +371,16 @@ class ModelProperties:
             return False
 
     def __handle_model_updates(self, data):
-        new_zip_url = Properties.get_twin_property(data, MODEL_ZIP_URL_PROP) or self.model_zip_url
+        new_zip_url = Properties.get_twin_property(
+            data, MODEL_ZIP_URL_PROP) or self.model_zip_url
 
         if (self.model_zip_url.lower != new_zip_url.lower):
             self.model_zip_url = new_zip_url
             self.has_model_changed = True
 
     def __update_objects_of_interest(self, data):
-        objects_json = Properties.get_twin_property(data, OBJS_OF_INTEREST_PROP)
+        objects_json = Properties.get_twin_property(
+            data, OBJS_OF_INTEREST_PROP)
         if objects_json is not None:
             self.objects_of_interest = json.loads(objects_json)
 
@@ -385,7 +390,8 @@ class ModelProperties:
             if delay < MINIMUM_MESSAGE_DELAY_IN_SECONDS:
                 delay = MINIMUM_MESSAGE_DELAY_IN_SECONDS
         except Exception:
-            log_unknown_exception("Message delay must be a number got %s" % delay)
+            log_unknown_exception(
+                "Message delay must be a number got %s" % delay)
             delay = MINIMUM_MESSAGE_DELAY_IN_SECONDS
         self.message_delay_sec = delay
 

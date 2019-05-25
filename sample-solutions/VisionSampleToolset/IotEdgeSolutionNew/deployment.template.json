@@ -63,7 +63,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.VisionSampleModule}",
+              "image": "${MODULES.VisionSampleModule.arm32v7}",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
@@ -91,7 +91,7 @@
     "VisionSampleModule": {
       "properties.desired": {
         "ModelZipUrl": "",
-        "MinMessageDelaySeconds": 6,
+        "TimeBetweenMessagesInSeconds": 12,
         "ObjectsOfInterest": "[\"ALL\"]",
         "ShowVideoOverlay": true,
         "Bitrate": "1.5Mbps",
