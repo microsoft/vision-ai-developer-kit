@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vision Sample camera webstream</title>
+        <style>    
+            #videoWindow {
+                width: 100%;
+                max-width: 1920px;
+            }
+        </style>
+    </head>
+    <body style="padding: 0;">
+        <video id="videoWindow" controls autoplay muted="muted" playsinline="true"></video>
+        <br>
+        <button id="playButton" onclick="ClickPlay()" style='display:none'>Play</button>
+    </body>
+    <script src="scripts/mpeg4.js"></script>
+</html>

@@ -2,22 +2,27 @@ FROM arm32v7/ubuntu:16.04
 
 RUN apt-get update \
     && apt-get install -y \
-    libboost-python-dev \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    python3.5 \
-    python3-pip \
-    wget \
-    inetutils-traceroute \
-    net-tools \
-    iputils-ping \
+        libboost-python-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        python3.5 \
+        python3-pip \
+        wget \
+        inetutils-traceroute \
+        net-tools \
+        iputils-ping \
+        libgstreamer1.0 \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-tools \
+        nodejs \
+        ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Repository of pre-built wheels for ARM
 RUN echo '[global]' >> /etc/pip.conf && \
     echo 'extra-index-url=https://www.piwheels.org/simple' >> /etc/pip.conf
 
-RUN pip3 install --upgrade pip 
+RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir https://modelmgmtreswcus.azureedge.net/wheels/azure_iothub_device_client-1.4.3-py3-none-linux_armv7l.whl
 
 RUN wget -O /THIRDPARTYNOTICE.TXT https://modelmgmtreswcus.azureedge.net/texts/THIRDPARTYNOTICE.TXT; \
@@ -33,20 +38,27 @@ done >> /THIRDPARTYNOTICE.TXT
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y libgstreamer1.0  gstreamer1.0-plugins-good gstreamer1.0-tools && \
-    rm -rf /var/lib/apt/lists/*
+RUN pip install --upgrade setuptools
 
-RUN pip install --upgrade setuptools 
+COPY requirements.txt iotccsdk-0.1.0+dev.tar.gz package*.json ./
+RUN pip install -r requirements.txt \
+    && pip install iotccsdk-0.1.0+dev.tar.gz
 
-COPY requirements.txt ./
-COPY iotccsdk-0.1.0+dev.tar.gz ./
-RUN pip install -r requirements.txt
-RUN pip install iotccsdk-0.1.0+dev.tar.gz
+WORKDIR /app/WebStream
+RUN npm install -q \
+    && npm prune --production
+# Port 3000 for http, 3001 for streaming server, and 3002 for web sockets
+EXPOSE 3000 3001 3002
+ENV CAMERA_IP=172.17.0.1
 
+WORKDIR /app
+
+# copy all files from the root of this module, relying on .dockerignore to filter out undesirable files
 COPY . .
 
 # RUN useradd -ms /bin/bash moduleuser
 # USER moduleuser
 
-CMD [ "python3", "-u", "./main.py" ]
+CMD "python3 -u ./main.py" \
+    && "cd WebStream" \
+    && "npm start"

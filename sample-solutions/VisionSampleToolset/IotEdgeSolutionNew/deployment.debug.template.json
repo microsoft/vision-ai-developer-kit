@@ -66,13 +66,35 @@
               "image": "${MODULES.VisionSampleModule}",
               "createOptions": {
                 "ExposedPorts": {
-                  "5678/tcp": {}
+                  "5678/tcp": {},
+                  "3000/tcp": {},
+                  "3001/tcp": {},
+                  "3002/tcp": {}
                 },
                 "HostConfig": {
+                  "Binds": [
+                    "/data/misc/camera:/app/vam_model_folder",
+                    "/run/systemd:/run/systemd"
+                  ],
                   "PortBindings": {
                     "5678/tcp": [
                       {
                         "HostPort": "5678"
+                      }
+                    ],
+                    "3000/tcp": [
+                      {
+                        "HostPort": "3000"
+                      }
+                    ],
+                    "3001/tcp": [
+                      {
+                        "HostPort": "3001"
+                      }
+                    ],
+                    "3002/tcp": [
+                      {
+                        "HostPort": "3002"
                       }
                     ]
                   }
@@ -92,6 +114,22 @@
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
         }
+      }
+    },
+    "VisionSampleModule": {
+      "properties.desired": {
+        "ModelZipUrl": "",
+        "TimeBetweenMessagesInSeconds": 12,
+        "ObjectsOfInterest": "[\"ALL\"]",
+        "ShowVideoOverlay": true,
+        "Bitrate": "1.5Mbps",
+        "Resolution": "1080P",
+        "VideoOverlayConfig": "inference",
+        "FrameRate": 30,
+        "HdmiDisplayActive": true,
+        "VideoAnalyticsEnabled": true,
+        "ShowVideoPreview": true,
+        "Codec": "AVC/H.264"
       }
     }
   }

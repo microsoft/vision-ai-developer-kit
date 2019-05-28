@@ -1,0 +1,19 @@
+{
+    "name": "visionsamplewebstream",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "node ./bin/www"
+    },
+    "dependencies": {
+        "adaro": "^1.0.4",
+        "child_process": "^1.0.2",
+        "debug": "^2.6.9",
+        "express": "^4.16.0",
+        "http-errors": "^1.6.2",
+        "morgan": "^1.9.0",
+        "ws": "^7.0.0"
+    },
+    "devDependencies": {
+        "eslint": "^5.16.0"
+    }
+}
