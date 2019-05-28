@@ -73,6 +73,52 @@
                 }
               }
             }
+          },
+          "WebStreamModule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.WebStreamModule}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "3000/tcp": {},
+                  "3001/tcp": {},
+                  "3002/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "3000/tcp": [
+                      {
+                        "HostPort": "3000"
+                      }
+                    ],
+                    "3001/tcp": [
+                      {
+                        "HostPort": "3001"
+                      }
+                    ],
+                    "3002/tcp": [
+                      {
+                        "HostPort": "3002"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "CAMERA_IP": {
+                "value": "172.17.0.1"
+              },
+              "RTSP_PORT": {
+                "value": "8900"
+              },
+              "RTSP_PATH": {
+                "value": "live"
+              }
+            }
           }
         }
       }
@@ -81,7 +127,8 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "VisionSampleModuleToIoTHub": "FROM /messages/modules/VisionSampleModule/outputs/* INTO $upstream"
+          "VisionSampleModuleToIoTHub": "FROM /messages/modules/VisionSampleModule/outputs/* INTO $upstream",
+          "WebStreamModuleToIoTHub": "FROM /messages/modules/WebStreamModule/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
