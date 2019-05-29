@@ -6,7 +6,6 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const adaro = require('adaro');
-const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
 
@@ -19,7 +18,6 @@ app.engine('dust', adaro.dust());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'dust');
 
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
