@@ -1,8 +1,11 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for
+// full license information.
+
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const adaro = require('adaro');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
@@ -19,7 +22,6 @@ app.set('view engine', 'dust');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);

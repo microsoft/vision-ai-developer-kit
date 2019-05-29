@@ -5,15 +5,12 @@
         "start": "node ./bin/www"
     },
     "dependencies": {
+        "adaro": "^1.0.4",
         "azure-iot-device": "^1.7.0",
         "azure-iot-device-mqtt": "^1.7.0",
-        "adaro": "^1.0.4",
-        "child_process": "^1.0.2",
-        "cookie-parser": "^1.4.3",
         "debug": "^2.6.9",
         "express": "^4.16.0",
         "http-errors": "^1.6.2",
-        "jsmpeg-player": "^2.1.6",
         "morgan": "^1.9.0",
         "ws": "^7.0.0"
     },

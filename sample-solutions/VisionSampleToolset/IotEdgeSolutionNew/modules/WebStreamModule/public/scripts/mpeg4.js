@@ -1,3 +1,7 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for
+// full license information.
+
 const mediaSource = new MediaSource();
 const queue = [];
 const video = document.querySelector('video');
