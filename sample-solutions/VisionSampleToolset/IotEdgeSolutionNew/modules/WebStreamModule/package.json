@@ -6,12 +6,10 @@
     },
     "dependencies": {
         "adaro": "^1.0.4",
-        "azure-iot-device": "^1.7.0",
-        "azure-iot-device-mqtt": "^1.7.0",
-        "debug": "^2.6.9",
+        "azure-iot-device": "^1.9.9",
+        "azure-iot-device-amqp": "^1.9.9",
         "express": "^4.16.0",
         "http-errors": "^1.6.2",
-        "morgan": "^1.9.0",
         "ws": "^7.0.0"
     },
     "devDependencies": {
