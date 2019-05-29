@@ -11,7 +11,7 @@ var websocket;
 var buffer;
 
 function OnClickPlay() {
-    console.log('ClickPlay');
+    console.log('OnClickPlay fired.');
     document.getElementById("playButton").style.display = "none";
     if (!pauseState) {
         return;
@@ -56,7 +56,7 @@ video.addEventListener("play", function () {
 }, false);
 
 mediaSource.addEventListener('sourceopen', function (e) {
-    console.log('sourceopen');
+    console.log('MediaSource sourceopen fired: ' + mediaSource.readyState);
     video.play();
     // buffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');  //mp4a.40.29
     // buffer = mediaSource.addSourceBuffer('video/mp4 codecs="avc1.64000d, mp4a.40.2"');
@@ -83,9 +83,6 @@ mediaSource.addEventListener('sourceopen', function (e) {
     });
 }, false);
 
-mediaSource.addEventListener('sourceopen', function (e) {
-    console.log('sourceopen: ' + mediaSource.readyState);
-});
 mediaSource.addEventListener('sourceended', function (e) {
     console.log('sourceended: ' + mediaSource.readyState);
 });
