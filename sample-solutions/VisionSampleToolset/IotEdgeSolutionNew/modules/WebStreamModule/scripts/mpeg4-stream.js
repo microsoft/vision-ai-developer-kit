@@ -24,18 +24,18 @@ class Mpeg4Stream {
     // Send video stream over the configured camera to the specified streaming port on localhost
     startVideo() {
         if (!this.isVideoStreaming()) {
-            const cameraIp = process.env.CAMERA_IP;
+            const rtspIp = process.env.RTSP_IP;
             const rtspPort = process.env.RTSP_PORT;
             const rtspPath = process.env.RTSP_PATH;
 
-            if (!cameraIp || !rtspPort || !rtspPath) {
-                console.error(`Necessary environment variables have not been set: CAMERA_IP=${cameraIp}, RTSP_PORT=${rtspPort}, RTSP_PATH=${rtspPath}`);
+            if (!rtspIp || !rtspPort || !rtspPath) {
+                console.error(`Necessary environment variables have not been set: RTSP_IP=${rtspIp}, RTSP_PORT=${rtspPort}, RTSP_PATH=${rtspPath}`);
                 return;
             }
 
-            const rtspUrl = `rtsp://${cameraIp}:${rtspPort}/${rtspPath}`;
+            const rtspUrl = `rtsp://${rtspIp}:${rtspPort}/${rtspPath}`;
             const ffmpegParams = `-loglevel fatal -i ${rtspUrl} -vcodec copy -an -sn -dn -reset_timestamps 1 -movflags empty_moov+default_base_moof+frag_keyframe -bufsize 256k -f mp4 -seekable 0 -headers Access-Control-Allow-Origin:* -content_type video/mp4 http://127.0.0.1:${this.streamingPort}/${this.secret}`;
-            console.log(ffmpegParams);
+            console.log(`Running: ffmpeg ${ffmpegParams}`);
 
             this.ffmpegProcess = Process.spawn('ffmpeg', ffmpegParams.split(' '));
 

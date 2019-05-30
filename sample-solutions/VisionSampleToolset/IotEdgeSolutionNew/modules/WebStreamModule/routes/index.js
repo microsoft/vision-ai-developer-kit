@@ -7,7 +7,12 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index', { title: 'RTSP webstream' });
+  res.render(
+    'index',
+    {
+      title: 'Webstream Video',
+      rtspSource: `rtsp://${process.env.RTSP_IP}:${process.env.RTSP_PORT}/${process.env.RTSP_PATH}`
+    });
 });
 
 module.exports = router;

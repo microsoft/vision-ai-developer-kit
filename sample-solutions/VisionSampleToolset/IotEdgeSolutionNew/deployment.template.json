@@ -109,7 +109,7 @@
               }
             },
             "env": {
-              "CAMERA_IP": {
+              "RTSP_IP": {
                 "value": "172.17.0.1"
               },
               "RTSP_PORT": {

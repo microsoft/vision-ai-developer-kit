@@ -4,7 +4,7 @@
     "image": {
         "repository": "$CONTAINER_REGISTRY_NAME/webstreammodule",
         "tag": {
-            "version": "0.0.9",
+            "version": "0.0.10",
             "platforms": {
                 "amd64": "./Dockerfile.amd64",
                 "amd64.debug": "./Dockerfile.amd64.debug",
