@@ -84,7 +84,6 @@
               "createOptions": {
                 "ExposedPorts": {
                   "3000/tcp": {},
-                  "3001/tcp": {},
                   "3002/tcp": {}
                 },
                 "HostConfig": {
@@ -92,11 +91,6 @@
                     "3000/tcp": [
                       {
                         "HostPort": "3000"
-                      }
-                    ],
-                    "3001/tcp": [
-                      {
-                        "HostPort": "3001"
                       }
                     ],
                     "3002/tcp": [
