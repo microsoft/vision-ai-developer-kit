@@ -85,12 +85,12 @@ class ModelUtility:
             self.restart_service("qmmf-webserver")
             self.restart_service("ipc-webserver")
         except Exception:
-            log_unknown_exception("Camera restart failed. Restart the device")
+            log_unknown_exception("Camera restart failed. Please restart the device.")
 
     def __call_system_command(self, cmd):
-        print("Command we are sending is: %s" % cmd)
+        print("Sending command: %s" % cmd)
         returnedvalue = sp.call(cmd, shell=True)
-        print("Returned-value is: %s" % str(returnedvalue))
+        print("Returned value is: %s" % str(returnedvalue))
 
     def __check_model_exists(self):
         if len(list(Path("/app/vam_model_folder").glob("*.dlc"))) > 0:

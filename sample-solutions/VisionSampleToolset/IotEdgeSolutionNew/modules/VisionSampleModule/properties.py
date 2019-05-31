@@ -397,8 +397,6 @@ class ModelProperties:
 
 
 class Properties:
-    SEND_REPORTED_STATE_CONTEXT = 0
-
     def __init__(self):
         print("Init Properties")
         self.camera_properties = CameraProperties()
@@ -427,7 +425,7 @@ class Properties:
             json_prop,
             len(json_prop),
             Properties.send_reported_state_callback,
-            self.SEND_REPORTED_STATE_CONTEXT)
+            json_prop)
 
     @staticmethod
     def get_twin_property(data, property_name):
@@ -447,4 +445,5 @@ class Properties:
 
     @staticmethod
     def send_reported_state_callback(status_code, user_context):
-        print("\nConfirmation for reported state called with status_code: %d" % status_code)
+        print("Confirmation of %d received for %s." %
+              (status_code, user_context))

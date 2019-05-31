@@ -50,7 +50,8 @@ model_util = None
 # Callback received when the message that we're forwarding is processed.
 def send_confirmation_callback(message, result, user_context):
     global send_callbacks
-    print("Confirmation[%d] received for message with result = %s" % (user_context, result))
+    print("Confirmation[%d] received for message with result = %s" % (
+        user_context, result))
     map_properties = message.properties()
     key_value_pair = map_properties.get_internals()
     print("\tProperties: %s" % key_value_pair)
@@ -75,9 +76,11 @@ def turn_camera_off_callback(payload, user_context):
 def method_callback(method_name, payload, user_context):
     retval = {
         TURN_CAMERA_ON_METHOD_NAME:
-            lambda payload, user_context: turn_camera_on_callback(payload, user_context),
+            lambda payload, user_context: turn_camera_on_callback(
+                payload, user_context),
         TURN_CAMERA_OFF_METHOD_NAME:
-            lambda payload, user_context: turn_camera_off_callback(payload, user_context)
+            lambda payload, user_context: turn_camera_off_callback(
+                payload, user_context)
     }[method_name](payload, user_context)
 
     return retval
@@ -165,7 +168,8 @@ class IotHubManager(object):
         self.client.set_module_method_callback(method_callback, 0)
 
         print("Subscribing to module twin updates")
-        self.client.set_module_twin_callback(module_twin_callback, MODULE_TWIN_UPDATE_CONTEXT)
+        self.client.set_module_twin_callback(
+            module_twin_callback, MODULE_TWIN_UPDATE_CONTEXT)
 
     # sends a messager to the "ToUpstream" queue to be sent to hub
     def send_message_to_upstream(self, message):
@@ -219,7 +223,8 @@ def main(protocol):
                                     last_time = print_inference(
                                         result, iot_hub_manager, last_time)
                     except EOFError:
-                        print("Current vam state: %s" % camera_client.vam_running)
+                        print("EOFError. Current VAM running state is %s." %
+                              camera_client.vam_running)
                     except Exception:
                         log_unknown_exception(
                             "Exception from get inferences", iot_hub_manager)
