@@ -27,3 +27,5 @@
 
 rm -r *.egg-info/
 python setup.py sdist --formats=gztar
+rm "..\sample-solutions\VisionSampleToolset\IotEdgeSolutionNew\modules\VisionSampleModule\iotccsdk-0.1.0+dev.tar.gz"
+cp ".\dist\iotccsdk-0.1.0+dev.tar.gz" "..\sample-solutions\VisionSampleToolset\IotEdgeSolutionNew\modules\VisionSampleModule"
