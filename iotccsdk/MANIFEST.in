@@ -25,4 +25,4 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include LICENSE.txt README.md iotcc/sdk/logger.conf
+include LICENSE.txt README.md iotccsdk/logger.conf

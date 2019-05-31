@@ -32,8 +32,11 @@ This module provides APIs for communicating with QMMF IPC webserver.
 import requests
 import json
 import traceback
-import sys
 import logging
+import threading
+import websocket
+import os
+
 
 class IpcProvider():
     """
@@ -49,6 +52,7 @@ class IpcProvider():
         IP address of the camera.
 
     """
+
     def __init__(self, ip=None, username=None, password=None):
         """
         This is the constructor for `IpcProvider` class
@@ -63,6 +67,7 @@ class IpcProvider():
         #: str: Session identifier obtained from the
         #:      camera/QMMF IPC webserver .
         self._session_token = None
+        self._heart_beat_manager = None
         self.logger = logging.getLogger('iotccsdk')
 
     def _show_error(self, err_msg):
@@ -88,7 +93,7 @@ class IpcProvider():
         """
         return traceback.extract_stack(None, 2)[0][2]
 
-    def _build_url(self,path,params=None):
+    def _build_url(self, path, params=None):
         """
         Private method for constructing request url.
 
@@ -132,7 +137,7 @@ class IpcProvider():
                 payload_data = json.dumps(payload)
                 self.logger.info("API: " + url + ",data:" + payload_data)
                 headers = {'Cookie': self._session_token}
-                if(param == None):
+                if not param:
                     response = mysession.get(
                         url, data=payload_data, headers=headers)
                 else:
@@ -147,7 +152,6 @@ class IpcProvider():
         except Exception as e:
             self.logger.exception(e)
             raise
-
 
     def post(self, path, payload=None, param=None):
         """
@@ -180,10 +184,12 @@ class IpcProvider():
                 payload_data = json.dumps(payload)
                 self.logger.info("API: " + url + ",data:" + payload_data)
                 headers = {'Cookie': self._session_token}
-                if(param == None) :
-                    response = mysession.post(url, data=payload_data, headers=headers)
-                else :
-                    response = mysession.post(url, data=payload_data, param=param, headers=headers)
+                if not param:
+                    response = mysession.post(
+                        url, data=payload_data, headers=headers)
+                else:
+                    response = mysession.post(
+                        url, data=payload_data, param=param, headers=headers)
 
                 self.logger.info("RESPONSE: " + response.text)
 
@@ -215,29 +221,43 @@ class IpcProvider():
             The request is not correctly formed.
 
         """
+        if self._session_token:
+            # This is to clear out previous session before starting a new one
+            self.logout()
+
         with requests.session() as mysession:
             try:
-                payload = "{\"username\": \"%s\", \"userpwd\": \"%s\"}" % (self.username, self.password)
-                url = "http://" + self.ip_address + ":" + self._port + "/login"
-                self.logger.info("API: " + url + ",data: " + json.dumps(payload,sort_keys=True))
-                response = mysession.post(url,data=payload)
+                payload = "{\"username\": \"%s\", \"userpwd\": \"%s\"}" % (
+                    self.username, self.password)
+                host = self.ip_address + ":" + self._port
+                url = "http://" + host + "/login"
+                self.logger.info("API: " + url + ",data: " +
+                                 json.dumps(payload, sort_keys=True))
+                response = mysession.post(url, data=payload)
                 self.logger.info("LOGIN RESPONSE: " + response.text)
                 json_resp = json.loads(response.text)
                 if json_resp['status']:
                     self._session_token = response.headers['Set-Cookie']
-                    self.logger.debug("connection established with session token: [%s]" % self._session_token)
+                    self.logger.debug(
+                        "connection established with session token: [%s]" % self._session_token)
+                    self._heart_beat_manager = HeartBeatManager(
+                        host, self._session_token)
                     return True
                 else:
                     raise requests.ConnectionError(
                         "Failed to connect. Server returned status=False")
 
             except requests.exceptions.Timeout:
-                # TODO: user should have a way to figure out if required services are running or not? maybe some simple URL
+                # TODO: user should have a way to figure out if required services are running?
+                # maybe some simple URL
                 self.logger.error(
-                    "Timeout: Please check that the device is up and running and the IPC service is available")
+                    "Timeout: Please check the device is running and the IPC service is available")
                 raise
             except requests.exceptions.RequestException as e:
                 self.logger.exception(e.strerror)
+                raise
+            except Exception as e:
+                self.logger.exception(e)
                 raise
 
     def logout(self):
@@ -257,9 +277,47 @@ class IpcProvider():
 
         """
         try:
-            path =  "/logout"
+            if self._heart_beat_manager:
+                self._heart_beat_manager.stop()
+            path = "/logout"
             response = self.post(path)
             return response["status"]
         except Exception as e:
             self.logger.exception(e)
             raise
+
+
+class HeartBeatManager():
+    def __init__(self, host=None, cookie=None):
+        self.logger = logging.getLogger('iotccsdk')
+        websocket.enableTrace(True)
+        uri = 'ws://' + host + '/async'
+        self.logger.info("Connecting to: " + uri)
+        self._ws = websocket.WebSocketApp(uri,
+                                          on_message=lambda ws, msg: self.on_message(
+                                              ws, msg),
+                                          on_error=lambda ws, msg: self.on_error(
+                                              ws, msg),
+                                          on_close=lambda ws: self.stop,
+                                          on_open=lambda ws: self.on_open(ws))
+        t = threading.Thread(target=self.run)
+        t.start()
+
+    def on_message(self, ws, message):
+        self.logger.debug(message)
+
+    def on_error(self, ws, error):
+        self.logger.error("Camera Restarted! Exiting!!")
+        # raise Exception ("Camera Restarted! Exiting!!")
+        os._exit(-1)
+
+    def on_open(self, ws):
+        self.logger.info("Starting heartbeat...")
+
+    def run(self):
+        self._ws.run_forever(ping_interval=11, ping_timeout=10)
+
+    def stop(self):
+        self.logger.info("Stoping heartbeat...")
+        if self._ws:
+            self._ws.close()

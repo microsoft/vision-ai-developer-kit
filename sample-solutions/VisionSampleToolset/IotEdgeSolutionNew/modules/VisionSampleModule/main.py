@@ -89,7 +89,7 @@ def method_callback(method_name, payload, user_context):
 def module_twin_callback(update_state, payload, user_context):
     print("Received twin callback")
     global properties
-    properties.handle_twin_update(payload)
+    properties.handle_twin_update(payload, camera_client)
     update_model_and_config()
 
 
@@ -134,7 +134,6 @@ def print_inference(result=None, hub_manager=None, last_sent_time=time.time()):
 
 def update_model_and_config():
     global properties
-    model_props = properties.model_properties
     camera_props = properties.camera_properties
     if not camera_client or not iot_hub_manager:
         print("Handle updates aborting")
@@ -142,8 +141,7 @@ def update_model_and_config():
         print("\tiot_hub_manager is %s" % iot_hub_manager)
         return
     try:
-        is_model_changed = model_props.update_inference_model()
-        camera_props.configure_camera_client(camera_client, is_model_changed)
+        camera_props.configure_camera_client(camera_client)
         properties.report_properties_to_hub(iot_hub_manager)
     except Exception as ex:
         log_unknown_exception(

@@ -33,8 +33,8 @@ import json
 import logging
 import os
 import subprocess
-import time
 import sys
+
 
 class CameraInference(object):
     """
@@ -48,6 +48,7 @@ class CameraInference(object):
         List of inferences obtained from the camera.
 
     """
+
     def __init__(self, timestamp, objects):
         """
         This is the constructor for the `CameraInference` class.
@@ -73,6 +74,7 @@ class CameraInferenceObject(object):
         Position of the identified object.
 
     """
+
     def __init__(self, id, label, confidence, position=None):
         """
         This is the constructor for `CameraInferenceObject` class.
@@ -82,6 +84,7 @@ class CameraInferenceObject(object):
         self.label = label
         self.confidence = confidence
         self.position = position
+
 
 class CameraInferenceObjectPosition(object):
     """
@@ -110,6 +113,7 @@ class CameraInferenceObjectPosition(object):
         self.width = width
         self.height = height
 
+
 class VideoInferenceIterator(object):
     """
     This is a class for inference generator.
@@ -128,6 +132,7 @@ class VideoInferenceIterator(object):
         calculation.
 
     """
+
     def __init__(self, preview_width, preview_height):
         """
         This is the constructor for `VideoInferenceIterator` class.
@@ -165,8 +170,16 @@ class VideoInferenceIterator(object):
             Any exception that occurs during inference handling.
 
         """
-        cmd = ['gst-launch-1.0 ', ' -q ', ' rtspsrc ', ' location=' + result_src, ' protocols=tcp ',
-               ' ! ', " application/x-rtp, media=application ", ' ! ', ' fakesink ', ' dump=true']
+        cmd = ['gst-launch-1.0 ',
+               ' -q ',
+               ' rtspsrc ',
+               ' location=%s' % result_src,
+               ' protocols=tcp ',
+               ' ! ',
+               ' application/x-rtp, media=application ',
+               ' ! ',
+               ' fakesink ',
+               ' dump=true']
         cmd = ''.join(cmd)
         self.logger.info('result_src: ' + result_src)
         self.logger.info('gstreamer cmd: ' + str(cmd))
@@ -179,8 +192,9 @@ class VideoInferenceIterator(object):
             data_idx = 72
 
         try:
-            self._sub_proc = subprocess.Popen(
-                cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, universal_newlines=True)
+            self._sub_proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                                              stderr=subprocess.PIPE, bufsize=1,
+                                              universal_newlines=True)
             for line in self._sub_proc.stdout:
                 if 'ERROR' in line or 'error' in line:
                     raise Exception(line)
@@ -197,7 +211,9 @@ class VideoInferenceIterator(object):
                     result = self._get_inference_result()
                     self._json_str = ""
                     yield result
-                elif ":[" not in self._json_str and '{ "' in self._json_str and " }" in self._json_str + l_str:
+                elif (":[" not in self._json_str
+                      and '{ "' in self._json_str
+                      and " }" in self._json_str + l_str):
                     self._json_str = ""
                 else:
                     self._json_str = self._json_str + l_str
@@ -235,7 +251,8 @@ class VideoInferenceIterator(object):
                 x = (object["position"]["x"] * self.preview_width) / 10000
                 y = (object["position"]["y"] * self.preview_height) / 10000
                 w = (object["position"]["width"] * self.preview_width) / 10000
-                h = (object["position"]["height"] * self.preview_height) / 10000
+                h = (object["position"]["height"]
+                     * self.preview_height) / 10000
                 position = CameraInferenceObjectPosition(x, y, w, h)
                 result_object = CameraInferenceObject(
                     object["id"], object["display_name"], object["confidence"], position)

@@ -31,7 +31,7 @@ import shutil
 
 _major = '0.0'
 _minor = '0+dev'
-_packages = find_packages(exclude=["tests","test.*"])
+_packages = find_packages(exclude=["tests", "test.*", "*.tests"])
 
 if os.path.exists('major.version'):
     with open('major.version', 'rt') as bf:
@@ -44,10 +44,11 @@ if os.path.exists('minor.version'):
 VERSION = '{}.{}'.format(_major, _minor)
 NAME = "iotccsdk"
 
-LONG_DESCRIPTION = 'Python IOTCC Software Development Kit'
+LONG_DESCRIPTION = 'IOTCC Software Development Kit in Python'
 DESCRIPTION = 'IOTCC SDK'
 
-DEPENDENCIES = ["pip >= 9.0.0", "requests", "setuptools-git"]
+DEPENDENCIES = ["pip >= 9.0.0", "requests",
+                "setuptools-git", "websocket-client"]
 
 setup_args = {
     'name': NAME,
@@ -62,6 +63,8 @@ setup_args = {
     'packages': _packages,
     'package_data': {'sdk': 'logger.conf'},
     'zip_safe': False,
+    'cmdclass': {
+    },
     'keywords': [
         'iot',
         'ai',
@@ -72,8 +75,10 @@ setup_args = {
         'Development Status :: 4 - Beta',
         'Framework :: IPython',
         'Intended Audience :: Developers',
-        'Intended Audience :: Science/Research',
-        'Topic :: Multimedia :: Graphics',
+        'Topic :: Multimedia :: Graphics :: Capture :: Digital Camera',
+        'Topic :: Multimedia :: Video',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Software Development',
         'Programming Language :: Python :: 3.5',
     ],
 }

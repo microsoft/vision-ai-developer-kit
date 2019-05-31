@@ -6,7 +6,7 @@ class Inference:
     def __init__(self, inference_object):
         self.id = inference_object.id
         # remove junk final character from the label
-        self.label = inference_object.label.strip()
+        self.label = inference_object.label.strip(" .\t\n")
         self.confidence = inference_object.confidence
         self.position_x = inference_object.position.x
         self.position_y = inference_object.position.y

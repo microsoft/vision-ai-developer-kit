@@ -242,7 +242,8 @@ class CameraClient():
 
         if display_out is None or display_out not in [0, 1]:
             self.logger.error(
-                "Invalid value: display_out should 0/1 using current display_out: %s" % (self.display_out))
+                "Invalid value: display_out should 0/1 using current display_out: %s"
+                % (self.display_out))
             display_out = self.display_out
 
         path = "/video"
@@ -365,7 +366,13 @@ class CameraClient():
         payload = '{ }'
         response = self.ipc_provider.get(path, payload)
         if "url" in response:
-            self.preview_url = response["url"]
+            url = response["url"]
+            e_idx = url.rindex(':')
+            # don't modify the url if we are using the docker ip
+            if "172.17" not in self.ipc_provider.ip_address:
+                url = 'rtsp://%s%s' % (
+                    self.ipc_provider.ip_address, url[e_idx:])
+            self.preview_url = url
         else:
             self.preview_url = None
         self.logger.info('preview url: %s' % self.preview_url)
@@ -417,14 +424,21 @@ class CameraClient():
         path = "/vam"
         payload = '{ }'
         response = self.ipc_provider.get(path, payload)
+        self.logger.info("RESPONSE: %s: " % response)
         if "url" in response:
-            self.vam_url = response["url"]
+            url = response["url"]
+            e_idx = url.rindex(':')
+            # don't modify the url if we are using the docker ip
+            if "172.17" not in self.ipc_provider.ip_address:
+                url = "rtsp://%s%s" % (self.ipc_provider.ip_address,
+                                       url[e_idx:])
+            self.vam_url = url
         else:
             self.vam_url = None
 
         self.vam_running = response["status"]
         self.logger.info('vam url: %s' % self.vam_url)
-        return
+        return self.vam_url
 
     @contextmanager
     def set_recording_state(self, state):
@@ -585,42 +599,7 @@ class CameraClient():
             return False
 
         file_name = os.path.join(os.path.dirname(os.path.abspath(
-            __name__)), 'snapshot_%s.jpg' % str(response["Timestamp"]))
-        self.logger.info("Storing snapshot: {}".format(file_name))
-        with open(file_name, "wb") as f:
-            f.write(base64.b64decode(response["Data"]))
-        return True
-
-    @contextmanager
-    def captureImageWithFolder(self, folder, tag1):
-        """
-        This method is for taking a snapshot.
-
-        The snapshot is taken and stored as snapshot_<timestamp>.jpg
-        when the call is successful.
-
-        Returns
-        -------
-        bool
-            True if the request was successful. False on failure.
-
-        """
-        path = "/captureimage"
-        payload = '{ }'
-        response = self.ipc_provider.post(path, payload)
-        if response["Error"] != "none":
-            self.logger.error(response["Error"])
-            return False
-        picture_folder = os.path.join(
-            os.path.dirname(os.path.abspath(__name__)), folder)
-        if not os.path.exists(picture_folder):
-            os.makedirs(picture_folder)
-        tag_folder = os.path.join(os.path.dirname(
-            os.path.abspath(__name__)), folder, tag1)
-        if not os.path.exists(tag_folder):
-            os.makedirs(tag_folder)
-        file_name = os.path.join(
-            tag_folder, tag1 + str(response["Timestamp"]) + '.jpg')
+            __name__)), 'snapshot_' + str(response["Timestamp"]) + '.jpg')
         self.logger.info("Storing snapshot: {}".format(file_name))
         with open(file_name, "wb") as f:
             f.write(base64.b64decode(response["Data"]))
