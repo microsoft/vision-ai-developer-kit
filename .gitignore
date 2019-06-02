@@ -335,9 +335,8 @@ ASALocalRun/
 .ipynb_checkpoints/01-convert-model-containerize-checkpoint.ipynb
 machine-learning-reference/*
 machine-learning-reference/notebooks/aml_config/config.json
-
-sample-solutions/VisionSampleToolset/IoTEdgeSolution/.env
-
-
 sample-solutions/VisionSampleToolset/IoTEdgeSolution/config/deployment.json
 sample-solutions/VisionSampleToolset/IoTEdgeSolution/modules/VisionSampleModule/Dockerfile.1.arm32v7
+sample-solutions/VisionSampleToolset/IoTEdgeSolution/.env
+.gitignore
+

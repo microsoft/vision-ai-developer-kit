@@ -21,7 +21,7 @@
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.7-rc2",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.7",
               "createOptions": "{}",
               "env": {
                 "UpstreamProtocol": {
@@ -35,7 +35,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.0.7-rc2",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0.7",
               "createOptions": "{\"User\":\"root\",\"HostConfig\":{\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}], \"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}",
               "env": {
                 "UpstreamProtocol": {
@@ -59,7 +59,7 @@
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.VisionSampleModule.arm32v7}",
-              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/data/misc/camera:/app/vam_model_folder\",\"/run/systemd:/run/systemd\"]},\"Cmd\":[\"-p False\"]}"
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/data/misc/camera:/app/vam_model_folder\",\"/run/systemd:/run/systemd\"]}}"
               
             }
           }
@@ -79,11 +79,9 @@
     },
     "VisionSampleModule": {
       "properties.desired":{
-          "ModelUrl":"",
-          "LabelUrl":"",
-          "ConfigUrl":"",
-          "FreqToSendMsg": 12,
-          "ObjectOfInterest":"ALL"
+          "inference_files_zip_url":"",
+          "msg_per_minute": 5,
+          "object_of_interest":"ALL"
       }
     }
   }
