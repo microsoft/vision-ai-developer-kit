@@ -181,11 +181,11 @@ class VideoInferenceIterator(object):
                ' fakesink ',
                ' dump=true']
         cmd = ''.join(cmd)
-        self.logger.info('result_src: ' + result_src)
-        self.logger.info('gstreamer cmd: ' + str(cmd))
+        self.logger.info('result_src: %s' % result_src)
+        self.logger.info('gstreamer cmd: %s' % str(cmd))
         platform = sys.platform
         platform = platform.lower()
-        self.logger.info('Platform: ' + platform)
+        self.logger.info('Platform: %s' % platform)
         if 'win' in platform:
             data_idx = 78
         elif 'linux' in platform:

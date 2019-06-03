@@ -29,13 +29,22 @@
 This module provides APIs for communicating with QMMF IPC webserver.
 """
 
-import requests
 import json
-import traceback
 import logging
-import threading
-import websocket
 import os
+import subprocess
+import requests
+import threading
+import traceback
+import websocket
+
+# Port over which the camera/QMMF IPC webserver
+IPC_WEBSERVER_PORT = "1080"
+LOGIN_PATH = "login"
+LOGOUT_PATH = "logout"
+POST_METHOD = "post"
+GET_METHOD = "get"
+ALL_METHODS = [POST_METHOD, GET_METHOD]
 
 
 class IpcProvider():
@@ -53,7 +62,7 @@ class IpcProvider():
 
     """
 
-    def __init__(self, ip=None, username=None, password=None):
+    def __init__(self, ip, username=None, password=None):
         """
         This is the constructor for `IpcProvider` class
 
@@ -61,14 +70,13 @@ class IpcProvider():
         self.username = username
         self.password = password
         self.ip_address = ip
-        #: str: Port over which the camera/QMMF IPC webserver
-        #:      communicates.
-        self._port = '1080'
+        self.host = ":".join([ip, str(IPC_WEBSERVER_PORT)])
+
         #: str: Session identifier obtained from the
         #:      camera/QMMF IPC webserver .
         self._session_token = None
-        self._heart_beat_manager = None
-        self.logger = logging.getLogger('iotccsdk')
+        self._heartbeat_manager = None
+        self.logger = logging.getLogger("iotccsdk")
 
     def _show_error(self, err_msg):
         """
@@ -93,17 +101,23 @@ class IpcProvider():
         """
         return traceback.extract_stack(None, 2)[0][2]
 
-    def _build_url(self, path, params=None):
+    def _build_url(self, api_path):
         """
         Private method for constructing request url.
 
+        Parameters
+        ----------
+        api_path : str
+            api portion of the path in list:
+            ["login", "logout", "video", "preview", vam",
+             "recording", "overlayconfig", "overlay", "captureimage"]
         Returns
         -------
         str
             Constructed request url
-
         """
-        return "http://" + self.ip_address + ":" + self._port + path
+        base_address = "".join(["http://", self.host])
+        return "/".join([base_address, api_path.strip("/")])
 
     def get(self, path, payload=None, param=None):
         """
@@ -113,45 +127,25 @@ class IpcProvider():
         ----------
         path : str
             QMMF IPC webserver API.
-        payload : str
-            JSON payload for the `path` API.
+        payload : dict
+            Key value pairs for `path` API
         param : str
             Params for the `path` API.
 
         Returns
         -------
-        bool
-            True if the GET was successful.
-            False on failure.
+        response: dict
+            response from the GET call
 
         Raises
         ------
+        ConnectionError
+            When response is malformed
         Exception
             Any exception that occurs during the request.
-
         """
-        try:
-            with requests.session() as mysession:
 
-                url = self._build_url(path)
-                payload_data = json.dumps(payload)
-                self.logger.info("API: " + url + ",data:" + payload_data)
-                headers = {'Cookie': self._session_token}
-                if not param:
-                    response = mysession.get(
-                        url, data=payload_data, headers=headers)
-                else:
-                    response = mysession.get(
-                        url, data=payload_data, param=param, headers=headers)
-
-                self.logger.info("RESPONSE: " + response.text)
-
-                result = json.loads(response.text)
-                return result
-            return False
-        except Exception as e:
-            self.logger.exception(e)
-            raise
+        return self.__send_request(GET_METHOD, path, payload, param)
 
     def post(self, path, payload=None, param=None):
         """
@@ -161,41 +155,77 @@ class IpcProvider():
         ----------
         path : str
             QMMF IPC webserver API.
-        payload : str
-            JSON payload for the `path` API.
+        payload : dict
+            Key value pairs for `path` API
         param : str
             Params for the `path` API.
 
         Returns
         -------
-        bool
-            True if the GET was successful.
-            False on failure.
+        response: dict
+            response from the POST call
 
         Raises
         ------
         Exception
             Any exception that occurs during the request.
+        ConnectionError
+            When response is malformed
+        """
+
+        return self.__send_request(POST_METHOD, path, payload, param)
+
+    def __send_request(self, method, path, payload, params):
+        """
+        private method to send requests to QMMF IPC webserver.
+
+        Parameters
+        ----------
+        method : str
+            Method type for call must be in `ALL_METHODS`
+        path : str
+            QMMF IPC webserver API.
+        payload : str
+            JSON payload for the `path` API.
+        params : str
+            Params for the `path` API.
+
+        Returns
+        -------
+        response: dict
+            response from the request
+
+        Raises
+        ------
+        ConnectionError
+            When response is malformed
+        Exception
+            Any exception that occurs during the request.
 
         """
+
+        if (method.lower() not in ALL_METHODS):
+            raise ValueError("Method must be in %s" % ALL_METHODS)
+
+        url = self._build_url(path)
+        headers = {"Cookie": self._session_token}
+        self.logger.info("API: %s data %s" % (url, payload))
         try:
             with requests.session() as mysession:
-                url = self._build_url(path)
-                payload_data = json.dumps(payload)
-                self.logger.info("API: " + url + ",data:" + payload_data)
-                headers = {'Cookie': self._session_token}
-                if not param:
+                if method.lower() == POST_METHOD:
                     response = mysession.post(
-                        url, data=payload_data, headers=headers)
+                        url, data=json.dumps(payload), headers=headers, params=params)
                 else:
-                    response = mysession.post(
-                        url, data=payload_data, param=param, headers=headers)
+                    response = mysession.get(
+                        url, data=json.dumps(payload), headers=headers, params=params)
+                self.logger.info("RESPONSE: %s" % response.text)
 
-                self.logger.info("RESPONSE: " + response.text)
-
-                result = json.loads(response.text)
-                return result
-            return False
+                result = response.json()
+                if "status" not in result:
+                    raise requests.ConnectionError(
+                        "Call with method: %s to: %s returned malformed response: %s" %
+                        (method, url, response))
+            return result
         except Exception as e:
             self.logger.exception(e)
             raise
@@ -211,10 +241,11 @@ class IpcProvider():
         -------
         bool
             True if the connection was successful.
-            False on failure.
 
         Raises
         ------
+        ConnectionError
+            When the result of the call is a failure
         Timeout
             When the request times out on the connect request.
         RequestException
@@ -227,21 +258,18 @@ class IpcProvider():
 
         with requests.session() as mysession:
             try:
-                payload = "{\"username\": \"%s\", \"userpwd\": \"%s\"}" % (
-                    self.username, self.password)
-                host = self.ip_address + ":" + self._port
-                url = "http://" + host + "/login"
-                self.logger.info("API: " + url + ",data: " +
-                                 json.dumps(payload, sort_keys=True))
-                response = mysession.post(url, data=payload)
-                self.logger.info("LOGIN RESPONSE: " + response.text)
-                json_resp = json.loads(response.text)
-                if json_resp['status']:
-                    self._session_token = response.headers['Set-Cookie']
+                url = self._build_url(LOGIN_PATH)
+                payload = {"username": self.username, "userpwd": self.password}
+                self.logger.info("API: %s data: %s" % (url, payload))
+                response = mysession.post(url, json.dumps(payload))
+                self.logger.info("Login response: %s" % response.text)
+                result = response.json()
+                if "status" in result and result["status"]:
+                    self._session_token = response.headers["Set-Cookie"]
                     self.logger.debug(
                         "connection established with session token: [%s]" % self._session_token)
-                    self._heart_beat_manager = HeartBeatManager(
-                        host, self._session_token)
+                    self._heartbeat_manager = HeartBeatManager(
+                        self.host, self._session_token)
                     return True
                 else:
                     raise requests.ConnectionError(
@@ -277,11 +305,13 @@ class IpcProvider():
 
         """
         try:
-            if self._heart_beat_manager:
-                self._heart_beat_manager.stop()
-            path = "/logout"
-            response = self.post(path)
-            return response["status"]
+            if self._heartbeat_manager:
+                self._heartbeat_manager.stop()
+            response = self.post(LOGOUT_PATH)
+            if "status" in response and response["status"]:
+                return response["status"]
+            else:
+                return False
         except Exception as e:
             self.logger.exception(e)
             raise
@@ -289,10 +319,10 @@ class IpcProvider():
 
 class HeartBeatManager():
     def __init__(self, host=None, cookie=None):
-        self.logger = logging.getLogger('iotccsdk')
+        self.logger = logging.getLogger("iotccsdk")
         websocket.enableTrace(True)
-        uri = 'ws://' + host + '/async'
-        self.logger.info("Connecting to: " + uri)
+        uri = "ws://%s/async" % host
+        self.logger.info("Connecting to: %s" % uri)
         self._ws = websocket.WebSocketApp(uri,
                                           on_message=lambda ws, msg: self.on_message(
                                               ws, msg),
@@ -308,7 +338,8 @@ class HeartBeatManager():
 
     def on_error(self, ws, error):
         self.logger.error("Camera Restarted! Exiting!!")
-        # raise Exception ("Camera Restarted! Exiting!!")
+        subprocess.call("systemctl restart qmmf-webserver", shell=True)
+        subprocess.call("systemctl restart ipc-webserver", shell=True)
         os._exit(-1)
 
     def on_open(self, ws):
@@ -318,6 +349,6 @@ class HeartBeatManager():
         self._ws.run_forever(ping_interval=11, ping_timeout=10)
 
     def stop(self):
-        self.logger.info("Stoping heartbeat...")
+        self.logger.info("Stopping heartbeat...")
         if self._ws:
             self._ws.close()

@@ -13,6 +13,7 @@ if __package__ == '' or __package__ is None:  # noqa
     __package__ = str(pkg_name)
     del os
 from . constants import SETTING_OFF, \
+    SETTING_ON, \
     TURN_CAMERA_ON_METHOD_NAME, \
     TURN_CAMERA_OFF_METHOD_NAME, \
     TO_UPSTREAM_MESSAGE_QUEUE_NAME
@@ -61,7 +62,7 @@ def send_confirmation_callback(message, result, user_context):
 
 def turn_camera_on_callback(payload, user_context):
     retval = DeviceMethodReturnValue()
-    # TODO: actually turn_camera_on()
+    camera_client.set_preview_state(SETTING_ON)
     return retval
 
 

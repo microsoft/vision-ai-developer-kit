@@ -142,6 +142,8 @@ class CameraProperties:
             print("configure_overlay_state: %s" % self.__overlay_state)
             camera_client.set_overlay_state(self.__overlay_state)
 
+        # TODO: it seems that analytics can't restart unless preview is bounced
+        # need to handle that case
         print("set_analytics_state: %s" % self.__analytics_state)
         if not camera_client.set_analytics_state(self.__analytics_state):
             print("Failed to set vam_running state to: %s" %
@@ -217,7 +219,6 @@ class CameraProperties:
     # turn off preview, overlay and analytics
     def __turn_camera_off(self, camera_client: CameraClient):
         camera_client.set_overlay_state(SETTING_OFF)
-
         count = 0
         print("Turning analytics off")
         while camera_client.vam_running and count < 5:
