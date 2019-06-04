@@ -12,6 +12,7 @@ from .error_utils import log_unknown_exception
 
 VAM_MODEL_DIR = "/app/vam_model_folder"
 CONFIG_FILE_NAME = "va-snpe-engine-library_config.json"
+MODEL_FILE_EXTENSIONS = ["dlc", "tflite", "tflit"]
 
 
 class ModelUtility:
@@ -85,7 +86,8 @@ class ModelUtility:
             self.restart_service("qmmf-webserver")
             self.restart_service("ipc-webserver")
         except Exception:
-            log_unknown_exception("Camera restart failed. Please restart the device.")
+            log_unknown_exception(
+                "Camera restart failed. Please restart the device.")
 
     def __call_system_command(self, cmd):
         print("Sending command: %s" % cmd)
@@ -93,18 +95,19 @@ class ModelUtility:
         print("Returned value is: %s" % str(returnedvalue))
 
     def __check_model_exists(self):
-        if len(list(Path("/app/vam_model_folder").glob("*.dlc"))) > 0:
-            return True
-        else:
-            print("No dlc or tflit model on device")
-            return False
+        for extension in MODEL_FILE_EXTENSIONS:
+            if len(list(Path("/app/vam_model_folder").glob("*.%s" % extension))) > 0:
+                return True
+        print("No dlc or tflite model on device")
+        return False
 
     def __find_file(self, input_path, file_name):
         # search the input path and all sub-directories for file_name
         selected_files = list(Path(input_path).glob("**/%s" % file_name))
 
         if len(selected_files) != 1:
-            print("Expected 1 file %s in %s but got %s" % (file_name, input_path, selected_files))
+            print("Expected 1 file %s in %s but got %s" %
+                  (file_name, input_path, selected_files))
             return
         return selected_files[0]
 
