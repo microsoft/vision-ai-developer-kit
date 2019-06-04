@@ -37,6 +37,10 @@ from contextlib import contextmanager
 from .ipcprovider import IpcProvider
 from .frame_iterators import VideoInferenceIterator
 
+DOCKER_IP_PREFIX = "172.17"
+NULL_IP = "0.0.0.0"
+LOOPBACK_IP = "127.0.0.1"
+
 
 class CameraClient():
     """
@@ -76,11 +80,11 @@ class CameraClient():
         HDMI display/preview is enabled if this flag is 1 else disabled.
         This can be configured using `configure_preview` API.
     """
-    logger = logging.getLogger('iotccsdk')
+    logger = logging.getLogger("iotccsdk")
 
     @classmethod
     @contextmanager
-    def connect(self, ipc_provider=None, ip_address=None, username=None, password=None):
+    def connect(self, ip_address, ipc_provider=None, username=None, password=None):
         """
         This method is used to create CameraClient handle for application.
 
@@ -185,12 +189,9 @@ class CameraClient():
         try:
             if self.vam_url == "":
                 self._get_vam_info()
-            if "0.0.0.0" in self.vam_url:
-                s_idx = self.vam_url.index('0')
-                start = self.vam_url[:s_idx]
-                e_idx = s_idx + len("0.0.0.0")
-                end = self.vam_url[e_idx:]
-                self.vam_url = start + "127.0.0.1" + end
+            if NULL_IP in self.vam_url:
+                self.vam_url.replace(NULL_IP, LOOPBACK_IP)
+
             yield inference_iterator.start(self.vam_url)
         except Exception as e:
             self.logger.exception(e)
@@ -220,7 +221,13 @@ class CameraClient():
         Returns
         -------
         bool
-            True if the request is successful. False on failure.
+            True if the request is successful.
+            False on failure.
+
+        Raises
+        ------
+        Exception
+            Any exception raised by ipc provider post
 
         """
         if resolution and self.resolutions and resolution in self.resolutions:
@@ -240,9 +247,9 @@ class CameraClient():
         else:
             fps = self.framerates.index(self.cur_framerate)
 
-        if display_out is None or display_out not in [0, 1]:
+        if display_out not in [0, 1]:
             self.logger.error(
-                "Invalid value: display_out should 0/1 using current display_out: %s" % (self.display_out))
+                "Invalid value: display_out should 0/1 got: %s" % display_out)
             display_out = self.display_out
 
         path = "/video"
@@ -257,22 +264,19 @@ class CameraClient():
         if response["status"]:
             if self.cur_resolution != self.resolutions[res]:
                 self.cur_resolution = self.resolutions[res]
-                self.logger.info('resolution updated to : ' +
-                                 self.cur_resolution)
+                self.logger.info("resolution now: %s" % self.cur_resolution)
             if self.cur_codec != self.encodetype[enc]:
                 self.cur_codec = self.encodetype[enc]
-                self.logger.info('encodetype updated to : ' + self.cur_codec)
+                self.logger.info("encodetype now: %s" % self.cur_codec)
             if self.cur_bitrate != self.bitrates[bit]:
                 self.cur_bitrate = self.bitrates[bit]
-                self.logger.info('bitrate updated to : ' + self.cur_bitrate)
+                self.logger.info("bitrate now : %s" % self.cur_bitrate)
             if self.cur_framerate != self.framerates[fps]:
                 self.cur_framerate = self.framerates[fps]
-                self.logger.info(
-                    'framerate updated to : {}'.format(self.cur_framerate))
+                self.logger.info("framerate now: %s" % self.cur_framerate)
             if self.display_out != display_out:
                 self.display_out = display_out
-                self.logger.info(
-                    'display_out updated to : {}'.format(self.display_out))
+                self.logger.info("display_out now: %s" % self.display_out)
         return response["status"]
 
     def _get_supported_params(self):
@@ -289,7 +293,7 @@ class CameraClient():
 
         """
         path = "/video"
-        payload = '{ }'
+        payload = {}
         response = self.ipc_provider.get(path, payload)
         if response["status"]:
             self.resolutions = response["resolution"]
@@ -305,16 +309,18 @@ class CameraClient():
             f_idx = response["fpsSelectVal"]
             self.cur_framerate = self.framerates[f_idx]
             self.display_out = response["displayOut"]
-            self.logger.info('resolutions: ' + str(self.resolutions))
-            self.logger.info('encodetype: ' + str(self.encodetype))
-            self.logger.info('bitrates: ' + str(self.bitrates))
-            self.logger.info('framerates: ' + str(self.framerates))
-            self.logger.info('Current preview settings:')
-            self.logger.info('resolution: ' + self.cur_resolution)
-            self.logger.info('encodetype: ' + self.cur_codec)
-            self.logger.info('bitrate: ' + self.cur_bitrate)
-            self.logger.info('framerate: {} '.format(self.cur_framerate))
-            self.logger.info('display_out: {}'.format(self.display_out))
+
+            self.logger.info("resolutions: %s" % self.resolutions)
+            self.logger.info("encodetype: %s" % self.encodetype)
+            self.logger.info("bitrates: %s" % self.bitrates)
+            self.logger.info("framerates: %s" % self.framerates)
+
+            self.logger.info("Current preview settings:")
+            self.logger.info("resolution: %s" % self.cur_resolution)
+            self.logger.info("encodetype: %s" % self.cur_codec)
+            self.logger.info("bitrate: %s" % self.cur_bitrate)
+            self.logger.info("framerate: %s" % self.cur_framerate)
+            self.logger.info("display_out: %s" % self.display_out)
 
         return response["status"]
 
@@ -341,11 +347,10 @@ class CameraClient():
         elif state.lower() == "off":
             status = False
         else:
-            self.logger.error("Invalid state: " + state + " should be on/off")
+            self.logger.error("Invalid state: %s should be on/off" % state)
         path = "/preview"
-        payload = {'switchStatus': status}
+        payload = {"switchStatus": status}
         response = self.ipc_provider.post(path, payload)
-        self.logger.info("response was: %s" % response)
         was_success = response["status"]
         self._get_preview_info()
         return was_success
@@ -362,13 +367,19 @@ class CameraClient():
 
         """
         path = "/preview"
-        payload = '{ }'
+        payload = {}
         response = self.ipc_provider.get(path, payload)
         if "url" in response:
-            self.preview_url = response["url"]
+            url = response["url"]
+            e_idx = url.rindex(":")
+            # don't modify the url if we are using the docker ip
+            if DOCKER_IP_PREFIX not in self.ipc_provider.ip_address:
+                url = "rtsp://%s%s" % (
+                    self.ipc_provider.ip_address, url[e_idx:])
+            self.preview_url = url
         else:
             self.preview_url = None
-        self.logger.info('preview url: %s' % self.preview_url)
+        self.logger.info("preview url: %s" % self.preview_url)
         self.preview_running = response["status"]
         return self.preview_url
 
@@ -395,7 +406,7 @@ class CameraClient():
         elif state.lower() == "off":
             status = False
         else:
-            self.logger.error("Invalid state: " + state + " should be on/off")
+            self.logger.error("Invalid state: %s should be on/off" % state)
         payload = {"switchStatus": status, "vamconfig": "MD"}
         path = "/vam"
         response = self.ipc_provider.post(path, payload)
@@ -415,16 +426,23 @@ class CameraClient():
 
         """
         path = "/vam"
-        payload = '{ }'
+        payload = {}
         response = self.ipc_provider.get(path, payload)
+        self.logger.info("RESPONSE: %s: " % response)
         if "url" in response:
-            self.vam_url = response["url"]
+            url = response["url"]
+            e_idx = url.rindex(":")
+            # don't modify the url if we are using the docker ip
+            if DOCKER_IP_PREFIX not in self.ipc_provider.ip_address:
+                url = "rtsp://%s%s" % (
+                    self.ipc_provider.ip_address, url[e_idx:])
+            self.vam_url = url
         else:
             self.vam_url = None
 
         self.vam_running = response["status"]
-        self.logger.info('vam url: %s' % self.vam_url)
-        return
+        self.logger.info("vam url: %s" % self.vam_url)
+        return self.vam_url
 
     @contextmanager
     def set_recording_state(self, state):
@@ -451,7 +469,7 @@ class CameraClient():
         else:
             self.logger.error("Invalid state: %s should be on/off" % state)
         path = "/recording"
-        payload = {'switchStatus': status}
+        payload = {"switchStatus": status}
         response = self.ipc_provider.post(path, payload)
         self.record_running = response["status"]
         return self.record_running
@@ -578,50 +596,16 @@ class CameraClient():
 
         """
         path = "/captureimage"
-        payload = '{ }'
+        payload = {}
         response = self.ipc_provider.post(path, payload)
         if response["Error"] != "none":
             self.logger.error(response["Error"])
             return False
 
-        file_name = os.path.join(os.path.dirname(os.path.abspath(
-            __name__)), 'snapshot_%s.jpg' % str(response["Timestamp"]))
-        self.logger.info("Storing snapshot: {}".format(file_name))
-        with open(file_name, "wb") as f:
-            f.write(base64.b64decode(response["Data"]))
-        return True
-
-    @contextmanager
-    def captureImageWithFolder(self, folder, tag1):
-        """
-        This method is for taking a snapshot.
-
-        The snapshot is taken and stored as snapshot_<timestamp>.jpg
-        when the call is successful.
-
-        Returns
-        -------
-        bool
-            True if the request was successful. False on failure.
-
-        """
-        path = "/captureimage"
-        payload = '{ }'
-        response = self.ipc_provider.post(path, payload)
-        if response["Error"] != "none":
-            self.logger.error(response["Error"])
-            return False
-        picture_folder = os.path.join(
-            os.path.dirname(os.path.abspath(__name__)), folder)
-        if not os.path.exists(picture_folder):
-            os.makedirs(picture_folder)
-        tag_folder = os.path.join(os.path.dirname(
-            os.path.abspath(__name__)), folder, tag1)
-        if not os.path.exists(tag_folder):
-            os.makedirs(tag_folder)
-        file_name = os.path.join(
-            tag_folder, tag1 + str(response["Timestamp"]) + '.jpg')
-        self.logger.info("Storing snapshot: {}".format(file_name))
+        file_name = "snapshot_%s.jpg" % response["Timestamp"]
+        dir_name = os.path.dirname(os.path.abspath(__name__))
+        full_file_name = os.path.join(dir_name, file_name)
+        self.logger.info("Storing snapshot: %s" % full_file_name)
         with open(file_name, "wb") as f:
             f.write(base64.b64decode(response["Data"]))
         return True
@@ -637,6 +621,5 @@ class CameraClient():
             True if the request was successful. False on failure.
 
         """
-        path = "/logout"
-        response = self.ipc_provider.post(path)
-        return response["status"]
+        status = self.ipc_provider.logout()
+        return status

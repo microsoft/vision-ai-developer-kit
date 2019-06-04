@@ -1,6 +1,6 @@
 # WebStreamModule
 
-To view the RTSP camera stream from the Vision AI Developer Kit, one needs to use a media player (e.g. VLC) or connect an HDMI cable to an available monitor. This module is provided as a way to view the RTSP camera feed in a web browser, in order to reduce the barrier to viewing the stream.
+To view the RTSP camera stream from the Vision AI Developer Kit, one needs to use a media player (e.g. VLC) or connect an HDMI cable to an available monitor. This module is provided as a way to view the RTSP camera feed in an HTML5 web browser, in order to reduce the barrier to viewing the stream.
 
 It reads 3 environment variables (CAMERA_IP, RTSP_PORT, and RTSP_PATH) to build the URI to the RTSP stream (i.e. rtsp://<RTSP_IP>:<RTSP_PORT>/<RTSP_PATH>). These environment variables should be specified in the docker deployment config, and by default are set to good values for the Vision AI Developer Kit.
 

@@ -1,5 +1,6 @@
 import json
 import time
+from iotccsdk import CameraClient
 from . error_utils import log_unknown_exception, CameraClientError
 from . model_utility import ModelUtility
 from . constants import SETTING_ON, \
@@ -121,7 +122,7 @@ class CameraProperties:
     def supported_config_overlay(self):
         return self.__list_to_delimited(self.__supported_config_overlay)
 
-    def configure_camera_client(self, camera_client, is_model_changed=False):
+    def configure_camera_client(self, camera_client: CameraClient, is_model_changed=False):
         if not self.__config_update_needed and not is_model_changed:
             return False
 
@@ -132,35 +133,17 @@ class CameraProperties:
 
         self.__turn_camera_off(camera_client)
 
-        # set up preview plus overlay
+        self.__configure_preview(camera_client)
+
         if self.preview_state:
-            print(
-                "Configure preview (%s, %s, %s, %s, %s)" %
-                (self.resolution,
-                 self.codec,
-                 self.bitrate,
-                 self.framerate,
-                 self.__display_out))
-
-            camera_client.configure_preview(
-                resolution=self.resolution,
-                encode=self.codec,
-                bitrate=self.bitrate,
-                framerate=self.framerate,
-                display_out=self.__display_out)
-
-            print("set preview state: %s" % self.__preview_state)
-            if not camera_client.set_preview_state(self.__preview_state):
-                raise CameraClientError(
-                    ("failed to set the preview state to %s"
-                        % self._CameraProperties__preview_state))
-
             # set overlay config then turn it on/off
             print("configure_overlay: %s" % self.overlay_config)
             camera_client.configure_overlay(self.overlay_config)
             print("configure_overlay_state: %s" % self.__overlay_state)
             camera_client.set_overlay_state(self.__overlay_state)
 
+        # TODO: it seems that analytics can't restart unless preview is bounced
+        # need to handle that case
         print("set_analytics_state: %s" % self.__analytics_state)
         if not camera_client.set_analytics_state(self.__analytics_state):
             print("Failed to set vam_running state to: %s" %
@@ -194,7 +177,7 @@ class CameraProperties:
     def __set_needs_update(self, is_changed):
         self.__config_update_needed = self.__config_update_needed or is_changed
 
-    def update_camera_properties(self, camera_client):
+    def update_camera_properties(self, camera_client: CameraClient):
         self.video_rtsp_url = camera_client.preview_url
         self.data_rtsp_url = camera_client.vam_url
         self.bitrate = camera_client.cur_bitrate
@@ -234,17 +217,8 @@ class CameraProperties:
                 props.append({prop_name: prop_val})
 
     # turn off preview, overlay and analytics
-    def __turn_camera_off(self, camera_client):
+    def __turn_camera_off(self, camera_client: CameraClient):
         camera_client.set_overlay_state(SETTING_OFF)
-
-        count = 0
-        print("Turning preview off")
-        while camera_client.preview_running and count < 5:
-            print("Retrying turning preview off: %s" % count)
-            camera_client.set_preview_state(SETTING_OFF)
-            count += 1
-            time.sleep(5)
-
         count = 0
         print("Turning analytics off")
         while camera_client.vam_running and count < 5:
@@ -252,6 +226,52 @@ class CameraProperties:
             camera_client.set_analytics_state(SETTING_OFF)
             count += 1
             time.sleep(1)
+
+    def __configure_preview(self, camera_client: CameraClient):
+        if (camera_client.cur_resolution == self.resolution
+                and camera_client.cur_codec == self.codec
+                and camera_client.cur_bitrate == self.bitrate
+                and camera_client.cur_framerate == self.framerate
+                and camera_client.display_out == self.__display_out
+                and camera_client.preview_running == self.preview_state):
+            return
+
+        count = 0
+        print("Turning preview off")
+        if not camera_client.set_preview_state(SETTING_OFF):
+            raise CameraClientError("Failed to stop preview")
+        while camera_client.preview_running and count < 5:
+            print("Waiting for preview to stop: %s" % count)
+            count += 1
+            time.sleep(1)
+
+        print(
+            "Configure preview (%s, %s, %s, %s, %s)" %
+            (self.resolution,
+             self.codec,
+             self.bitrate,
+             self.framerate,
+             self.__display_out))
+
+        camera_client.configure_preview(
+            resolution=self.resolution,
+            encode=self.codec,
+            bitrate=self.bitrate,
+            framerate=self.framerate,
+            display_out=self.__display_out)
+
+        print("set preview state: %s" % self.__preview_state)
+        if not camera_client.set_preview_state(self.__preview_state):
+            raise CameraClientError(
+                ("failed to set the preview state to %s"
+                    % self.__preview_state))
+
+    def __has_preview_changed(self, camera_client: CameraClient):
+        return (camera_client.cur_resolution != self.resolution
+                or camera_client.cur_codec != self.codec
+                or camera_client.cur_bitrate != self.bitrate
+                or camera_client.cur_framerate != self.framerate
+                or camera_client.display_out != self.__display_out)
 
     # update property and return bool to indicate if changed
     def __update_analytics_state(self, data):
@@ -374,7 +394,7 @@ class ModelProperties:
         new_zip_url = Properties.get_twin_property(
             data, MODEL_ZIP_URL_PROP) or self.model_zip_url
 
-        if (self.model_zip_url.lower != new_zip_url.lower):
+        if (self.model_zip_url.lower() != new_zip_url.lower()):
             self.model_zip_url = new_zip_url
             self.has_model_changed = True
 
