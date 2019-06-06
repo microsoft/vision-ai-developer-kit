@@ -57,13 +57,13 @@
           }
         },
         "modules": {
-          "VisionSampleModule": {
+          "AIVisionDevKitGetStartedModule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.VisionSampleModule}",
+              "image": "${MODULES.AIVisionDevKitGetStartedModule}",
               "createOptions": {
                 "ExposedPorts": {
                   "5678/tcp": {}
@@ -133,7 +133,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "VisionSampleModuleToIoTHub": "FROM /messages/modules/VisionSampleModule/outputs/* INTO $upstream",
+          "AIVisionDevKitGetStartedModuleToIoTHub": "FROM /messages/modules/AIVisionDevKitGetStartedModule/outputs/* INTO $upstream",
           "WebStreamModuleToIoTHub": "FROM /messages/modules/WebStreamModule/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {

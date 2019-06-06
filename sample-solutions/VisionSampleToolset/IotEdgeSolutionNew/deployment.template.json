@@ -57,13 +57,13 @@
           }
         },
         "modules": {
-          "VisionSampleModule": {
+          "AIVisionDevKitGetStartedModule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.VisionSampleModule.arm32v7}",
+              "image": "${MODULES.AIVisionDevKitGetStartedModule.arm32v7}",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
@@ -121,15 +121,14 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "VisionSampleModuleToIoTHub": "FROM /messages/modules/VisionSampleModule/outputs/* INTO $upstream",
-          "WebStreamModuleToIoTHub": "FROM /messages/modules/WebStreamModule/outputs/* INTO $upstream"
+          "AIVisionDevKitGetStartedModuleToIoTHub": "FROM /messages/modules/AIVisionDevKitGetStartedModule/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
         }
       }
     },
-    "VisionSampleModule": {
+    "AIVisionDevKitGetStartedModule": {
       "properties.desired": {
         "ModelZipUrl": "",
         "TimeBetweenMessagesInSeconds": 12,

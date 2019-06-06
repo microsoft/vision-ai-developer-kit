@@ -1,6 +1,6 @@
-# Develop and Deploy a New VisionSampleModule for Vision AI Developer Kit
+# Develop and Deploy a New AIVisionDevKitGetStartedModule for Vision AI Developer Kit
 
-This solution is used to build and deploy a new VisionSampleModule developed by QTI's python SDK to Vision AI Developer Kit.
+This solution is used to build and deploy a new AIVisionDevKitGetStartedModule developed by QTI's python SDK to Vision AI Developer Kit.
 
 ## Setup Build Environment
 
@@ -11,11 +11,11 @@ This solution is used to build and deploy a new VisionSampleModule developed by 
 1. Install [Docker Extension](https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker) to Visual Studio Code.
     - `code --install-extension peterjausovec.vscode-docker`
 
-## Develop a New VisionSampleModule
+## Develop a New AIVisionDevKitGetStartedModule
 
-Refer to [modules/VisionSampleModule/python_iotcc_sdk/README.md](modules/VisionSampleModule/python_iotcc_sdk/README.md) to develop and test source code for a new VisionSampleModule.
+Refer to [modules/AIVisionDevKitGetStartedModule/python_iotcc_sdk/README.md](modules/AIVisionDevKitGetStartedModule/python_iotcc_sdk/README.md) to develop and test source code for a new AIVisionDevKitGetStartedModule.
 
-## Build a Local Container Image for VisionSampleModule
+## Build a Local Container Image for AIVisionDevKitGetStartedModule
 
 1. Launch Visual Studio Code, and select **File > Open Folder...** command to open the IotEdgeSolution directory as workspace root.
 
@@ -30,9 +30,9 @@ Refer to [modules/VisionSampleModule/python_iotcc_sdk/README.md](modules/VisionS
 1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
     - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
 
-1. Copy the files DLC, labels.txt, and va-snpe-engine-library_config.json to the modules\VisionSampleModule\model folder.
+1. Copy the files DLC, labels.txt, and va-snpe-engine-library_config.json to the modules\AIVisionDevKitGetStartedModule\model folder.
 
-1. Open modules\VisionSampleModule\module.json and change the version setting in the tag property for creating a new version of the module image.
+1. Open modules\AIVisionDevKitGetStartedModule\module.json and change the version setting in the tag property for creating a new version of the module image.
 
 1. Right-click on deployment.template.json and select the **Build and Push IoT Edge Solution** command to generate a new deployment.json file in the config folder, build a module image, and push the image to the specified ACR repository.
     > Note: Some red warnings "/usr/bin/find: '/proc/XXX': No such file or directory" and "debconf: delaying package configuration, since apt-utils is not installed" displayed during the building process can be ignored.
