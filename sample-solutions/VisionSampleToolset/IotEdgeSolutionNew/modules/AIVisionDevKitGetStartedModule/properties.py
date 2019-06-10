@@ -1,4 +1,5 @@
 import json
+import math
 import time
 from iotccsdk import CameraClient
 from . error_utils import log_unknown_exception, CameraClientError
@@ -308,10 +309,15 @@ class CameraProperties:
     # update property and return bool to indicate if changed
     def __update_frame_rate(self, data):
         new_value = Properties.get_twin_property(data, FRAME_RATE_PROP)
-        if new_value is None or new_value == self.framerate:
-            return False
-        self.framerate = new_value
-        return True
+        try:
+            if type(new_value) is str:
+                new_value = int(new_value)
+            if new_value != self.framerate:
+                self.framerate = new_value
+                return True
+        except (TypeError, ValueError):
+            print("Received unusable framerate %s" % new_value)
+        return False
 
     # update property and return bool to indicate if changed
     def __update_overlay_config(self, data):
@@ -407,6 +413,9 @@ class ModelProperties:
     def __update_message_delay(self, data):
         delay = Properties.get_twin_property(data, MESSAGE_DELAY_SECS_PROP)
         try:
+            if type(delay) is not int:
+                # convert from str and truncate to int
+                delay = math.trunc(float(delay))
             if delay < MINIMUM_MESSAGE_DELAY_IN_SECONDS:
                 delay = MINIMUM_MESSAGE_DELAY_IN_SECONDS
         except Exception:
