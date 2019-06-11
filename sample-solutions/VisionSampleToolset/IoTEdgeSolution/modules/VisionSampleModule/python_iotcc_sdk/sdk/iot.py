@@ -5,22 +5,24 @@
 # ==============================================================================
 
 #pylint: disable=E0611
+
 import time
 import os
 import subprocess as sp
 import sys
 import shutil
 import socket
-import utility
-from utility import GetFile
-import logging
-logging.basicConfig(level=print)
 
+#from main import my_camera_client
+import logging
+logging.basicConfig(level=logging.INFO)
+from utility import get_file_zip
 import iothub_client
 from iothub_client import IoTHubClient, IoTHubMessage, IoTHubModuleClient, IoTHubMessageDispositionResult,IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult, IoTHubError
 
 import json 
-
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # messageTimeout - the maximum time in milliseconds until a message times out.
 # The timeout period starts at IoTHubModuleClient.send_event_async.
@@ -30,134 +32,24 @@ MESSAGE_TIMEOUT = 10000
 # global counters
 RECEIVE_CALLBACKS = 0
 SEND_CALLBACKS = 0
-ModelUrl = ""
-LabelUrl = ""
-ConfigUrl = ""
+
+inference_files_zip_url =""
+model_url = ""
+label_url = ""
+config_url = ""
 restartCamera = False
-FreqToSendMsg = 12
-ObjectOfInterest = "ALL"
+msg_per_minute = 5
+wait_for_minutes = 12
+object_of_interest = "ALL"
+start_time = 0
 
-def module_twin_callback(update_state, payload, user_context):
-    global ModelUrl
-    global LabelUrl
-    global ConfigUrl
-    global restartCamera
-    global FreqToSendMsg
-    global ObjectOfInterest
-    print ( "" )
-    print ( "Twin callback called with:" )
-    print ( "    updateStatus: %s" % update_state )
-    print ( "    payload: %s" % payload )
-    data = json.loads(payload)
-    setRestartCamera = False
 
-    if "desired" in data and "ModelUrl" in data["desired"]:
-        ModelUrl = data["desired"]["ModelUrl"]
-        if ModelUrl:
-            print("Setting value to %s from ::  data[\"desired\"][\"ModelUrl\"]" % ModelUrl)
-            setRestartCamera = GetFile(ModelUrl)
-        else:
-            print(ModelUrl)
-    if "ModelUrl" in data:
-        ModelUrl = data["ModelUrl"]
-        if ModelUrl:
-            print("Setting value to %s from ::  data[\"ModelUrl\"]" % ModelUrl)
-            setRestartCamera = GetFile(ModelUrl)
 
-    if "desired" in data and "LabelUrl" in data["desired"]:
-        LabelUrl = data["desired"]["LabelUrl"]
-        if LabelUrl:
-            print("Setting value to %s from ::  data[\"desired\"][\"LabelUrl\"]" % LabelUrl)
-            setRestartCamera = GetFile(LabelUrl)
-        else:
-            print(LabelUrl)
-    if "LabelUrl" in data:
-        LabelUrl = data["LabelUrl"]
-        if LabelUrl:
-            print("Setting value to %s from ::  data[\"LabelUrl\"]" % LabelUrl)
-            setRestartCamera = GetFile(LabelUrl)
-        
-    
-    if "desired" in data and "ConfigUrl" in data["desired"]:
-        ConfigUrl = data["desired"]["ConfigUrl"]
-        if ConfigUrl:
-            print("Setting value to %s from ::  data[\"desired\"][\"ConfigUrl\"]" % ConfigUrl)
-            setRestartCamera = GetFile(ConfigUrl)
-
-    if "ConfigUrl" in data:
-        ConfigUrl = data["ConfigUrl"]
-        if ConfigUrl:
-            print("Setting value to %s from ::  data[\"ConfigUrl\"]" % ConfigUrl)
-            setRestartCamera = GetFile(ConfigUrl)
-
-    if "desired" in data and "FreqToSendMsg" in data["desired"]:
-        
-        FreqToSendMsg = data["desired"]["FreqToSendMsg"]
-        print("Setting value to %s from ::  data[\"FreqToSendMsg\"]" % FreqToSendMsg)
-
-    if "FreqToSendMsg" in data:
-        FreqToSendMsg = data["FreqToSendMsg"]
-        print("Setting value to %s from ::  data[\"FreqToSendMsg\"]" % FreqToSendMsg)
-
-    if "desired" in data and "ObjectOfInterest" in data["desired"]:
-        ObjectOfInterest = data["desired"]["ObjectOfInterest"]
-        print("Setting value to %s from ::  data[\"ObjectOfInterest\"]" % ObjectOfInterest)
-
-    if "ObjectOfInterest" in data:
-        ObjectOfInterest = data["ObjectOfInterest"]
-        print("Setting value to %s from ::  data[\"ObjectOfInterest\"]" % ObjectOfInterest)
-    if setRestartCamera:
-        restartCamera = True 
 
 def send_reported_state_callback(status_code, user_context):
     print ( "" )
     print ( "Confirmation for reported state called with:" )
     print ( "    status_code: %d" % status_code )
-
-class sendip_info_to_portal:
-    PROTOCOL = IoTHubTransportProvider.MQTT
-    TIMER_COUNT = 2
-    
-    TWIN_CONTEXT = 0 
-    SEND_REPORTED_STATE_CONTEXT = 0
-
-    def iothub_client_init(self):
-      
-        protocol=IoTHubTransportProvider.MQTT
-        client = IoTHubModuleClient()
-        client.create_from_environment(protocol)
-        PYTHON_PRODUCT_INFO = "Peabody Sample device"
-        OPTION_PRODUCT_INFO = "product_info"
-        client.set_option(client,"product_info", PYTHON_PRODUCT_INFO)
-        
-        
-        
-        if client.protocol == IoTHubTransportProvider.MQTT or client.protocol == IoTHubTransportProvider.MQTT_WS:
-            client.set_module_twin_callback(module_twin_callback, self.TWIN_CONTEXT)
-        return client 
-    
-
-    def iothub_client_sample_run(self,message):
-        try:
-            client = self.iothub_client_init()
-            if client.protocol == IoTHubTransportProvider.MQTT:
-                print ( "Sending data as reported property..." )
-                reported_state = "{\"rtsp_addr\":\"" + message + "\"}"
-                client.send_reported_state(reported_state, len(reported_state), send_reported_state_callback, self.SEND_REPORTED_STATE_CONTEXT)
-                status_counter = 0
-                while status_counter <= self.TIMER_COUNT:
-                    status = client.get_send_status()
-                    time.sleep(2)
-                    status_counter += 1 
-    
-        except IoTHubError as iothub_error:
-            print ( "Unexpected error %s from IoTHub" % iothub_error )
-            return
-        except KeyboardInterrupt:
-            print ( "IoTHubClient sample stopped" )
-        #except Exception as e:
-            #print("Exception occured :: " + e.__str__)
-            
 
 # Callback received when the message that we're forwarding is processed.
 def send_confirmation_callback(message, result, user_context):
@@ -195,18 +87,19 @@ class HubManager(object):
 
     def __init__(
             self,
-            protocol=IoTHubTransportProvider.MQTT):
+            camera_handle,protocol=IoTHubTransportProvider.MQTT):
         self.client_protocol = protocol
         self.client = IoTHubModuleClient()
         self.client.create_from_environment(protocol)
-        
+        self.iot_camera_handle = camera_handle
         # set the time until a message times out
         self.client.set_option("messageTimeout", MESSAGE_TIMEOUT)
         
         # sets the callback when a message arrives on "input1" queue.  Messages sent to 
         # other inputs or to the default will be silently discarded.
         self.client.set_message_callback("input1", receive_message_callback, self)
-        self.client.set_module_twin_callback(module_twin_callback, self)
+        self.client.set_module_twin_callback(self.module_twin_callback, self)
+       
 
     # Forwards the message received onto the next stage in the process.
     def forward_event_to_output(self, outputQueueName, event, send_context):
@@ -238,10 +131,89 @@ class HubManager(object):
             message=IoTHubMessage(msg)
             self.client.send_event_async(
                 "output1", message, send_confirmation_callback, 0)
-            #logging.info("finished sending message...")
+            logging.info("finished sending message...")
         except Exception :
             print ("Exception in SendMsgToCloud")
             pass
+    def module_twin_callback(self,update_state, payload, user_context):
+        global inference_files_zip_url
+        global model_url
+        global label_url
+        global config_url
+        global msg_per_minute
+        global wait_for_minutes
+        global object_of_interest 
+        print ( "" )
+        print ( "Twin callback called with:" )
+        print ( "    updateStatus: %s" % update_state )
+        print ( "    payload: %s" % payload )
+        data = json.loads(payload)
+        setRestartCamera = False
+
+        if "desired" in data and "inference_files_zip_url" in data["desired"]:
+            dst_folder="twin_provided_model"
+            inference_files_zip_url = data["desired"]["inference_files_zip_url"]
+            if inference_files_zip_url:
+                print("Setting value to %s from ::  data[\"desired\"][\"all_inference_files_zip\"]" % inference_files_zip_url)
+                setRestartCamera = get_file_zip(inference_files_zip_url,dst_folder)
+            else:
+                print(inference_files_zip_url)
+        if "inference_files_zip_url" in data:
+            dst_folder="twin_provided_model"
+            inference_files_zip_url = data["inference_files_zip_url"]
+            if inference_files_zip_url:
+                print("Setting value to %s from ::  data[\"all_inference_files_zip\"]" % inference_files_zip_url)
+                setRestartCamera = get_file_zip(inference_files_zip_url,dst_folder)
+            else:
+                print(inference_files_zip_url)
+
+        if "desired" in data and "msg_per_minute" in data["desired"]:
+            
+            msg_per_minute = data["desired"]["msg_per_minute"]
+            msg_per_minute = 60/int(msg_per_minute)
+            print("Setting value to %s from ::  data[\"msg_per_minute\"]" % msg_per_minute)
+
+        if "msg_per_minute" in data:
+            msg_per_minute = data["msg_per_minute"]
+            wait_for_minutes = int(60/int(msg_per_minute))
+
+            print("Setting value to %s from ::  data[\"msg_per_minute\"]" % msg_per_minute)
+
+        if "desired" in data and "object_of_interest" in data["desired"]:
+            object_of_interest = data["desired"]["object_of_interest"]
+            print("Setting value to %s from ::  data[\"object_of_interest\"]" % object_of_interest)
+
+        if "object_of_interest" in data:
+            msg_per_minute = data["object_of_interest"]
+            print("Setting value to %s from ::  data[\"object_of_interest\"]" % object_of_interest)
+                
+        if setRestartCamera:
+            #
+            try:
+                logger.info("Restarting VAM to apply new model config")
+                self.restartInference(self.iot_camera_handle)
+                
+            except Exception as e:
+                logger.info("Got an issue during vam ON off after twin update")
+                logger.exception(e)
+                raise
+    def restartInference(self,camera_client) :
+        try:
+
+            logger.debug("Restarting VAM to apply new model config")
+            camera_client.set_overlay_state("off")
+            if(camera_client.vam_running):
+                camera_client.set_analytics_state("off")
+            #time.sleep(1)
+            camera_client.set_analytics_state("on")
+            camera_client.set_overlay_state("on")
+            #self.print_and_send_results()
+
+        except Exception as e:
+            logger.debug("System got an exception during vam ON off after twin model update!!! ")
+            logger.exception(e)
+            #self.restart_cam(camera_client)
+            raise
     
  
 

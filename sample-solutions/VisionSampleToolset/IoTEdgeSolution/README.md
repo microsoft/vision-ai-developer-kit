@@ -17,7 +17,7 @@ Refer to [modules/VisionSampleModule/python_iotcc_sdk/README.md](modules/VisionS
 
 ## Build a Local Container Image for VisionSampleModule
 
-1. Launch Visual Studio Code, and select **[File > Open Folder…]** command to open the **IotEdgeSolution** directory as workspace root.
+1. Launch Visual Studio Code, and select **[File > Open Folder...]** command to open the **IotEdgeSolution** directory as workspace root.
 
 1. Update the **.env** file with the values for your container registry.  Refer to [**Create a container registry**](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
      ```<language>

@@ -1,0 +1,44 @@
+{!
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for
+// full license information.
+!}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{title}</title>
+        <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+        <style>
+            #videoWrapper {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: wrap;
+                justify-content: center;
+                text-align: center;
+                align-items: center;
+            }
+
+            #videoWindow {
+                width: 100%;
+                max-width: 1920px;
+            }
+
+            #sourceStream {
+                color: gray;
+            }
+        </style>
+    </head>
+    <body style="padding: 0;">
+        <div id="videoWrapper">
+            <h1>{title}</h1>
+            <video id="videoWindow" controls autoplay muted="muted" playsinline="true"></video>
+            <br />
+            <div id="sourceStream">(re-streaming from {rtspSource})</div>
+        </div>
+        <br />
+        <button id="playButton" onclick="OnClickPlay()" style='display:none'>Play</button>
+    </body>
+    <script src="scripts/mpeg4.js"></script>
+</html>
