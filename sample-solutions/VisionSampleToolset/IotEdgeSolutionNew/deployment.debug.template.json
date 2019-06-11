@@ -69,12 +69,22 @@
                   "5678/tcp": {}
                 },
                 "HostConfig": {
+                  "NetworkMode": "host",
+                  "Binds": [
+                    "/data/misc/camera:/app/vam_model_folder",
+                    "/run/systemd:/run/systemd"
+                  ],
                   "PortBindings": {
                     "5678/tcp": [
                       {
                         "HostPort": "5678"
                       }
                     ]
+                  },
+                  "NetworkingConfig": {
+                    "EndpointsConfig": {
+                      "host": {}
+                    }
                   }
                 }
               }
@@ -94,6 +104,7 @@
                   "3002/tcp": {}
                 },
                 "HostConfig": {
+                  "NetworkMode": "host",
                   "PortBindings": {
                     "9229/tcp": [
                       {
@@ -110,6 +121,11 @@
                         "HostPort": "3002"
                       }
                     ]
+                  }
+                },
+                "NetworkingConfig": {
+                  "EndpointsConfig": {
+                    "host": {}
                   }
                 }
               }
