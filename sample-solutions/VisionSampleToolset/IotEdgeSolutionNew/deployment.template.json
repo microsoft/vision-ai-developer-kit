@@ -66,10 +66,16 @@
               "image": "${MODULES.AIVisionDevKitGetStartedModule.arm32v7}",
               "createOptions": {
                 "HostConfig": {
+                  "NetworkMode": "host",
                   "Binds": [
                     "/data/misc/camera:/app/vam_model_folder",
                     "/run/systemd:/run/systemd"
                   ]
+                },
+                "NetworkingConfig": {
+                  "EndpointsConfig": {
+                    "host": {}
+                  }
                 }
               }
             }
@@ -87,6 +93,7 @@
                   "3002/tcp": {}
                 },
                 "HostConfig": {
+                  "NetworkMode": "host",
                   "PortBindings": {
                     "3000/tcp": [
                       {
@@ -98,6 +105,11 @@
                         "HostPort": "3002"
                       }
                     ]
+                  }
+                },
+                "NetworkingConfig": {
+                  "EndpointsConfig": {
+                    "host": {}
                   }
                 }
               }
