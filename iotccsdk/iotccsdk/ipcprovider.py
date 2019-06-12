@@ -221,7 +221,7 @@ class IpcProvider():
                 self.logger.info("RESPONSE: %s" % response.text)
 
                 result = response.json()
-                if "status" not in result:
+                if "status" not in result and "Status" not in result:
                     raise requests.ConnectionError(
                         "Call with method: %s to: %s returned malformed response: %s" %
                         (method, url, response))
