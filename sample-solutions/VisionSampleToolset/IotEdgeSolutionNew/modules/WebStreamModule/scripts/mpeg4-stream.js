@@ -23,32 +23,34 @@ class Mpeg4Stream {
 
     // Send video stream over the configured camera to the specified streaming port on localhost
     startVideo() {
-        if (!this.isVideoStreaming()) {
-            const rtspIp = process.env.RTSP_IP;
-            const rtspPort = process.env.RTSP_PORT;
-            const rtspPath = process.env.RTSP_PATH;
-
-            if (!rtspIp || !rtspPort || !rtspPath) {
-                console.error(`Necessary environment variables have not been set: RTSP_IP=${rtspIp}, RTSP_PORT=${rtspPort}, RTSP_PATH=${rtspPath}`);
-                return;
-            }
-
-            const rtspUrl = `rtsp://${rtspIp}:${rtspPort}/${rtspPath}`;
-            const ffmpegParams = `-loglevel fatal -i ${rtspUrl} -vcodec copy -an -sn -dn -reset_timestamps 1 -movflags empty_moov+default_base_moof+frag_keyframe -bufsize 256k -f mp4 -seekable 0 -headers Access-Control-Allow-Origin:* -content_type video/mp4 http://127.0.0.1:${this.streamingPort}/${this.secret}`;
-            console.log(`Running: ffmpeg ${ffmpegParams}`);
-
-            this.ffmpegProcess = Process.spawn('ffmpeg', ffmpegParams.split(' '));
-
-            this.ffmpegProcess.on('exit', function(code, signal) {
-                console.log(`ffmpeg exited with code ${code} and signal ${signal}`);
-            });
+        if (this.isVideoStreaming()) {
+            return;
         }
+
+        const rtspIp = process.env.RTSP_IP;
+        const rtspPort = process.env.RTSP_PORT;
+        const rtspPath = process.env.RTSP_PATH;
+
+        if (!rtspIp || !rtspPort || !rtspPath) {
+            console.error(`Necessary environment variables have not been set: RTSP_IP=${rtspIp}, RTSP_PORT=${rtspPort}, RTSP_PATH=${rtspPath}`);
+            return;
+        }
+
+        const rtspUrl = `rtsp://${rtspIp}:${rtspPort}/${rtspPath}`;
+        const ffmpegParams = `-loglevel fatal -i ${rtspUrl} -vcodec copy -an -sn -dn -reset_timestamps 1 -movflags empty_moov+default_base_moof+frag_keyframe -bufsize 256k -f mp4 -seekable 0 -headers Access-Control-Allow-Origin:* -content_type video/mp4 http://127.0.0.1:${this.streamingPort}/${this.secret}`;
+        console.log(`Running: ffmpeg ${ffmpegParams}`);
+
+        this.ffmpegProcess = Process.spawn('ffmpeg', ffmpegParams.split(' '));
+
+        this.ffmpegProcess.on('exit', (code, signal) => {
+            console.log(`ffmpeg exited with code ${code} and signal ${signal}`);
+        });
     }
 
     // Stop video streaming
     stopVideo() {
-        if (this.ffmpegProcess === undefined) {
-            console.warn("Tried to stop video when ffmpeg wasn't known to be running");
+        if (!this.ffmpegProcess) {
+            console.warn("Tried to stop video when ffmpeg wasn't known to be running.");
             return;
         }
 
@@ -67,42 +69,42 @@ class Mpeg4Stream {
     startStreamingServer() {
         this.socketServer = new ws.Server({ port: this.wsPort, perMessageDeflate: false });
         this.socketServer.connectionCount = 0;
-        
-        const self = this;
 
-        this.socketServer.on('connection', function(socket, upgradeReq) {
-            self.socketServer.connectionCount++;
-            self.startVideo();
+        this.socketServer.on('connection', (socketClient, upgradeReq) => {
+            const req = upgradeReq || socketClient.upgradeReq;
+            this.socketServer.connectionCount++;
+            console.log(`New client connected: ${req.socket.remoteAddress}, ${req.headers['user-agent']} (${this.socketServer.connectionCount} clients)`);
 
-            const req = upgradeReq || socket.upgradeReq;
-            console.log(`New client connected: ${req.socket.remoteAddress}, ${req.headers['user-agent']} (${self.socketServer.connectionCount} clients)`);
+            this.startVideo();
 
-            // eslint-disable-next-line no-unused-vars
-            socket.on('close', function(code, message) {
-                if (--self.socketServer.connectionCount <= 0) {
-                    console.log('Connected clients dropped to 0, so stopping video streaming');
-                    self.stopVideo();
+            socketClient.on('close', (code, message) => {
+                console.log(`Client disconnected with code [${code}] and message [${message}].`);
+
+                if (--this.socketServer.connectionCount <= 0) {
+                    console.log('Connected clients dropped to 0, so stopping video streaming.');
+                    this.stopVideo();
                     return;
                 }
 
-                console.log(`A client disconnected; (${self.socketServer.connectionCount} clients remaining)`);
+                console.log(`A client disconnected; (${this.socketServer.connectionCount} clients remaining)`);
             });
         });
 
-        this.socketServer.broadcast = function(data) {
-            self.socketServer.clients.forEach(function each(client) {
+        this.socketServer.broadcast = (data) => {
+            this.socketServer.clients.forEach((client) => {
                 if (client.readyState === ws.OPEN) {
                     client.send(data);
+                } else {
+                    console.error(`Error sending to client ${client.Server} because websocket client readyState is ${client.readyState}.`);
                 }
             });
         };
 
-
         // HTTP Server to accept incoming mp4 stream from ffmpeg
-        const streamServer = http.createServer(function(request, response) {
+        const streamServer = http.createServer((request, response) => {
             const params = request.url.substr(1).split('/');
 
-            if (params[0] !== self.secret) {
+            if (params[0] !== this.secret) {
                 console.error(`Failed stream connection: ${request.socket.remoteAddress}:${request.socket.remotePort} - wrong secret.`);
                 response.end();
             }
@@ -110,12 +112,12 @@ class Mpeg4Stream {
             response.connection.setTimeout(0);
             console.log(`Stream connected at ${request.socket.remoteAddress}:${request.socket.remotePort}`);
 
-            request.on('data', function(data) {
-                self.socketServer.broadcast(data);
+            request.on('data', (data) => {
+                this.socketServer.broadcast(data);
             });
 
-            request.on('end', function() {
-                console.log("Stream closed.");
+            request.on('end', () => {
+                console.log(`Stream closed.`);
             });
         });
 
