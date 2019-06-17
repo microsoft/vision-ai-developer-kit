@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Basic tutorial 1: Live preview &#8212; QTI&#39;s python SDK for IOT connected camera 0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="basic-tutorial-1-live-preview">
+<span id="basic-tut-1"></span><h1>Basic tutorial 1: Live preview<a class="headerlink" href="#basic-tutorial-1-live-preview" title="Permalink to this headline">¶</a></h1>
+<p>So you bought the camera, what next?
+This tutorial will walk you through steps that are required to get preview working
+both over RTSP as well as via HDMI. We will also see how to configure preview using
+the <em>configure_preview</em> API.</p>
+<div class="section" id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">test-preview.py</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">sdk.camera</span> <span class="k">import</span> <span class="n">CameraClient</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Python </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ip&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;ip address of the camera&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;username of the camera&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--password&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;password of the camera&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">ip_addr</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">ip</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">username</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">password</span>
+
+    <span class="k">with</span> <span class="n">CameraClient</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ip_address</span><span class="o">=</span><span class="n">ip_addr</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span> <span class="k">as</span> <span class="n">camera_client</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported resolutions: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">resolutions</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported encodetype: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">encodetype</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported bitrates: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">bitrates</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported framerates: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">framerates</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">configure_preview</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;1080P&quot;</span><span class="p">,</span> <span class="n">display_out</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">preview_url</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running for 60 seconds&quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+
+        <span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Changing preview resolution to 4K and encode type to AVC&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">configure_preview</span><span class="p">(</span>
+            <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;4K&quot;</span><span class="p">,</span> <span class="n">encode</span><span class="o">=</span><span class="s2">&quot;AVC/H.264&quot;</span><span class="p">))</span>
+
+        <span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running for 60 seconds&quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">camera_client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This script is present in the <em>tests/</em> directory of the SDK.</p>
+</div>
+</div>
+<div class="section" id="walkthrough">
+<h2>Walkthrough<a class="headerlink" href="#walkthrough" title="Permalink to this headline">¶</a></h2>
+<p>Don’t get scared. Let’s break down this code and see what these lines of code do.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+</pre></div>
+</div>
+<p>The above lines will allow us to use the mentioned standard python packages. <em>argparse</em> is used for parsing the command line arguments.
+<em>sys</em> for printing the python version below and <em>time</em> is used for adding sleep. This is pretty basic stuff.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sdk.camera</span> <span class="k">import</span> <span class="n">CameraClient</span>
+</pre></div>
+</div>
+<p>This is where we import the camera module of the SDK as CameraClient. We have now got the power to use all
+the SDK APIs.</p>
+<p>Next is the <em>main</em> function. This is where actual work happens.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Python </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first thing that will happen when this script runs is it will print the python version through which we are running this script.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ip&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;ip address of the camera&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;username of the camera&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--password&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;password of the camera&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above code tells <em>argparse</em> that our script supports <em>–ip</em>, <em>–username</em>, and <em>–password</em> as command line arguments.
+We also tell argparse that what their default values will be just in case someone forgets to add them. All these arguments
+are required by the <em>connect</em> method of the camera module <a class="reference internal" href="../sdk.html#sdk"><span class="std std-ref">sdk.camera module</span></a> of the SDK.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+<span class="n">ip_addr</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">ip</span>
+<span class="n">username</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">username</span>
+<span class="n">password</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">password</span>
+</pre></div>
+</div>
+<p>Above lines are capturing the arguments passed in the command line into the respective variable. If no arguments were specified for the parameters
+then it will assign the default value for the param which is specified in <em>add_argument</em>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">CameraClient</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ip_address</span><span class="o">=</span><span class="n">ip_addr</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span> <span class="k">as</span> <span class="n">camera_client</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>This is where we login to the camera whose <em>ip_address</em> and other params we have specified as command line arguments.
+And get a handle to the <em>CameraClient</em> which can be used for controlling the camera or requesting the camera.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported resolutions: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">resolutions</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported encodetype: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">encodetype</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported bitrates: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">bitrates</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;supported framerates: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">framerates</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Next, we just print some information that can be used for configuring the preview, for instance, resolution, codec type, bitrate, and framerate.
+This is just to see what parameters are supported. And also to show how you can access them in your code.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">configure_preview</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;1080P&quot;</span><span class="p">,</span> <span class="n">display_out</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The above line will configure preview resolution to 1080p(<em>resolution=”1080P”</em>) and enable HDMI output(<em>display_out=1</em>).
+For the full set of options for <em>configure_preview</em> please check <a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Module Index</span></a>.
+Now that we have setup preview lets start preview and get some frames out.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">preview_url</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the request was successful you should now be seeing live preview on HDMI. To check the live stream.
+The <em>preview_url</em> can be used to get the RTSP url as illustrated below. You can play/open stream using
+any player that supports RTSP client or write your own function to parse this using python packages.
+We use VLC media player.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running for 60 seconds&quot;</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The preview will keep running till you tell it to stop. The above lines will ensure that the preview runs for 60 seconds.
+We then stop it using the <em>set_preview_state</em> API.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Changing preview resolution to 4K and encode type to AVC&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">camera_client</span><span class="o">.</span><span class="n">configure_preview</span><span class="p">(</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="s2">&quot;4K&quot;</span><span class="p">,</span> <span class="n">encode</span><span class="o">=</span><span class="s2">&quot;AVC/H.264&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The above lines illustrate how you can use the configure_preview API to change the preview
+resolution(<em>resolution=”4K”</em>) and codec type(<em>encode=”AVC/H.264”</em>). Notice that we are not
+setting the display_out here. This is because once the display_out is enabled it will persist
+until you stop it by setting it to 0 i.e. <em>display_out=0</em> using <em>configure_preview</em> API. Also, the
+other parameters will retain the previously set value or the default value if not specified earlier.
+As before since we have configured the preview lets turn it on using the <em>set_preview_state</em> API.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;on&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again, the preview will keep running till you tell it to stop. For this test will keep it running
+for 60 seconds(<em>time.sleep</em>) and then stop it using the <em>set_preview_state</em> API.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running for 60 seconds&quot;</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">camera_client</span><span class="o">.</span><span class="n">set_preview_state</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once you are done using the camera you can disconnect from the camera using the <em>logout</em> API.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">camera_client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="it-s-time-to-test">
+<h2>It’s time to test<a class="headerlink" href="#it-s-time-to-test" title="Permalink to this headline">¶</a></h2>
+<p>Once you have the application/script ready. You can test it by following the steps mentioned in
+<a class="reference internal" href="../getting_started.html#test"><span class="std std-ref">Test</span></a> section of the <a class="reference internal" href="../getting_started.html#getting-started"><span class="std std-ref">Getting started</span></a> page.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Basic tutorial 1: Live preview</a><ul>
+<li><a class="reference internal" href="#code">Code</a></li>
+<li><a class="reference internal" href="#walkthrough">Walkthrough</a></li>
+<li><a class="reference internal" href="#it-s-time-to-test">It’s time to test</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/basic_tut1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright (c) 2018-2019, The Linux Foundation. All rights reserved..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

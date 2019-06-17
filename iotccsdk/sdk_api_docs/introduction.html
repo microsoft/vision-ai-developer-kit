@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Introduction &#8212; QTI&#39;s python SDK for IOT connected camera 0.0 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This package provides QTI’s python SDK for developing IOT connected camera applications. The SDK provides simplified python APIs on top
+of QTI’s IP Camera webserver (<a class="reference internal" href="#ipc-webserver">IPC-webserver</a>). QTI’s <a class="reference internal" href="#ipc-webserver">IPC-webserver</a> is a reference application which provides RESTful APIs for web-based access
+to <a class="reference internal" href="#qti-s-multimedia-framework-qmmf">QTI’s MultiMedia framework (QMMF)</a> SDK. QMMF SDK encapsulates common connected camera features and provides an easy to use API to simplify
+application development across various connected camera application.</p>
+<p>Below is the list of currently supported APIs with a brief description of their functionality.</p>
+<ul class="simple">
+<li><p>connect: connect to the camera</p></li>
+<li><p>captureimage: capture an image</p></li>
+<li><p>configure_preview: configure preview parameters</p></li>
+<li><p>configure_overlay: configure overlay parameters</p></li>
+<li><p>get_inferences: get inferences from the analytics metadata stream</p></li>
+<li><p>logout: logout from the camera</p></li>
+<li><p>set_overlay_state: switch overlay on/off</p></li>
+<li><p>set_preview_state: switch preview on/off</p></li>
+<li><p>set_recording_state: switch recording on/off</p></li>
+<li><p>set_analytics_state: switch video analytics on/off</p></li>
+</ul>
+<p>Check the <a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a> for detailed information on this APIs.</p>
+</div>
+<div class="section" id="qti-s-multimedia-framework-qmmf">
+<h1>QTI’s MultiMedia Framework (QMMF)<a class="headerlink" href="#qti-s-multimedia-framework-qmmf" title="Permalink to this headline">¶</a></h1>
+<p>QTI’s MultiMedia framework encapsulates common connected camera features and provides an easy to use API to simplify application development.
+Below are its key features.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Domain specific APIs to simplify connected camera application development across following segments</dt><dd><ul>
+<li><p>360 Camera support, VR camera support, Sports Camera support, IP Camera support</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Concurrent multichannel video recording using variety of codecs (AVC, HEVC, MPEG4)</p></li>
+<li><p>Concurrent multichannel audio recording using variety of codecs (AAC, AMR, G711)</p></li>
+<li><p>Multi client support to camera – enable multiple applications to access same camera concurrently</p></li>
+<li><p>Optimized Video overlay support (text, images, dynamic content)</p></li>
+<li><p>Optimized implementation with zero copies for large image/video data</p></li>
+<li><p>Advanced camera feature control for video SHDR, IR, zoom, Temporal noise filtering(TNR), lens distortion correction.</p></li>
+<li><p>Different image capture modes (RAW, ZSL capture, different types of burst – continuous, auto)</p></li>
+<li><p>High speed record</p></li>
+<li><p>Ability to plugin 3rd party post processing to video encode and image capture pipelines, built in post proc framework, easy interface
+to plugin in house or 3rd party algorithms.</p></li>
+<li><p>Linked track - Ability to generate multiple tracks from single source without copy, buffer sharing across multiple video streams.</p></li>
+<li><p>Multi thumbnails, Smooth Zoom.</p></li>
+<li><p>Minimum external dependencies, Solution works across Android and Linux solution</p></li>
+</ul>
+<p>For more information on the framework please contact QTI’s support team.</p>
+</div>
+<div class="section" id="qmmf-webserver">
+<h1>QMMF-webserver<a class="headerlink" href="#qmmf-webserver" title="Permalink to this headline">¶</a></h1>
+<p>A service designed on top <a class="reference internal" href="#qti-s-multimedia-framework-qmmf">QTI’s MultiMedia Framework (QMMF)</a> to access its client API from a remote location using REST APIs.
+It uses JSON for message passing between client and device. Its a Golang based webserver listening for client request on port 4000.
+QMMF webserver has the following key modules</p>
+<ul class="simple">
+<li><p>HTTP interface: This acts as a glue and connects webserver go implementation with the QMMF service. It also takes care of establishing
+links between RTSP and VAM module when required by supplying the buffers to them.</p></li>
+<li><p>Video Analytics Manager interface: This module takes a buffer from HTTP interface runs the configured engine and generates metadata
+depending on the engine that is running.</p></li>
+<li><p>MUX interface: This module is used for muxing the AV streams and storing them on the device.</p></li>
+<li><p>RTSP interface: This module takes care of streaming the A/V stream or metadata obtained from VAM interface through RTSP stream.</p></li>
+</ul>
+<p>All this is good, but QMMF-webserver cannot manage resource and clients. For that, we have <a class="reference internal" href="#ipc-webserver">IPC-webserver</a>. If you are interested in
+knowing more about the QMMF-webserver please contact QTI’s support team.</p>
+</div>
+<div class="section" id="ipc-webserver">
+<h1>IPC-webserver<a class="headerlink" href="#ipc-webserver" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="#ipc-webserver">IPC-webserver</a> is webserver written in Golang which manages multiple clients who want to access the camera via the QMMF-webserver.
+It also encapsulates APIs provided by QMMF-webserver into more intuitive connected camera related APIs like preview, record, etc.
+The python SDK uses the APIs provided by <a class="reference internal" href="#ipc-webserver">IPC-webserver</a>. For more information on the <a class="reference internal" href="#ipc-webserver">IPC-webserver</a> and all of its API please reach
+out to QTI’s support team.</p>
+</div>
+<div class="section" id="common-use-case-flow">
+<h1>Common use case flow<a class="headerlink" href="#common-use-case-flow" title="Permalink to this headline">¶</a></h1>
+<img alt="_images/ipc-webserver.jpg" src="_images/ipc-webserver.jpg" />
+<div class="section" id="control">
+<h2>Control<a class="headerlink" href="#control" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Python application written using this SDK sends a request to <a class="reference internal" href="#ipc-webserver">IPC-webserver</a></p></li>
+<li><p><a class="reference internal" href="#ipc-webserver">IPC-webserver</a> checks the resource availability and calls <a class="reference internal" href="#qmmf-webserver">QMMF-webserver</a> with required parameters.</p></li>
+<li><p><a class="reference internal" href="#qmmf-webserver">QMMF-webserver</a> receives the requests, parses the parameters and calls HTTP interface.</p></li>
+<li><dl class="simple">
+<dt>HTTP interface requests QMMF server for tracks and initializes VAM/RTSP/MUX module depending on the request.</dt><dd><ul>
+<li><p>VAM: Configure and start the analytics engine.</p></li>
+<li><p>MUX: Configure and start the muxer.</p></li>
+<li><p>RTSP: Configure and start LIVE555 module for RTSP streaming.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>QMMF-server gives the response of the request to the HTTP interface who passes it to <a class="reference internal" href="#qmmf-webserver">QMMF-webserver</a>.</p></li>
+<li><p><a class="reference internal" href="#qmmf-webserver">QMMF-webserver</a> then encapsulates the response in JSON format and sends the response to <a class="reference internal" href="#ipc-webserver">IPC-webserver</a> which relays it to the client.</p></li>
+</ul>
+</div>
+<div class="section" id="data">
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<p>If the request was successful then the data in this buffer will take the below path</p>
+<ul class="simple">
+<li><p>QMMF-server gives the buffer to the HTTP interface.</p></li>
+<li><dl class="simple">
+<dt>HTTP interface then passes it on the relevant module(VAM/MUX/RTSP) depending on the request from the client.</dt><dd><ul>
+<li><dl class="simple">
+<dt>VAM</dt><dd><ul>
+<li><p>Takes the frame and passes it on the configured engine.</p></li>
+<li><p>Engine generates analytics result and gives it to the HTTP interface.</p></li>
+<li><p>HTTP interface then packages it metadata format and gives it to RTSP interface for streaming.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>MUX</dt><dd><ul>
+<li><p>Takes the A/V frame.</p></li>
+<li><p>Muxes it and stores it on the device storage.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>RTSP: This can either be A/V stream or Analytics data</dt><dd><ul>
+<li><p>Packages it RTSP format</p></li>
+<li><p>Sends as RTSP stream</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The python application receives the data directly from RTSP interface module of the QMMF-webserver.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a></li>
+<li><a class="reference internal" href="#qti-s-multimedia-framework-qmmf">QTI’s MultiMedia Framework (QMMF)</a></li>
+<li><a class="reference internal" href="#qmmf-webserver">QMMF-webserver</a></li>
+<li><a class="reference internal" href="#ipc-webserver">IPC-webserver</a></li>
+<li><a class="reference internal" href="#common-use-case-flow">Common use case flow</a><ul>
+<li><a class="reference internal" href="#control">Control</a></li>
+<li><a class="reference internal" href="#data">Data</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/introduction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright (c) 2018-2019, The Linux Foundation. All rights reserved..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

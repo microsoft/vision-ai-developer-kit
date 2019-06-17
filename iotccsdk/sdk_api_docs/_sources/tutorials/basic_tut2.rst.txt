@@ -1,0 +1,81 @@
+.. Copyright (c) 2019, The Linux Foundation. All rights reserved.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+  * Neither the name of The Linux Foundation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+.. _basic_tut_2:
+
+*********************************************
+Basic tutorial 2: Live preview with recording
+*********************************************
+This tutorial will walk you through steps that are required to get preview working
+both over RTSP as well as via HDMI and record at the same time. We will see how to
+start/stop recording using *set_recording_state* API.
+
+.. warning:: We assume you have already checked :ref:`basic_tut_1`. If not, please
+             go through it before proceeding as this tutorial only explains the
+             additional code i.e. start/stop of recording.
+
+
+Code
+====
+
+.. literalinclude:: ../../../tests/test-preview-record.py
+    :linenos:
+    :lines: 28-
+    :caption: test-preview-record.py
+
+.. note:: This script is present in the *tests/* directory of the SDK.
+
+Walkthrough
+===========
+As you would have noticed most of the code is the same as the :ref:`basic_tut_1`. So in this
+walkthrough we will just focus on the add-ons i.e. start/stop record.
+
+You can start/stop recording using the *set_recording_state* API anytime after obtaining
+the camera client handle. In this tutorial we start recording after 60 seconds of preview.
+
+::
+
+    print("Start recording")
+    camera_client.set_recording_state("on")
+
+We keep recording for 60 seconds.
+
+::
+
+    print("Running for 60 seconds")
+    time.sleep(60)
+
+Then stop recording using the *set_recording_state* API.
+
+::
+
+    camera_client.set_recording_state("off")
+
+
+It's time to test
+=================
+
+Once you have the application/script ready. You can test it by following the steps mentioned in
+:ref:`test` section of the :ref:`getting_started` page.

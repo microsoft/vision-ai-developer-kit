@@ -1,0 +1,131 @@
+.. Copyright (c) 2019, The Linux Foundation. All rights reserved.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+  * Neither the name of The Linux Foundation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+.. _basic_tut_4:
+
+*********************************************************
+Basic tutorial 4: Live preview with analytics and overlay
+*********************************************************
+This tutorial will walk you through steps that are required to start the analytics
+and see the results i.e. get preview, analytics, and overlay working together.
+This example highlights usage of *configure_overlay*, *set_overlay_state*, and
+*set_analytics_state* API.
+
+.. warning:: We assume the correct analytics engine is already installed and for ML based
+            engine you have installed required model and related files. If you are not
+            clear on what is required, please get in touch with QTI's support team.
+            We also assume that you have already checked :ref:`basic_tut_1`.
+            If not, please go through it before proceeding as this tutorial
+            only explains the additional code i.e. overlay and analytics
+            configuration and usage.
+
+Code
+====
+.. literalinclude:: ../../../tests/test-preview-inference-overlay.py
+    :linenos:
+    :lines: 28-
+    :caption: test-preview-inference-overlay.py
+
+.. note:: This script is present in the *tests/* directory of the SDK.
+
+
+Walkthrough
+===========
+As you would have noticed the beginning of the code is the same as the :ref:`basic_tut_1`.
+Which means we now have things in place for starting preview both live and on HDMI.
+We can start the analytics using the *set_analytics_state* API. And if the request was
+successful then *vam_url* will contain the RTSP url where the analytics result will be
+available.
+
+::
+
+    camera_client.set_analytics_state("on")
+    print(camera_client.vam_url)
+
+Next, we will configure and start overlay so that we can see the results from the analytics
+engine when they are available on the preview. Overlay can be configured using the
+*configure_overlay* API and it can be turned on using the *set_overlay_state* API.
+
+::
+
+        camera_client.configure_overlay("inference")
+        camera_client.set_overlay_state("on")
+
+All is good till now. You have started preview, are able to see the analytics results on screen.
+Wouldn't it have been great if you can get access to the result of the analytics engine so that you
+can take actions based on it, if required?
+Don't worry, we have *get_inferences* API for that which will parse the analytics RTSP stream and give you results.
+In the above example we print every result.
+
+::
+
+    try:
+        with camera_client.get_inferences() as results:
+            print_inferences(results)
+    except:
+        print("Stopping")
+
+We print till results are available or an exception occurs.
+
+Please refer to :ref:`frame` for more info on the contents of the result.
+
+The implementation of *print_inferences* method shows how to extract the parameters
+from the result obtained from *get_inferences* API.
+
+::
+
+    def print_inferences(results=None):
+        print("")
+        for result in results:
+            if result is not None and result.objects is not None and len(result.objects):
+                timestamp = result.timestamp
+                if timestamp:
+                    print("timestamp={}".format(timestamp))
+                else:
+                    print("timestamp= " + "None")
+                for object in result.objects:
+                    id = object.id
+                    print("id={}".format(id))
+                    label = object.label
+                    print("label={}".format(label))
+                    confidence = object.confidence
+                    print("confidence={}".format(confidence))
+                    x = object.position.x
+                    y = object.position.y
+                    w = object.position.width
+                    h = object.position.height
+                    print("Position(x,y,w,h)=({},{},{},{})".format(x, y, w, h))
+                    print("")
+            else:
+                print("No results")
+
+It's time to test
+=================
+
+Once you have the application/script ready. You can test it by following the steps mentioned in
+:ref:`test` section of the :ref:`getting_started` page.
+
+.. warning:: This example script will not exit until there is an exception. If you wish to stop it
+             you can do so by pressing Ctrl+C key on your keyboard.

@@ -1,0 +1,114 @@
+.. Copyright (c) 2019, The Linux Foundation. All rights reserved.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+  * Neither the name of The Linux Foundation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+.. _getting_started:
+
+Getting started
+=====================================================================
+
+Pre-requisites
+==============
+
+Install Python version 3.5
+--------------------------
+
+Install python version **3.5** as per your operating system from the `Python website <https://www.python.org/downloads/>`_.
+
+.. note:: **Make sure the installed bin path is set in your PATH variable. Run “python –version” on command prompt to check**.
+
+.. warning:: This SDK is tested with python version 3.5 only. Other versions may not work.
+
+Install gstreamer (v1.14.x or higher)
+-------------------------------------
+
+Windows
+~~~~~~~
+
+Download the latest package from the `Gstreamer website <https://gstreamer.freedesktop.org/data/pkg/windows/>`_.
+::
+
+   gstreamer-1.0-x86* (per your architecture)
+
+.. note:: Make sure the installed bin path is set in your **PATH** variable. Run “gst-inspect-1.0 –version” on command prompt to check
+
+Linux
+~~~~~
+Install the gstreamer and relevant gstreamer plugin modules
+::
+
+   apt-get install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools
+
+.. note:: You may have to use ``sudo`` with the above command if you don’t have permission to install packages.
+
+Build and install
+=================
+* Change to the SDk directory
+   * Fresh installation
+      ::
+
+         cd python_iotcc_sdk
+         pip install -e .
+   * Updating to new version of the SDK (overwriting previously installed version)
+      ::
+
+         cd python_iotcc_sdk
+         pip install --user --force-reinstall .
+
+.. _test:
+
+Test
+====
+Quick test (**no network connectivity required**)
+-------------------------------------------------
+   * Connect device via USB
+   * Connect display via HDMI
+   * Reset the device and setup port forwarding
+   * Windows
+      ::
+
+         tests\port_forward.bat
+   * Linux
+      ::
+
+         tests\port_forward.sh
+
+   * Run the test script from your machine
+      ::
+
+         python test-preview.py --ip 127.0.0.1
+
+Use –help or -h for all options. And press Ctrl-C for exiting. You can see preview on display via HDMI.
+
+Quick test (**with network connectivity**)
+------------------------------------------
+   * Connect the device to network (WiFi)
+   * Check camera ip
+   * Connect display via HDMI
+   * Run the test script from your machine
+      ::
+
+         python test-preview.py --ip <ip address>
+
+Use –help or -h for all options. And press Ctrl-C for exiting. You can see the preview on display via HDMI.

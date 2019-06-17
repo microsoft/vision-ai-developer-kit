@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>sdk.camera &#8212; QTI&#39;s python SDK for IOT connected camera 0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sdk.camera</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions are</span>
+<span class="c1"># met:</span>
+<span class="c1">#    * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#      notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#    * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#      copyright notice, this list of conditions and the following</span>
+<span class="c1">#      disclaimer in the documentation and/or other materials provided</span>
+<span class="c1">#      with the distribution.</span>
+<span class="c1">#    * Neither the name of The Linux Foundation nor the names of its</span>
+<span class="c1">#      contributors may be used to endorse or promote products derived</span>
+<span class="c1">#      from this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED</span>
+<span class="c1"># WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF</span>
+<span class="c1"># MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS</span>
+<span class="c1"># BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR</span>
+<span class="c1"># CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF</span>
+<span class="c1"># SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR</span>
+<span class="c1"># BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,</span>
+<span class="c1"># WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE</span>
+<span class="c1"># OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN</span>
+<span class="c1"># IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the high level client APIs.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">.ipcprovider</span> <span class="k">import</span> <span class="n">IpcProvider</span>
+<span class="kn">from</span> <span class="nn">.frame_iterators</span> <span class="k">import</span> <span class="n">VideoInferenceIterator</span>
+
+<div class="viewcode-block" id="CameraClient"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient">[docs]</a><span class="k">class</span> <span class="nc">CameraClient</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a class for high level client APIs.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ipc_provider : IpcProvider object</span>
+<span class="sd">    preview_running : bool</span>
+<span class="sd">        Flag for preview status.</span>
+<span class="sd">    preview_url : str</span>
+<span class="sd">    vam_running : bool</span>
+<span class="sd">        Flag for vam status.</span>
+<span class="sd">    vam_url : str</span>
+<span class="sd">    resolutions : list of str</span>
+<span class="sd">        List of supported resolutions values.</span>
+<span class="sd">        Use this for `configure_preview` API.</span>
+<span class="sd">    encodetype : list of str</span>
+<span class="sd">        List of supported codec types.</span>
+<span class="sd">        Use this for `configure_preview` API.</span>
+<span class="sd">    bitrates : list of str</span>
+<span class="sd">        List of supported bitrates values.</span>
+<span class="sd">        Use this for `configure_preview` API.</span>
+<span class="sd">    framerates : list of int</span>
+<span class="sd">        List of supported fps values.</span>
+<span class="sd">        Use this for `configure_preview` API.</span>
+<span class="sd">    cur_resolution: str</span>
+<span class="sd">        Current preview resolution</span>
+<span class="sd">    cur_codec: str</span>
+<span class="sd">        Current preview encode type</span>
+<span class="sd">    cur_bitrate: str</span>
+<span class="sd">        Current preview bitrate</span>
+<span class="sd">    cur_framerate: int</span>
+<span class="sd">        Current preview framerate</span>
+<span class="sd">    display_out: int</span>
+<span class="sd">        Flag that tells whether HDMI display/preview is enabled or not.</span>
+<span class="sd">        HDMI display/preview is enabled if this flag is 1 else disabled.</span>
+<span class="sd">        This can be configured using `configure_preview` API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;iotccsdk&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CameraClient.connect"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.connect">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipc_provider</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ip_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is used to create CameraClient handle for application.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ipc_provider : `IpcProvider` object</span>
+<span class="sd">            `IpcProvider` handle for class methods.</span>
+<span class="sd">        ip_address : str</span>
+<span class="sd">            IP address of the camera.</span>
+<span class="sd">        username : str</span>
+<span class="sd">            username for the camera.</span>
+<span class="sd">        password : str</span>
+<span class="sd">            password for the camera.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        CameraClient</span>
+<span class="sd">            `CameraClient` handle for the application.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ipc_provider</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ipc_provider</span> <span class="o">=</span> <span class="n">IpcProvider</span><span class="p">(</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip_address</span><span class="p">,</span> <span class="n">username</span> <span class="o">=</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">password</span><span class="p">)</span>
+
+        <span class="n">ipc_provider</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">CameraClient</span><span class="p">(</span><span class="n">ipc_provider</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">ipc_provider</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipc_provider</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The constructor for `CameraClient` class</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ipc_provider : `IpcProvider` object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span> <span class="o">=</span> <span class="n">ipc_provider</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vam_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_codec</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_bitrate</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cur_framerate</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_out</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_supported_params</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CameraClient.get_inferences"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.get_inferences">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">get_inferences</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inference generator for the application.</span>
+
+<span class="sd">        This inference generator gives inferences from the VA metadata stream.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        AiCameraInference: `AiCameraInference` class object</span>
+<span class="sd">            This `AiCameraInference` object yielded</span>
+<span class="sd">            from `VideoInferenceIterator.start()`</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        EOFError</span>
+<span class="sd">            If the preview is not started.</span>
+<span class="sd">            Or if the vam is not started.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_running</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">(</span><span class="s2">&quot;preview not started&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_running</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">EOFError</span><span class="p">(</span><span class="s2">&quot;VAM not started&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">==</span> <span class="s2">&quot;4K&quot;</span><span class="p">:</span>
+            <span class="n">preview_width</span> <span class="o">=</span> <span class="mi">3840</span>
+            <span class="n">preview_height</span> <span class="o">=</span> <span class="mi">2160</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">==</span> <span class="s2">&quot;1080P&quot;</span><span class="p">:</span>
+            <span class="n">preview_width</span> <span class="o">=</span> <span class="mi">1920</span>
+            <span class="n">preview_height</span> <span class="o">=</span> <span class="mi">1080</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">==</span> <span class="s2">&quot;720P&quot;</span><span class="p">:</span>
+            <span class="n">preview_width</span> <span class="o">=</span> <span class="mi">1280</span>
+            <span class="n">preview_height</span> <span class="o">=</span> <span class="mi">720</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">==</span> <span class="s2">&quot;480P&quot;</span><span class="p">:</span>
+            <span class="n">preview_width</span> <span class="o">=</span> <span class="mi">640</span>
+            <span class="n">preview_height</span> <span class="o">=</span> <span class="mi">480</span>
+
+        <span class="n">inference_iterator</span> <span class="o">=</span> <span class="n">VideoInferenceIterator</span><span class="p">(</span><span class="n">preview_width</span><span class="p">,</span> <span class="n">preview_height</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_vam_info</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;0.0.0.0&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span><span class="p">:</span>
+                <span class="n">s_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span><span class="p">[:</span><span class="n">s_idx</span><span class="p">]</span>
+                <span class="n">e_idx</span> <span class="o">=</span> <span class="n">s_idx</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span><span class="p">[</span><span class="n">e_idx</span><span class="p">:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="s2">&quot;127.0.0.1&quot;</span> <span class="o">+</span> <span class="n">end</span>
+            <span class="k">yield</span> <span class="n">inference_iterator</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">inference_iterator</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CameraClient.configure_preview"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.configure_preview">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">configure_preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">encode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bitrate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">framerate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">display_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is for setting preview params.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        resolution : str</span>
+<span class="sd">            A value from `resolutions` attribute</span>
+<span class="sd">        encode : str</span>
+<span class="sd">            A value from `encodetype` attribute</span>
+<span class="sd">        bitrate : str</span>
+<span class="sd">            A value from `bitrates` attribute</span>
+<span class="sd">        framerate : int</span>
+<span class="sd">            A value from `framerates` attribute</span>
+<span class="sd">        display_out : {0, 1}</span>
+<span class="sd">            For enabling or disabling HDMI output</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request is successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span> <span class="ow">and</span> <span class="n">resolution</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span> <span class="ow">and</span> <span class="n">encode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span><span class="p">:</span>
+            <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">encode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_codec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bitrate</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span> <span class="ow">and</span> <span class="n">bitrate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bitrate</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_bitrate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">framerate</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span> <span class="ow">and</span> <span class="n">framerate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span><span class="p">:</span>
+            <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">framerate</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_framerate</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">display_out</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="n">display_out</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">display_out</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid value: display_out should 0/1, using current display_out:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display_out</span><span class="p">))</span>
+            <span class="n">display_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_out</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/video&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;resolutionSelectVal&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">,</span>
+            <span class="s2">&quot;encodeModeSelectVal&quot;</span><span class="p">:</span> <span class="n">enc</span><span class="p">,</span>
+            <span class="s2">&quot;bitRateSelectVal&quot;</span><span class="p">:</span> <span class="n">bit</span><span class="p">,</span>
+            <span class="s2">&quot;fpsSelectVal&quot;</span><span class="p">:</span> <span class="n">fps</span><span class="p">,</span>
+            <span class="s2">&quot;displayOut&quot;</span><span class="p">:</span> <span class="n">display_out</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span><span class="p">[</span><span class="n">res</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span><span class="p">[</span><span class="n">res</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;resolution updated to : &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_codec</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span><span class="p">[</span><span class="n">enc</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur_codec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span><span class="p">[</span><span class="n">enc</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;encodetype updated to : &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_codec</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_bitrate</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span><span class="p">[</span><span class="n">bit</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur_bitrate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span><span class="p">[</span><span class="n">bit</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;bitrate updated to : &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_bitrate</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_framerate</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span><span class="p">[</span><span class="n">fps</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cur_framerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span><span class="p">[</span><span class="n">fps</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;framerate updated to : </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_framerate</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_out</span> <span class="o">!=</span> <span class="n">display_out</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">display_out</span> <span class="o">=</span> <span class="n">display_out</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;display_out updated to : </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display_out</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_supported_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method for getting preview params</span>
+
+<span class="sd">        This method populates the `resolutions`, `encodetype`, `bitrates`</span>
+<span class="sd">        and `framerates` attribute. It is called by the `CameraClient` constructor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request is successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/video&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;{ }&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span>
+            <span class="n">r_idx</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;resolutionSelectVal&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span><span class="p">[</span><span class="n">r_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;encodeMode&quot;</span><span class="p">]</span>
+            <span class="n">e_idx</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;encodeModeSelectVal&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur_codec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span><span class="p">[</span><span class="n">e_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;bitRate&quot;</span><span class="p">]</span>
+            <span class="n">b_idx</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;bitRateSelectVal&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur_bitrate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span><span class="p">[</span><span class="n">b_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">]</span>
+            <span class="n">f_idx</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;fpsSelectVal&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cur_framerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framerates</span><span class="p">[</span><span class="n">f_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display_out</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;displayOut&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;resolutions: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolutions</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;encodetype: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encodetype</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;bitrates: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bitrates</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;framerates: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">framerates</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Current preview settings:&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;resolution: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_resolution</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;encodetype: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_codec</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;bitrate: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cur_bitrate</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;framerate: </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cur_framerate</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;display_out: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display_out</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CameraClient.set_preview_state"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.set_preview_state">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">set_preview_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a switch for preview.</span>
+
+<span class="sd">        Preview can be enabled or disabled using this API.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        state : str</span>
+<span class="sd">            Set it &quot;on&quot; for enabling or &quot;off&quot; for disabling preview.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request was successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid state: &quot;</span> <span class="o">+</span> <span class="n">state</span> <span class="o">+</span> <span class="s2">&quot; should be on/off&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/preview&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;switchStatus&#39;</span> <span class="p">:</span> <span class="n">status</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_running</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_running</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_preview_info</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_running</span></div>
+
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">_get_preview_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method for getting preview url</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Preview RTSP url</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/preview&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;{ }&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_url</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;preview url: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_url</span>
+
+<div class="viewcode-block" id="CameraClient.set_analytics_state"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.set_analytics_state">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">set_analytics_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a switch for video analytics(VA).</span>
+
+<span class="sd">        VA can be enabled or disabled using this API.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        state : str</span>
+<span class="sd">            Set it &quot;on&quot; for enabling or &quot;off&quot; for disabling Video Analytics.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request was successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid state: &quot;</span> <span class="o">+</span> <span class="n">state</span> <span class="o">+</span> <span class="s2">&quot; should be on/off&quot;</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;switchStatus&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span> <span class="s2">&quot;vamconfig&quot;</span><span class="p">:</span> <span class="s2">&quot;MD&quot;</span><span class="p">}</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/vam&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vam_running</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_running</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_vam_info</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_running</span></div>
+
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">_get_vam_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method for getting VA url</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Preview VA url</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/vam&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;{ }&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;vam url: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vam_url</span>
+
+<div class="viewcode-block" id="CameraClient.set_recording_state"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.set_recording_state">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">set_recording_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a switch for recording.</span>
+
+<span class="sd">        Recording can be enabled or disabled using this API.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        state : str</span>
+<span class="sd">            Set it &quot;on&quot; for enabling or &quot;off&quot; for disabling recording.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request was successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid state: &quot;</span> <span class="o">+</span> <span class="n">state</span> <span class="o">+</span> <span class="s2">&quot; should be on/off&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/recording&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;switchStatus&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record_running</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_running</span></div>
+
+<div class="viewcode-block" id="CameraClient.configure_overlay"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.configure_overlay">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">configure_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is for configuring overlay params.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        type : {None, &quot;inference&quot;, &quot;text&quot;}</span>
+<span class="sd">            Type of the overlay you want to configure.</span>
+<span class="sd">        text : str, optional</span>
+<span class="sd">            Text for text overlay type (the default is None).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">            True if the configuration was successful.</span>
+<span class="sd">            False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;inference&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configure_inference_overlay</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configure_text_overlay</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid overlay type use (inference/text)&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_configure_inference_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method for inference overlay configuration.</span>
+
+<span class="sd">        This is used by `configure_overlay` for inference type overlay.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the configuration was successful.</span>
+<span class="sd">            False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/overlayconfig&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ov_type_SelectVal&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;ov_position_SelectVal&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_color&quot;</span><span class="p">:</span> <span class="s2">&quot;869007615&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ov_usertext&quot;</span><span class="p">:</span> <span class="s2">&quot;Text&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ov_start_x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_start_y&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_width&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_height&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_configure_text_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method for text overlay configuration.</span>
+
+<span class="sd">        This is used by `configure_overlay` for text type overlay.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the configuration was successful.</span>
+<span class="sd">            False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/overlayconfig&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ov_type_SelectVal&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_position_SelectVal&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_color&quot;</span><span class="p">:</span> <span class="s2">&quot;869007615&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ov_usertext&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+            <span class="s2">&quot;ov_start_x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_start_y&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_width&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;ov_height&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CameraClient.set_overlay_state"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.set_overlay_state">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">set_overlay_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a switch for overlay.</span>
+
+<span class="sd">        Overlay can be enabled or disabled using this API.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        state : str</span>
+<span class="sd">            Set it &quot;on&quot; for enabling or &quot;off&quot; for disabling overlay.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request was successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;on&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">state</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;off&quot;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid state: &quot;</span> <span class="o">+</span> <span class="n">state</span> <span class="o">+</span> <span class="s2">&quot; should be on/off&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/overlay&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;switchStatus&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CameraClient.captureimage"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.captureimage">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">captureimage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is for taking a snapshot.</span>
+
+<span class="sd">        The snapshot is taken and stored as snapshot_&lt;timestamp&gt;.jpg</span>
+<span class="sd">        when the call is successful.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request was successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/captureimage&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="s1">&#39;{ }&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;Error&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Error&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)),</span> <span class="s1">&#39;snapshot_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">])</span><span class="o">+</span> <span class="s1">&#39;.jpg&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Storing snapshot: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Data&quot;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CameraClient.logout"><a class="viewcode-back" href="../../sdk.html#sdk.camera.CameraClient.logout">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is for logging out from the camera.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the request was successful. False on failure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/logout&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_provider</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright (c) 2018-2019, The Linux Foundation. All rights reserved..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>
