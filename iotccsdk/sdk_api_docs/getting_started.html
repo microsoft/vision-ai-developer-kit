@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Getting started &#8212; QTI&#39;s python SDK for IOT connected camera 0.0 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<span id="id1"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="pre-requisites">
+<h1>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="install-python-version-3-5">
+<h2>Install Python version 3.5<a class="headerlink" href="#install-python-version-3-5" title="Permalink to this headline">¶</a></h2>
+<p>Install python version <strong>3.5</strong> as per your operating system from the <a class="reference external" href="https://www.python.org/downloads/">Python website</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Make sure the installed bin path is set in your PATH variable. Run “python –version” on command prompt to check</strong>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This SDK is tested with python version 3.5 only. Other versions may not work.</p>
+</div>
+</div>
+<div class="section" id="install-gstreamer-v1-14-x-or-higher">
+<h2>Install gstreamer (v1.14.x or higher)<a class="headerlink" href="#install-gstreamer-v1-14-x-or-higher" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="windows">
+<h3>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h3>
+<p>Download the latest package from the <a class="reference external" href="https://gstreamer.freedesktop.org/data/pkg/windows/">Gstreamer website</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gstreamer</span><span class="o">-</span><span class="mf">1.0</span><span class="o">-</span><span class="n">x86</span><span class="o">*</span> <span class="p">(</span><span class="n">per</span> <span class="n">your</span> <span class="n">architecture</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure the installed bin path is set in your <strong>PATH</strong> variable. Run “gst-inspect-1.0 –version” on command prompt to check</p>
+</div>
+</div>
+<div class="section" id="linux">
+<h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
+<p>Install the gstreamer and relevant gstreamer plugin modules</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libgstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="mi">0</span> <span class="n">gstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">plugins</span><span class="o">-</span><span class="n">base</span> <span class="n">gstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">plugins</span><span class="o">-</span><span class="n">good</span> <span class="n">gstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">plugins</span><span class="o">-</span><span class="n">bad</span> <span class="n">gstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">plugins</span><span class="o">-</span><span class="n">ugly</span> <span class="n">gstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">libav</span> <span class="n">gstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">doc</span> <span class="n">gstreamer1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">tools</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You may have to use <code class="docutils literal notranslate"><span class="pre">sudo</span></code> with the above command if you don’t have permission to install packages.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="build-and-install">
+<h1>Build and install<a class="headerlink" href="#build-and-install" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><dl>
+<dt>Change to the SDk directory</dt><dd><ul>
+<li><dl>
+<dt>Fresh installation</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">python_iotcc_sdk</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Updating to new version of the SDK (overwriting previously installed version)</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">python_iotcc_sdk</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">--</span><span class="n">force</span><span class="o">-</span><span class="n">reinstall</span> <span class="o">.</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="test">
+<span id="id2"></span><h1>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="quick-test-no-network-connectivity-required">
+<h2>Quick test (<strong>no network connectivity required</strong>)<a class="headerlink" href="#quick-test-no-network-connectivity-required" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p>Connect device via USB</p></li>
+<li><p>Connect display via HDMI</p></li>
+<li><p>Reset the device and setup port forwarding</p></li>
+<li><dl>
+<dt>Windows</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tests</span>\<span class="n">port_forward</span><span class="o">.</span><span class="n">bat</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Linux</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tests</span>\<span class="n">port_forward</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Run the test script from your machine</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">test</span><span class="o">-</span><span class="n">preview</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">ip</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>Use –help or -h for all options. And press Ctrl-C for exiting. You can see preview on display via HDMI.</p>
+</div>
+<div class="section" id="quick-test-with-network-connectivity">
+<h2>Quick test (<strong>with network connectivity</strong>)<a class="headerlink" href="#quick-test-with-network-connectivity" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p>Connect the device to network (WiFi)</p></li>
+<li><p>Check camera ip</p></li>
+<li><p>Connect display via HDMI</p></li>
+<li><dl>
+<dt>Run the test script from your machine</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">test</span><span class="o">-</span><span class="n">preview</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">ip</span> <span class="o">&lt;</span><span class="n">ip</span> <span class="n">address</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>Use –help or -h for all options. And press Ctrl-C for exiting. You can see the preview on display via HDMI.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting started</a></li>
+<li><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
+<li><a class="reference internal" href="#install-python-version-3-5">Install Python version 3.5</a></li>
+<li><a class="reference internal" href="#install-gstreamer-v1-14-x-or-higher">Install gstreamer (v1.14.x or higher)</a><ul>
+<li><a class="reference internal" href="#windows">Windows</a></li>
+<li><a class="reference internal" href="#linux">Linux</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#build-and-install">Build and install</a></li>
+<li><a class="reference internal" href="#test">Test</a><ul>
+<li><a class="reference internal" href="#quick-test-no-network-connectivity-required">Quick test (<strong>no network connectivity required</strong>)</a></li>
+<li><a class="reference internal" href="#quick-test-with-network-connectivity">Quick test (<strong>with network connectivity</strong>)</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting_started.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright (c) 2018-2019, The Linux Foundation. All rights reserved..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

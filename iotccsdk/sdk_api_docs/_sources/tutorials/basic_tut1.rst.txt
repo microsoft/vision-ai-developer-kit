@@ -1,0 +1,175 @@
+.. Copyright (c) 2019, The Linux Foundation. All rights reserved.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+  * Neither the name of The Linux Foundation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+  IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+.. _basic_tut_1:
+
+******************************
+Basic tutorial 1: Live preview
+******************************
+So you bought the camera, what next?
+This tutorial will walk you through steps that are required to get preview working
+both over RTSP as well as via HDMI. We will also see how to configure preview using
+the *configure_preview* API.
+
+Code
+====
+.. literalinclude:: ../../../tests/test-preview.py
+    :linenos:
+    :lines: 28-
+    :caption: test-preview.py
+
+.. note:: This script is present in the *tests/* directory of the SDK.
+
+Walkthrough
+===========
+Don't get scared. Let's break down this code and see what these lines of code do.
+
+::
+
+    import argparse
+    import sys
+    import time
+
+The above lines will allow us to use the mentioned standard python packages. *argparse* is used for parsing the command line arguments.
+*sys* for printing the python version below and *time* is used for adding sleep. This is pretty basic stuff.
+
+::
+
+    from sdk.camera import CameraClient
+
+This is where we import the camera module of the SDK as CameraClient. We have now got the power to use all
+the SDK APIs.
+
+Next is the *main* function. This is where actual work happens.
+::
+
+    def main(protocol=None):
+    print("\nPython %s\n" % sys.version)
+
+The first thing that will happen when this script runs is it will print the python version through which we are running this script.
+
+::
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--ip', help='ip address of the camera', default='127.0.0.1')
+    parser.add_argument('--username', help='username of the camera', default='admin')
+    parser.add_argument('--password', help='password of the camera', default='admin')
+
+The above code tells *argparse* that our script supports *--ip*, *--username*, and *--password* as command line arguments.
+We also tell argparse that what their default values will be just in case someone forgets to add them. All these arguments
+are required by the *connect* method of the camera module :ref:`sdk` of the SDK.
+
+::
+
+    args = parser.parse_args()
+    ip_addr = args.ip
+    username = args.username
+    password = args.password
+
+Above lines are capturing the arguments passed in the command line into the respective variable. If no arguments were specified for the parameters
+then it will assign the default value for the param which is specified in *add_argument*.
+
+::
+
+    with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
+
+This is where we login to the camera whose *ip_address* and other params we have specified as command line arguments.
+And get a handle to the *CameraClient* which can be used for controlling the camera or requesting the camera.
+
+::
+
+    print('supported resolutions: ' + str(camera_client.resolutions))
+    print('supported encodetype: ' + str(camera_client.encodetype))
+    print('supported bitrates: ' + str(camera_client.bitrates))
+    print('supported framerates: ' + str(camera_client.framerates))
+
+Next, we just print some information that can be used for configuring the preview, for instance, resolution, codec type, bitrate, and framerate.
+This is just to see what parameters are supported. And also to show how you can access them in your code.
+
+::
+
+    print(camera_client.configure_preview(resolution="1080P", display_out=1))
+
+The above line will configure preview resolution to 1080p(*resolution="1080P"*) and enable HDMI output(*display_out=1*).
+For the full set of options for *configure_preview* please check :ref:`modindex`.
+Now that we have setup preview lets start preview and get some frames out.
+
+::
+
+    camera_client.set_preview_state("on")
+    print(camera_client.preview_url)
+
+If the request was successful you should now be seeing live preview on HDMI. To check the live stream.
+The *preview_url* can be used to get the RTSP url as illustrated below. You can play/open stream using
+any player that supports RTSP client or write your own function to parse this using python packages.
+We use VLC media player.
+
+::
+
+    print("Running for 60 seconds")
+    time.sleep(60)
+    camera_client.set_preview_state("off")
+
+The preview will keep running till you tell it to stop. The above lines will ensure that the preview runs for 60 seconds.
+We then stop it using the *set_preview_state* API.
+
+::
+
+    print("Changing preview resolution to 4K and encode type to AVC")
+    print(camera_client.configure_preview(
+        resolution="4K", encode="AVC/H.264"))
+
+The above lines illustrate how you can use the configure_preview API to change the preview
+resolution(*resolution="4K"*) and codec type(*encode="AVC/H.264"*). Notice that we are not
+setting the display_out here. This is because once the display_out is enabled it will persist
+until you stop it by setting it to 0 i.e. *display_out=0* using *configure_preview* API. Also, the
+other parameters will retain the previously set value or the default value if not specified earlier.
+As before since we have configured the preview lets turn it on using the *set_preview_state* API.
+
+::
+
+    camera_client.set_preview_state("on")
+
+Again, the preview will keep running till you tell it to stop. For this test will keep it running
+for 60 seconds(*time.sleep*) and then stop it using the *set_preview_state* API.
+
+::
+
+    print("Running for 60 seconds")
+    time.sleep(60)
+    camera_client.set_preview_state("off")
+
+Once you are done using the camera you can disconnect from the camera using the *logout* API.
+
+::
+
+    camera_client.logout()
+
+It's time to test
+=================
+
+Once you have the application/script ready. You can test it by following the steps mentioned in
+:ref:`test` section of the :ref:`getting_started` page.

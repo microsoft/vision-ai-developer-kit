@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>sdk.frame_iterators &#8212; QTI&#39;s python SDK for IOT connected camera 0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sdk.frame_iterators</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions are</span>
+<span class="c1"># met:</span>
+<span class="c1">#    * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#      notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#    * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#      copyright notice, this list of conditions and the following</span>
+<span class="c1">#      disclaimer in the documentation and/or other materials provided</span>
+<span class="c1">#      with the distribution.</span>
+<span class="c1">#    * Neither the name of The Linux Foundation nor the names of its</span>
+<span class="c1">#      contributors may be used to endorse or promote products derived</span>
+<span class="c1">#      from this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED</span>
+<span class="c1"># WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF</span>
+<span class="c1"># MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT</span>
+<span class="c1"># ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS</span>
+<span class="c1"># BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR</span>
+<span class="c1"># CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF</span>
+<span class="c1"># SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR</span>
+<span class="c1"># BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,</span>
+<span class="c1"># WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE</span>
+<span class="c1"># OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN</span>
+<span class="c1"># IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides iterator for getting frame and inference.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<div class="viewcode-block" id="CameraInference"><a class="viewcode-back" href="../../sdk.html#sdk.frame_iterators.CameraInference">[docs]</a><span class="k">class</span> <span class="nc">CameraInference</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a class for inferences obtained from the camera.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    timestamp : int</span>
+<span class="sd">        Timestamp at which the inferences where made by the camera.</span>
+<span class="sd">    objects : list of `CameraInferenceObject` objects</span>
+<span class="sd">        List of inferences obtained from the camera.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">objects</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the constructor for the `CameraInference` class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">objects</span></div>
+
+
+<div class="viewcode-block" id="CameraInferenceObject"><a class="viewcode-back" href="../../sdk.html#sdk.frame_iterators.CameraInferenceObject">[docs]</a><span class="k">class</span> <span class="nc">CameraInferenceObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a class for inference data obtained from the camera.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    id : int</span>
+<span class="sd">        ID of the identified object.</span>
+<span class="sd">    label : str</span>
+<span class="sd">        Label of the identified object.</span>
+<span class="sd">    confidence : int</span>
+<span class="sd">        Confidence value for the object in %.</span>
+<span class="sd">    position : object of `CameraInferenceObjectPosition` type</span>
+<span class="sd">        Position of the identified object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the constructor for `CameraInferenceObject` class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="n">confidence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span></div>
+
+<div class="viewcode-block" id="CameraInferenceObjectPosition"><a class="viewcode-back" href="../../sdk.html#sdk.frame_iterators.CameraInferenceObjectPosition">[docs]</a><span class="k">class</span> <span class="nc">CameraInferenceObjectPosition</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a class for inferenced object position.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : int</span>
+<span class="sd">        x coordinate of the inferenced object.</span>
+<span class="sd">    y : int</span>
+<span class="sd">        y coordinate of the inferenced object.</span>
+<span class="sd">    width : int</span>
+<span class="sd">        width of the inferenced object from `x`.</span>
+<span class="sd">    height : int</span>
+<span class="sd">        height of the inferenced object from `y`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the constructor for CameraInferenceObjectPosition class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span></div>
+
+<div class="viewcode-block" id="VideoInferenceIterator"><a class="viewcode-back" href="../../sdk.html#sdk.frame_iterators.VideoInferenceIterator">[docs]</a><span class="k">class</span> <span class="nc">VideoInferenceIterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a class for inference generator.</span>
+
+<span class="sd">    Provides an generator method which can be used</span>
+<span class="sd">    to get inferences from RTSP VA stream from</span>
+<span class="sd">    the camera.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    preview_width: int</span>
+<span class="sd">        Preview stream width. This is required for object location</span>
+<span class="sd">        calculation.</span>
+<span class="sd">    preview_height: int</span>
+<span class="sd">        Preview stream height. This is required for object location</span>
+<span class="sd">        calculation.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preview_width</span><span class="p">,</span> <span class="n">preview_height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the constructor for `VideoInferenceIterator` class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_width</span> <span class="o">=</span> <span class="n">preview_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_height</span> <span class="o">=</span> <span class="n">preview_height</span>
+        <span class="c1">#: str: Holds the JSON inference metadata obtained from the camera</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1">#: subprocess: object where gstreamer pipeline for capture inference</span>
+        <span class="c1">#:             stream is run.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sub_proc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;iotccsdk&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VideoInferenceIterator.start"><a class="viewcode-back" href="../../sdk.html#sdk.frame_iterators.VideoInferenceIterator.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result_src</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the inference generator method</span>
+
+<span class="sd">        It gets inferences from the RTSP VA stream from the camera.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        result_src : str</span>
+<span class="sd">            VA RTSP stream url.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        CameraInference</span>
+<span class="sd">            An object of `CameraInference` type.</span>
+<span class="sd">            Which has timestamp and list of `CameraInferenceObject` objects.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            Any exception that occurs during inference handling.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gst-launch-1.0 &#39;</span><span class="p">,</span> <span class="s1">&#39; -q &#39;</span><span class="p">,</span> <span class="s1">&#39; rtspsrc &#39;</span><span class="p">,</span> <span class="s1">&#39; location=&#39;</span> <span class="o">+</span> <span class="n">result_src</span><span class="p">,</span> <span class="s1">&#39; protocols=tcp &#39;</span><span class="p">,</span>
+               <span class="s1">&#39; ! &#39;</span><span class="p">,</span> <span class="s2">&quot; application/x-rtp, media=application &quot;</span><span class="p">,</span> <span class="s1">&#39; ! &#39;</span><span class="p">,</span> <span class="s1">&#39; fakesink &#39;</span><span class="p">,</span> <span class="s1">&#39; dump=true&#39;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;result_src: &#39;</span> <span class="o">+</span> <span class="n">result_src</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;gstreamer cmd: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
+        <span class="n">platform</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+        <span class="n">platform</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Platform: &#39;</span> <span class="o">+</span> <span class="n">platform</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;win&#39;</span> <span class="ow">in</span> <span class="n">platform</span><span class="p">:</span>
+            <span class="n">data_idx</span> <span class="o">=</span> <span class="mi">78</span>
+        <span class="k">elif</span> <span class="s1">&#39;linux&#39;</span> <span class="ow">in</span> <span class="n">platform</span><span class="p">:</span>
+            <span class="n">data_idx</span> <span class="o">=</span> <span class="mi">72</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sub_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                <span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">bufsize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_proc</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;ERROR&#39;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="s1">&#39;error&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">l_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">data_idx</span><span class="p">:]</span>
+                <span class="n">l_str</span> <span class="o">=</span> <span class="n">l_str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">l_str</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;:[&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="ow">and</span> <span class="s2">&quot;] }&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">+</span> <span class="n">l_str</span><span class="p">:</span>
+                    <span class="c1"># Only yield if objects are present in the inferences</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">+</span> <span class="n">l_str</span>
+                    <span class="n">s_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;{ &quot;&#39;</span><span class="p">)</span>
+                    <span class="n">e_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;] }&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span><span class="p">[</span><span class="n">s_idx</span><span class="p">:</span><span class="n">e_idx</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span><span class="p">)</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_inference_result</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="k">yield</span> <span class="n">result</span>
+                <span class="k">elif</span> <span class="s2">&quot;:[&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="ow">and</span> <span class="s1">&#39;{ &quot;&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="ow">and</span> <span class="s2">&quot; }&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">+</span> <span class="n">l_str</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span> <span class="o">+</span> <span class="n">l_str</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="VideoInferenceIterator.stop"><a class="viewcode-back" href="../../sdk.html#sdk.frame_iterators.VideoInferenceIterator.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method stops the inference generator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_proc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sub_proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_inference_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method for creating `CameraInference` object</span>
+
+<span class="sd">        This method extracts the inference result from the</span>
+<span class="sd">        VA json metadata string.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        CameraInference</span>
+<span class="sd">            `CameraInference` object with extracted values on success.</span>
+<span class="sd">            `CameraInference` object with None if the json_str does not</span>
+<span class="sd">            have any values or there is a malformed string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_json_str</span><span class="p">)</span>
+            <span class="n">objects</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="nb">object</span> <span class="ow">in</span> <span class="n">j</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">][</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_width</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_height</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">][</span><span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_width</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">][</span><span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_height</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">CameraInferenceObjectPosition</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+                <span class="n">result_object</span> <span class="o">=</span> <span class="n">CameraInferenceObject</span><span class="p">(</span>
+                    <span class="nb">object</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="nb">object</span><span class="p">[</span><span class="s2">&quot;display_name&quot;</span><span class="p">],</span> <span class="nb">object</span><span class="p">[</span><span class="s2">&quot;confidence&quot;</span><span class="p">],</span> <span class="n">position</span><span class="p">)</span>
+                <span class="n">objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result_object</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">CameraInference</span><span class="p">(</span><span class="n">j</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">],</span> <span class="n">objects</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">CameraInference</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">QTI&#39;s python SDK for IOT connected camera 0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright Copyright (c) 2018-2019, The Linux Foundation. All rights reserved..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>
