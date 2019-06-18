@@ -18,12 +18,13 @@ class Mpeg4Stream {
     }
 
     isVideoStreaming() {
-        return this.ffmpegProcess !== undefined && !this.ffmpegProcess.killed;
+        return !!this.ffmpegProcess && !this.ffmpegProcess.killed;
     }
 
     // Send video stream over the configured camera to the specified streaming port on localhost
     startVideo() {
         if (this.isVideoStreaming()) {
+            console.log(`Video is already streaming.`);
             return;
         }
 
@@ -32,7 +33,7 @@ class Mpeg4Stream {
         const rtspPath = process.env.RTSP_PATH;
 
         if (!rtspIp || !rtspPort || !rtspPath) {
-            console.error(`Necessary environment variables have not been set: RTSP_IP=${rtspIp}, RTSP_PORT=${rtspPort}, RTSP_PATH=${rtspPath}`);
+            console.error(`Necessary environment variables have not been set: RTSP_IP=${rtspIp}, RTSP_PORT=${rtspPort}, RTSP_PATH=${rtspPath}.`);
             return;
         }
 
@@ -43,20 +44,21 @@ class Mpeg4Stream {
         this.ffmpegProcess = Process.spawn('ffmpeg', ffmpegParams.split(' '));
 
         this.ffmpegProcess.on('exit', (code, signal) => {
-            console.log(`ffmpeg exited with code ${code} and signal ${signal}`);
+            console.log(`Process ffmpeg exited with code ${code} and signal ${signal}.`);
         });
     }
 
     // Stop video streaming
     stopVideo() {
         if (!this.ffmpegProcess) {
-            console.warn("Tried to stop video when ffmpeg wasn't known to be running.");
+            console.warn(`Tried to stop video when ffmpeg wasn't known to be running.`);
             return;
         }
 
         const ffmpegProcess = this.ffmpegProcess;
         this.ffmpegProcess = undefined;
         ffmpegProcess.kill();
+        console.log(`Terminated ffmpeg process.`);
 
         if (process.platform === 'win32') {
             console.log('Running taskkill on ffmpeg to ensure all child processes are closed.');
@@ -73,10 +75,10 @@ class Mpeg4Stream {
         this.socketServer.on('connection', (socketClient, upgradeReq) => {
             const req = upgradeReq || socketClient.upgradeReq;
             this.socketServer.connectionCount++;
-            console.log(`New client connected: ${req.socket.remoteAddress}, ${req.headers['user-agent']} (${this.socketServer.connectionCount} clients)`);
+            socketClient.id = req.headers['sec-websocket-key'];
+            console.log(`New client connected:\n\taddress: ${req.socket.remoteAddress}\n\tid: ${socketClient.id}\n\tuser agent: ${req.headers['user-agent']}\n\tnumber: ${this.socketServer.connectionCount}`);
 
             this.startVideo();
-
             socketClient.on('close', (code, message) => {
                 console.log(`Client disconnected with code [${code}] and message [${message}].`);
 
@@ -86,7 +88,7 @@ class Mpeg4Stream {
                     return;
                 }
 
-                console.log(`A client disconnected; (${this.socketServer.connectionCount} clients remaining)`);
+                console.log(`A client disconnected; (${this.socketServer.connectionCount} clients remaining).`);
             });
         });
 
@@ -94,8 +96,6 @@ class Mpeg4Stream {
             this.socketServer.clients.forEach((client) => {
                 if (client.readyState === ws.OPEN) {
                     client.send(data);
-                } else {
-                    console.error(`Error sending to client ${client.Server} because websocket client readyState is ${client.readyState}.`);
                 }
             });
         };
@@ -110,7 +110,7 @@ class Mpeg4Stream {
             }
 
             response.connection.setTimeout(0);
-            console.log(`Stream connected at ${request.socket.remoteAddress}:${request.socket.remotePort}`);
+            console.log(`Stream connected at ${request.socket.remoteAddress}:${request.socket.remotePort}.`);
 
             request.on('data', (data) => {
                 this.socketServer.broadcast(data);
