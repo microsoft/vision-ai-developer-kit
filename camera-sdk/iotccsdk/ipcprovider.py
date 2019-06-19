@@ -218,7 +218,8 @@ class IpcProvider():
                 else:
                     response = mysession.get(
                         url, data=json.dumps(payload), headers=headers, params=params)
-                self.logger.info("RESPONSE: %s" % response.text)
+                if response.status_code != requests.codes.ok:
+                    self.logger.info("RESPONSE: %s" % response.text)
 
                 result = response.json()
                 if "status" not in result and "Status" not in result:
@@ -266,7 +267,7 @@ class IpcProvider():
                 result = response.json()
                 if "status" in result and result["status"]:
                     self._session_token = response.headers["Set-Cookie"]
-                    self.logger.debug(
+                    self.logger.info(
                         "connection established with session token: [%s]" % self._session_token)
                     self._heartbeat_manager = HeartBeatManager(
                         self.host, self._session_token)
