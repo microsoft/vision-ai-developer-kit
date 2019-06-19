@@ -55,11 +55,7 @@ function OnClickPlay() {
         return;
     }
 
-    pauseState = false;
-    waitForFirstMoof = true;
-    baseMediaDecodeTimeLow = 0;
-    baseMediaDecodeTimeHigh = 0;
-    sequenceNumber = 2;
+    isPaused = false;
 
     websocket = new WebSocket('ws://' + document.location.hostname + ':3002');
     websocket.binaryType = 'arraybuffer';
@@ -121,10 +117,10 @@ function OnClickPlay() {
                             packet[66] === 100 &&
                             packet[67] === 116
                         ) {
-                            packet[72] = (baseMediaDecodeTimeHigh >> 56) & 255;
-                            packet[73] = (baseMediaDecodeTimeHigh >> 48) & 255;
-                            packet[74] = (baseMediaDecodeTimeHigh >> 40) & 255;
-                            packet[75] = (baseMediaDecodeTimeHigh >> 32) & 255;
+                            packet[72] = (baseMediaDecodeTimeHigh >> 24) & 255;
+                            packet[73] = (baseMediaDecodeTimeHigh >> 16) & 255;
+                            packet[74] = (baseMediaDecodeTimeHigh >> 8) & 255;
+                            packet[75] = baseMediaDecodeTimeHigh & 255;
                             packet[76] = (baseMediaDecodeTimeLow >> 24) & 255;
                             packet[77] = (baseMediaDecodeTimeLow >> 16) & 255;
                             packet[78] = (baseMediaDecodeTimeLow >> 8) & 255;
@@ -211,6 +207,11 @@ video.addEventListener('play', () => {
 
 mediaSource.addEventListener('sourceopen', (e) => {
     console.log('MediaSource sourceopen fired: ' + mediaSource.readyState);
+
+    waitForFirstMoof = true;
+    baseMediaDecodeTimeLow = 0;
+    baseMediaDecodeTimeHigh = 0;
+    sequenceNumber = 2;
 
     buffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
     video.addEventListener('canplay', () => { video.play(); });
