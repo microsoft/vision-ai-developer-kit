@@ -116,7 +116,7 @@
             },
             "env": {
               "RTSP_IP": {
-                "value": "172.17.0.1"
+                "value": "localhost"
               },
               "RTSP_PORT": {
                 "value": "8900"
