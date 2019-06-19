@@ -14,7 +14,7 @@ let buffer;
 let waitForFirstMoof = true;
 // tracks the sequence number and decode time for each moof
 // we override the default decode time since we may receive a currently playing video
-let baseMediaDecodeTimeLow;   
+let baseMediaDecodeTimeLow;
 let baseMediaDecodeTimeHigh;
 let sequenceNumber;
 
@@ -190,7 +190,9 @@ function OnClickPlay() {
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        websocket.close();
+        if (websocket) {
+            websocket.close();
+        }
         isPaused = true;
     } else {
         OnClickPlay();
@@ -198,7 +200,9 @@ document.addEventListener('visibilitychange', () => {
 }, false);
 
 video.addEventListener('pause', () => {
-    websocket.close();
+    if (websocket) {
+        websocket.close();
+    }
     isPaused = true;
 }, false);
 
