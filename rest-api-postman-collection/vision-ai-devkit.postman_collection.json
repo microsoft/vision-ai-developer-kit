@@ -1,0 +1,644 @@
+{
+	"info": {
+		"_postman_id": "e0f9d8b7-216b-3b49-0809-dd43b5f14052",
+		"name": "Peabody",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2dd70056-8f18-40c9-bdfc-ab28f8ed260a",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"admin\",\n\t\"userpwd\": \"admin\"\n}"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/login",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "session={{sessionId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/logout",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get preview config",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/video",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"video"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set preview config",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"resolutionSelectVal\": 0,\n\t\"encodeModeSelectVal\": 1,\n\t\"bitRateSelectVal\": 5,\n\t\"fpsSelectVal\": 1,\n\t\"displayOut\": 1\n}"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/video",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"video"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get preview info (RTSP url)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/preview",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"preview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set preview on/off",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"switchStatus\": true\n}"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/preview",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"preview"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get VA info (url)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/vam",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"vam"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set VA on/off",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"switchStatus\": true,\n\t\"vamconfig\": \"MD\"\n}"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/vam",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"vam"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get video overlay config",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/overlayconfig",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"overlayconfig"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set inference overlay config",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"ov_type_SelectVal\": 0,\n\t\"ov_position_SelectVal\": 0,\n\t\"ov_color\": \"0\",\n\t\"ov_usertext\": \"IOT CENTRAL\",\n\t\"ov_start_x\": 0,\n\t\"ov_start_y\": 0,\n\t\"ov_width\": 0,\n\t\"ov_height\": 0\n}"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/overlayconfig",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"overlayconfig"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set overlay on/off",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"switchStatus\": true\n}"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/overlay",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"overlay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Capture image (screen shot)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/captureimage",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"captureimage"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set inference overlay config Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"ov_type_SelectVal\": 5,\n\t\"ov_position_SelectVal\": 0,\n\t\"ov_color\": \"869007615\",\n\t\"ov_usertext\": \"Text\",\n\t\"ov_start_x\": 0,\n\t\"ov_start_y\": 0,\n\t\"ov_width\": 0,\n\t\"ov_height\": 0\n}"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:1080/overlayconfig",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"overlayconfig"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST generate auth token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"scope\": [\"admin\"]\n}\n"
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:9010/api/v1/auth/generate",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "9010",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"generate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST upload file",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "session={{sessionId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{hostIp}}:9010/api/v1/peabody/restart",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "9010",
+					"path": [
+						"api",
+						"v1",
+						"peabody",
+						"restart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET HDR params",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/params",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"params"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST HDR params",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/params",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"params"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET network info",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/network",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"network"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST test",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"type": "text",
+						"value": "session={{sessionId}}"
+					}
+				],
+				"url": {
+					"raw": "http://{{hostIp}}:1080/network",
+					"protocol": "http",
+					"host": [
+						"{{hostIp}}"
+					],
+					"port": "1080",
+					"path": [
+						"network"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
