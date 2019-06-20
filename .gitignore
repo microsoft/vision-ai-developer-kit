@@ -341,4 +341,5 @@ machine-learning-notebooks/aml_config/config.json
 
 camera-sdk/iotccsdk.egg-info/*
 camera-sdk/dist/*
+camera-sdk/build/*
 

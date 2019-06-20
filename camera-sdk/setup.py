@@ -13,7 +13,7 @@
 #      contributors may be used to endorse or promote products derived
 #      from this software without specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+# THIS SOFTWARE IS PROVIDED 'AS IS' AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
 # ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
@@ -26,35 +26,33 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from setuptools import setup, find_packages
-import os
-import shutil
+from os import path
+from io import open
 
-_major = '0.0'
-_minor = '0+dev'
-_packages = find_packages(exclude=["tests", "test.*", "*.tests"])
+_packages = find_packages(exclude=['tests', 'test.*', '*.tests'])
 
-if os.path.exists('major.version'):
-    with open('major.version', 'rt') as bf:
-        _major = str(bf.read()).strip()
+here = path.abspath(path.dirname(__file__))
 
-if os.path.exists('minor.version'):
-    with open('minor.version', 'rt') as bf:
-        _minor = str(bf.read()).strip()
+# Get the long description from the README file
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
-VERSION = '{}.{}'.format(_major, _minor)
-NAME = "iotccsdk"
 
-LONG_DESCRIPTION = 'IOTCC Software Development Kit in Python'
-DESCRIPTION = 'IOTCC SDK'
 
-DEPENDENCIES = ["pip >= 9.0.0", "requests",
-                "setuptools-git", "websocket-client"]
+NAME = 'iotccsdk'
+VERSION = '0.1.4'
+DESCRIPTION = 'SDK in Python for interacting with the Vision AI DevKit. See https://aka.ms/visionaidevkit'
+PROJECT_URL = 'https://github.com/microsoft/vision-ai-developer-kit'
+DEPENDENCIES = ['pip >= 9.0.0', 'requests',
+                'setuptools-git', 'websocket-client']
 
 setup_args = {
     'name': NAME,
     'version': VERSION,
     'description': DESCRIPTION,
-    'long_description': LONG_DESCRIPTION,
+    'long_description': long_description,
+    'long_description_content_type': 'text/markdown',
+    'url': PROJECT_URL,
     'include_package_data': True,
     'python_requires': '~=3.5',
     'install_requires': [
@@ -81,6 +79,10 @@ setup_args = {
         'Topic :: Software Development',
         'Programming Language :: Python :: 3.5',
     ],
+     'project_urls':{
+        'Vision AI DevKit Page': 'https://azure.github.io/Vision-AI-DevKit-Pages/',
+        'Get Started': 'https://azure.github.io/Vision-AI-DevKit-Pages/docs/Get_Started/'
+    }
 }
 
 setup(**setup_args)
