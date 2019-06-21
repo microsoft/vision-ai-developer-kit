@@ -38,10 +38,9 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
-
 NAME = 'iotccsdk'
 VERSION = '0.1.4'
-DESCRIPTION = 'SDK in Python for interacting with the Vision AI DevKit. See https://aka.ms/visionaidevkit'
+DESCRIPTION = 'SDK in Python for interacting with the Vision AI DevKit.'
 PROJECT_URL = 'https://github.com/microsoft/vision-ai-developer-kit'
 DEPENDENCIES = ['pip >= 9.0.0', 'requests',
                 'setuptools-git', 'websocket-client']
@@ -79,7 +78,7 @@ setup_args = {
         'Topic :: Software Development',
         'Programming Language :: Python :: 3.5',
     ],
-     'project_urls':{
+    'project_urls': {
         'Vision AI DevKit Page': 'https://azure.github.io/Vision-AI-DevKit-Pages/',
         'Get Started': 'https://azure.github.io/Vision-AI-DevKit-Pages/docs/Get_Started/'
     }
