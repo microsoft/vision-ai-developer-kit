@@ -185,6 +185,12 @@ function OnClickPlay() {
 
         console.error('WebSocket closed due to: ' + reason);
         console.log(event);
+
+        // restart the video stream on network errors
+        if (!isPaused) {
+            isPaused = true;
+            OnClickPlay();
+        }
     }
 }
 
@@ -251,14 +257,19 @@ mediaSource.addEventListener('error', (e) => {
     console.log(e);
 });
 
-const promise = video.play();
-if (promise !== undefined) {
-    promise.then(_ => {
-        // Autoplay started!
-    }).catch(error => {
-        // Autoplay was prevented.
-        // Show a "Play" button so that user can start playback.
-        document.getElementById('playButton').style.display = null;
-        console.error('Autoplay failed due to: ' + error);
-    });
-}
+window.onload = function () {
+    OnClickPlay();
+    const promise = video.play();
+    if (promise !== undefined) {
+        promise.then(_ => {
+            // Autoplay started!
+        }).catch(error => {
+            // Autoplay was prevented.
+            // Show a "Play" button so that user can start playback.
+            document.getElementById("playButton").style.display = null;
+            console.error('Autoplay failed due to: ' + error);
+       });
+    } else {
+        document.getElementById("playButton").style.display = null;
+    }
+};
