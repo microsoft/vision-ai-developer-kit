@@ -100,6 +100,14 @@ class Mpeg4Stream {
             });
         };
 
+        this.socketServer.close = () => {
+            this.socketServer.clients.forEach((client) => {
+                if (client.readyState === ws.OPEN) {
+                    client.close(1011);  // error code unexpected condition
+                }
+            });
+        };
+
         // HTTP Server to accept incoming mp4 stream from ffmpeg
         const streamServer = http.createServer((request, response) => {
             const params = request.url.substr(1).split('/');
@@ -118,6 +126,7 @@ class Mpeg4Stream {
 
             request.on('end', () => {
                 console.log(`Stream closed.`);
+                this.socketServer.close();
             });
         });
 
