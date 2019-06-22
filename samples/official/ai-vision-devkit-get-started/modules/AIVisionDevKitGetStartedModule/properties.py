@@ -3,6 +3,7 @@ import math
 import time
 from iotccsdk import CameraClient
 from . error_utils import log_unknown_exception, CameraClientError
+from . inference import Inference
 from . model_utility import ModelUtility
 from . constants import SETTING_ON, \
     SETTING_OFF, \
@@ -23,11 +24,20 @@ PREVIEW_STATE_PROP = "ShowVideoPreview"
 CODEC_PROP = "Codec"
 VIDEO_RTSP_PROP = "RtspVideoUrl"
 DATA_RTSP_PROP = "RtspDataUrl"
+TRAINING_MODE_PROP = "TrainingMode"
+TM_ENABLED_PROP = "Enabled"
+TM_IMAGE_COUNT_PROP = "ImagesToCapture"
+TM_OBJS_TO_CAPTURE = "ObjectsToCapture"
+TM_MIN_CONFIDENCE = "MinimumConfidence"
+TM_MAX_CONFIDENCE = "MaximumConfidence"
+TM_IMAGES_CAPTURED = "CountOfImagesCaptured"
+
 SPTD_ENCODING_PROP = "SupportedEncodingTypes"
 SPTD_BITRATES_PROP = "SupportedBitrates"
 SPTD_FRAME_RATES_PROP = "SupportedFrameRates"
 SPTD_RESOLUTIONS_PROP = "SupportedResolutions"
 SPTD_CONFIG_OVERLAY_PROP = "SupportedConfigOverlayStyles"
+
 
 PROPERTY_NAME_MAP = {
     'resolution': RESOLUTION_PROP,
@@ -45,7 +55,12 @@ PROPERTY_NAME_MAP = {
     'supported_bitrates': SPTD_BITRATES_PROP,
     'supported_frame_rates': SPTD_FRAME_RATES_PROP,
     'supported_resolutions': SPTD_RESOLUTIONS_PROP,
-    'supported_config_overlay': SPTD_CONFIG_OVERLAY_PROP
+    'supported_config_overlay': SPTD_CONFIG_OVERLAY_PROP,
+    'is_training_enabled': TM_ENABLED_PROP,
+    'images_to_capture': TM_IMAGE_COUNT_PROP,
+    'objs_to_capture': TM_OBJS_TO_CAPTURE,
+    'min_confidence': TM_MIN_CONFIDENCE,
+    'max_confidence': TM_MAX_CONFIDENCE
 }
 
 
@@ -407,7 +422,7 @@ class ModelProperties:
     def __update_objects_of_interest(self, data):
         objects_json = Properties.get_twin_property(
             data, OBJS_OF_INTEREST_PROP)
-        if objects_json is not None:
+        if objects_json:
             self.objects_of_interest = json.loads(objects_json)
 
     def __update_message_delay(self, data):
@@ -425,29 +440,196 @@ class ModelProperties:
         self.message_delay_sec = delay
 
 
+class TrainingProperties:
+    def __init__(self):
+        self.is_training_enabled = False
+        self.images_to_capture = 30
+        self.objs_to_capture = ['ALL']
+        self.min_confidence = 40
+        self.max_confidence = 70
+        self.__images_captured = 0
+
+    def handle_twin_update(self, data: str):
+        training_mode = Properties.get_twin_property(data, TRAINING_MODE_PROP)
+        if not training_mode:
+            return
+        try:
+            is_changed = False
+            is_changed = self.__set_training_mode(training_mode) or is_changed
+            is_changed = self.__set_image_count(training_mode) or is_changed
+            is_changed = self.__set_capture_objs(training_mode) or is_changed
+            is_changed = self.__set_min_confidence(training_mode) or is_changed
+            is_changed = self.__set_max_confidence(training_mode) or is_changed
+
+            if is_changed:
+                # reset number of captured images
+                self.__images_captured = 0
+        except Exception:
+            log_unknown_exception(
+                "Failed to parse training_mode %s" % training_mode)
+
+    def get_reported_properties(self):
+        return [{TRAINING_MODE_PROP: self.__add_class_fields()},
+                {TM_IMAGES_CAPTURED: self.__images_captured}]
+
+    def capture_training_image(self, inference: Inference,
+                               camera_client: CameraClient,
+                               hub_manager):
+        if not inference or not camera_client:
+            return
+        if (self.is_training_enabled
+                and self.__is_capture_object(inference.label)
+                and self.min_confidence <= inference.confidence <= self.max_confidence
+                and self.__images_captured < self.images_to_capture):
+            # TODO: when captureimage is fixed in camera use that call instead of capture_image
+            camera_client.capture_image()
+            self.__images_captured += 1
+            Properties.report_property(
+                {TM_IMAGES_CAPTURED: self.__images_captured}, hub_manager)
+
+    def __set_training_mode(self, training_mode):
+        if TM_ENABLED_PROP not in training_mode:
+            return False
+        try:
+            enabled = training_mode[TM_ENABLED_PROP]
+            if not type(enabled) is bool:
+                if enabled.lower() == "false":
+                    enabled = False
+                elif enabled.lower() == "true":
+                    enabled = True
+            has_changed = False if self.is_training_enabled == enabled else True
+            if has_changed:
+                self.is_training_enabled = enabled
+            return has_changed
+        except Exception:
+            log_unknown_exception("Invalid value received for %s: %s" % (
+                TM_ENABLED_PROP, enabled))
+            return self.is_training_enabled
+
+    def __set_image_count(self, training_mode):
+        if TM_IMAGE_COUNT_PROP not in training_mode:
+            return False
+        try:
+            image_count = training_mode[TM_IMAGE_COUNT_PROP]
+            if type(image_count) is not int:
+                image_count = int(image_count)
+            has_changed = False if self.images_to_capture == image_count else True
+            if has_changed:
+                self.images_to_capture = image_count
+            return has_changed
+        except Exception:
+            log_unknown_exception("Invalid value received for %s: %s" % (
+                TM_IMAGE_COUNT_PROP, image_count))
+            return False
+
+    def __set_capture_objs(self, training_mode):
+        if TM_OBJS_TO_CAPTURE not in training_mode:
+            return False
+        try:
+            objs_to_capture = json.loads(
+                training_mode[TM_OBJS_TO_CAPTURE])
+            if type(objs_to_capture) is not list:
+                objs_to_capture = [objs_to_capture]
+            has_changed = (False if set(self.objs_to_capture)
+                           == set(objs_to_capture) else True)
+            if has_changed:
+                self.objs_to_capture = objs_to_capture
+            return has_changed
+        except Exception:
+            log_unknown_exception("Invalid value received for %s: %s" % (
+                TM_OBJS_TO_CAPTURE, objs_to_capture))
+            return False
+
+    def __set_min_confidence(self, training_mode):
+        if TM_MIN_CONFIDENCE not in training_mode:
+            return False
+        try:
+            min_confidence = self.__get_confidence_int(
+                training_mode[TM_MIN_CONFIDENCE])
+            has_changed = False if self.min_confidence == min_confidence else True
+            if has_changed:
+                self.min_confidence = min_confidence
+            return has_changed
+        except Exception:
+            log_unknown_exception("Invalid value received for %s: %s" % (
+                TM_MIN_CONFIDENCE, min_confidence))
+            return False
+
+    def __set_max_confidence(self, training_mode):
+        if TM_MAX_CONFIDENCE not in training_mode:
+            return self.max_confidence
+        try:
+            max_confidence = self.__get_confidence_int(
+                training_mode[TM_MAX_CONFIDENCE])
+            has_changed = False if self.max_confidence == max_confidence else True
+            if has_changed:
+                self.max_confidence = max_confidence
+            return has_changed
+        except Exception:
+            log_unknown_exception("Invalid value received for %s: %s" % (
+                TM_MAX_CONFIDENCE, max_confidence))
+            return False
+
+    def __get_confidence_int(self, confidence):
+        if type(confidence) is str:
+            confidence = float(confidence)
+        if type(confidence) is float:
+            # in case confidence is expressed as percent i.e. .70
+            if confidence < 1:
+                confidence *= 100
+        return math.trunc(confidence)
+
+    def __add_class_fields(self):
+        prop_dict = dict()
+        for k, v in self.__dict__.items():
+            # skip private fields
+            if "__" in k:
+                continue
+            if type(v) is list:
+                # format as stringified json
+                v = json.dumps(v)
+            if k in PROPERTY_NAME_MAP:
+                prop_dict[PROPERTY_NAME_MAP[k]] = v
+        return prop_dict
+
+    def __is_capture_object(self, label):
+        # create a filter object to select a string the objects of interest list
+        # return true if the resulting list has items otherwise false
+        list_filter = list(filter(lambda list_item: (list_item.lower() == label.lower()
+                                                     or list_item.lower() == "all"),
+                                  self.objs_to_capture))
+        return (len(list_filter) > 0)
+
+
 class Properties:
     def __init__(self):
         print("Init Properties")
         self.camera_properties = CameraProperties()
         self.model_properties = ModelProperties()
+        self.training_properties = TrainingProperties()
 
     def handle_twin_update(self, payload):
         data = json.loads(payload)
         print("Received twin update: %s" % data)
         self.model_properties.handle_twin_update(data)
         self.camera_properties.handle_twin_update(data)
+        self.training_properties.handle_twin_update(data)
 
     def report_properties_to_hub(self, hub_manager):
         if (hub_manager is None):
             raise ValueError("hub_manager is None")
 
         for prop in self.camera_properties.get_reported_properties():
-            self.__report_property(prop, hub_manager)
+            Properties.report_property(prop, hub_manager)
 
         for prop in self.model_properties.get_reported_properties():
-            self.__report_property(prop, hub_manager)
+            Properties.report_property(prop, hub_manager)
 
-    def __report_property(self, prop, hub_manager):
+        for prop in self.training_properties.get_reported_properties():
+            Properties.report_property(prop, hub_manager)
+
+    @staticmethod
+    def report_property(prop, hub_manager):
         json_prop = json.dumps(prop)
         print("Send prop: %s" % json_prop)
         hub_manager.client.send_reported_state(

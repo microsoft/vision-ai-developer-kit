@@ -30,6 +30,20 @@ This module contains the high level client APIs.
 
 """
 
+import sys
+import time
+import subprocess
+
+if __package__ == '' or __package__ is None:  # noqa
+    import os
+    parent_dir = os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(1, parent_dir)
+    pkg_name = os.path.split(os.path.dirname(os.path.abspath(__file__)))[-1]
+    __import__(pkg_name)
+    __package__ = str(pkg_name)
+    del os
+
 import base64
 import logging
 import os
@@ -142,6 +156,7 @@ class CameraClient():
         self.cur_bitrate = ""
         self.cur_framerate = 0
         self.display_out = 0
+        self.cap = None
         self._get_supported_params()
 
     @contextmanager
@@ -609,6 +624,38 @@ class CameraClient():
         with open(file_name, "wb") as f:
             f.write(base64.b64decode(response["Data"]))
         return True
+
+    def capture_image(self):
+        if not self.preview_running:
+            return False
+
+        file_name = "snapshot_%s.jpg" % time.time()
+        dir_name = os.path.dirname(os.path.abspath(__name__))
+        full_file_name = os.path.join(dir_name, file_name)
+
+        cmd = ['ffmpeg',
+               '-y',
+               '-i',
+               self.preview_url,
+               '-vframes',
+               '1',
+               '-rtsp_transport tcp',
+               full_file_name
+               ]
+
+        cmd = ' '.join(cmd)
+        subprocess.call(cmd, shell=True)
+
+        try:
+            output = subprocess.check_output(
+                cmd, stderr=subprocess.STDOUT, shell=True, timeout=3,
+                universal_newlines=True)
+
+        except subprocess.CalledProcessError as exc:
+            print("Status : FAIL", exc.returncode, exc.output)
+            return False
+        else:
+            print("Captured image: %s" % full_file_name)
 
     @contextmanager
     def logout(self):

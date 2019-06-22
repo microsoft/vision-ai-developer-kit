@@ -52,23 +52,31 @@ def create_camera(ip_address=None, username="admin", password="admin"):
         password=password)
 
 
-def print_inference(result=None, hub_manager=None, last_sent_time=time.time()):
-    global properties
-    if (time.time() - last_sent_time <= properties.model_properties.message_delay_sec
-            or result is None
-            or result.objects is None
-            or len(result.objects) == 0):
-        return last_sent_time
+def handle_results(camera_client: CameraClient, iot_hub_manager: IotHubManager):
+    last_time = time.time()
+    delay = properties.model_properties.message_delay_sec
+    with camera_client.get_inferences() as results:
+        for result in results:
+            if (time.time() - last_time > delay and result):
+                handle_inferences(result, iot_hub_manager, camera_client)
+                last_time = time.time()
 
+
+def handle_inferences(result, iot_hub_manager, camera_client):
+    if not result.objects or len(result.objects) == 0:
+        return
     for inf_obj in result.objects:
-        print("Found result object")
         inference = Inference(inf_obj)
-        if (properties.model_properties.is_object_of_interest(inference.label)):
-            json_message = inference.to_json()
-            iot_hub_manager.send_message_to_upstream(json_message)
-            print(json_message)
-            last_sent_time = time.time()
-    return last_sent_time
+        send_inference(inference, iot_hub_manager)
+        properties.training_properties.capture_training_image(
+            inference, camera_client, iot_hub_manager)
+
+
+def send_inference(inference: Inference, iot_hub_manager: IotHubManager):
+    if (properties.model_properties.is_object_of_interest(inference.label)):
+        json_message = inference.to_json()
+        iot_hub_manager.send_message_to_upstream(json_message)
+        print(json_message)
 
 
 def main(protocol):
@@ -89,7 +97,6 @@ def main(protocol):
     model_util.transfer_dlc(False)
 
     print("\nPython %s\n" % sys.version)
-    last_time = time.time()
 
     while True:
         with create_camera() as camera_client:
@@ -103,10 +110,7 @@ def main(protocol):
                 while True:
                     try:
                         while camera_client.vam_running:
-                            with camera_client.get_inferences() as results:
-                                for result in results:
-                                    last_time = print_inference(
-                                        result, iot_hub_manager, last_time)
+                            handle_results(camera_client, iot_hub_manager)
                     except EOFError:
                         print("EOFError. Current VAM running state is %s." %
                               camera_client.vam_running)

@@ -153,7 +153,14 @@
         "HdmiDisplayActive": true,
         "VideoAnalyticsEnabled": true,
         "ShowVideoPreview": true,
-        "Codec": "AVC/H.264"
+        "Codec": "AVC/H.264",
+        "TrainingMode": {
+          "Enabled": true,
+          "ImagesToCapture": 3,
+          "MaximumConfidence": 70,
+          "MinimumConfidence": 40,
+          "ObjectsToCapture": "[\"ALL\"]"
+        }
       }
     }
   }

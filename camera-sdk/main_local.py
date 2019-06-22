@@ -6,14 +6,14 @@ from iotccsdk.camera import CameraClient
 SET_STATE_ON = "on"
 SET_STATE_OFF = "off"
 
-ip_addr = "10.69.26.44"
+ip_addr = "10.69.25.83"
 username = "admin"
 password = "admin"
 resolution = "1080P"
 overlay_config = "inference"
 
 delay_interval_secs = 5
-should_capture_images = False
+should_capture_images = True
 cap_min_confidence = 50
 cap_max_confidence = 70
 
@@ -62,7 +62,7 @@ def print_inferences(camera_client: CameraClient):
                     inference = Inference(inf_obj)
                     if cap_min_confidence < inference.confidence < cap_max_confidence:
                         capture_image(camera_client)
-                
+
                     print(inference.to_json())
                     last_time = time.time()
 
@@ -71,7 +71,7 @@ def capture_image(camera_client: CameraClient):
     if not should_capture_images:
         print("capture image skipped")
         return
-    if not camera_client.captureimage():
+    if not camera_client.capture_image():
         print("capture image failed")
 
 
