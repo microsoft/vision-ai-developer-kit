@@ -55,7 +55,7 @@
         <button id="playButton" onclick="OnClickPlay()" style='display: none; margin-bottom: 10px;'>Play</button> (re-streaming from {rtspSource})
     </div>
     <div id="videoWrapper" class="useRemainingSpace">
-        <video id="videoWindow" controls autoplay muted="muted" playsinline="true"></video>
+        <video id="videoWindow" controls muted="muted" playsinline="true"></video>
     </div>
 </body>
 <script src="scripts/mpeg4.js"></script>
