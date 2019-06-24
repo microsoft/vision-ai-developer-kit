@@ -68,7 +68,7 @@ function OnClickPlay() {
                     }
                 }
 
-                // process moof packet               
+                // process moof packet
                 if (e.data.byteLength > 8) {
                     let packet = new Uint8Array(payload);
 
@@ -97,7 +97,7 @@ function OnClickPlay() {
                         }
                     }
                 }
-                
+
                 if (buffer.updating || queue.length > 0) {
                     queue.push(payload);
                 } else {
@@ -197,6 +197,7 @@ video.addEventListener('canplay', () => {
         if (promise !== undefined) {
             promise.then(_ => {
                 // Autoplay started!
+                console.log('autoplay started');
             }).catch(error => {
                 // Autoplay was prevented.
                 // Show a "Play" button so that user can start playback.
