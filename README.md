@@ -15,8 +15,9 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 ## Resources
 
 * [GitHub repo](https://github.com/Microsoft/vision-ai-developer-kit) - this site
+* [Samples](https://github.com/microsoft/vision-ai-developer-kit/tree/master/samples) - In the samples section you will find two folders.  The official folder contains stable releases, such as the current Vision module.  The research folder contains samples that are under development or experimental.
 * [Documentation](https://aka.ms/VAIDKGetStarted) - all documentation for the Vision AI Developer Kit
-* [Landing Ppge](https://aka.ms/VisionAIDevKit) - learn more about the Vision AI Developer Kit
+* [Landing Page](https://aka.ms/VisionAIDevKit) - learn more about the Vision AI Developer Kit
 * [Qualcomm QCS603](https://www.qualcomm.com/products/vision-intelligence-300-platform) - learn more about the chipset powering the Vision AI Developer Kit hardware
 
 ## Get a kit
