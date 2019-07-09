@@ -4,6 +4,15 @@
 
 This repo contains the components needed to use the Vision AI Developer Kit (VAI DevKit) to develop Neural Network models which can be deployed to the Vision AI DevKit hardware. Manufactured through a partnership between [Altek](http://www.altek.com.tw/en-global/news/detail/127) and [eInfochips](https://www.einfochips.com/partnerships-and-alliances/digital-partnerships/microsoft/), the Vision AI DevKit uses the [Qualcomm QCS603](https://www.qualcomm.com/products/vision-intelligence-300-platform) chipset, a member of the [Qualcomm Vision Intelligence Platform](https://developer.qualcomm.com/hardware/vertical-platforms/vision-intelligence-platform).
 
+## Technical Support
+
+If you encounter an issue with Vision AI Dev Kit, visit our [Get Help](https://visionaidevkitsupport.azurewebsites.net/) page.
+
+If you can't find a solution or answer to your request, file a GitHub issue [here](https://github.com/microsoft/vision-ai-developer-kit/issues) and click New Issue at the top-right. Add one of the following labels so we can quickly assess your issue:
+* Bug
+* Feature Request
+* Support Needed
+
 ## Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit <https://cla.microsoft.com>.
