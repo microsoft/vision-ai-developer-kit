@@ -57,13 +57,13 @@
           }
         },
         "modules": {
-          "AIVisionDevKitGetStartedModule": {
+          "OnnxRuntimeModule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.AIVisionDevKitGetStartedModule}",
+              "image": "${MODULES.OnnxRuntimeModule.arm32v7}",
               "createOptions": {
                 "ExposedPorts": {
                   "5678/tcp": {}
@@ -71,7 +71,7 @@
                 "HostConfig": {
                   "NetworkMode": "host",
                   "Binds": [
-                    "/data/misc/camera:/app/vam_model_folder",
+                    "/data/misc/qmmf:/app/output",
                     "/run/systemd:/run/systemd"
                   ],
                   "PortBindings": {
@@ -89,58 +89,6 @@
                 }
               }
             }
-          },
-          "WebStreamModule": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.WebStreamModule.debug}",
-              "createOptions": {
-                "ExposedPorts": {
-                  "9229/tcp": {},
-                  "3000/tcp": {},
-                  "3002/tcp": {}
-                },
-                "HostConfig": {
-                  "NetworkMode": "host",
-                  "PortBindings": {
-                    "9229/tcp": [
-                      {
-                        "HostPort": "9229"
-                      }
-                    ],
-                    "3000/tcp": [
-                      {
-                        "HostPort": "3000"
-                      }
-                    ],
-                    "3002/tcp": [
-                      {
-                        "HostPort": "3002"
-                      }
-                    ]
-                  }
-                },
-                "NetworkingConfig": {
-                  "EndpointsConfig": {
-                    "host": {}
-                  }
-                }
-              }
-            },
-            "env": {
-              "RTSP_IP": {
-                "value": "localhost"
-              },
-              "RTSP_PORT": {
-                "value": "8900"
-              },
-              "RTSP_PATH": {
-                "value": "live"
-              }
-            }
           }
         }
       }
@@ -149,8 +97,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "AIVisionDevKitGetStartedModuleToIoTHub": "FROM /messages/modules/AIVisionDevKitGetStartedModule/outputs/* INTO $upstream",
-          "WebStreamModuleToIoTHub": "FROM /messages/modules/WebStreamModule/outputs/* INTO $upstream"
+          "OnnxRuntimeModuleToIoTHub": "FROM /messages/modules/OnnxRuntimeModule/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
