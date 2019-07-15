@@ -37,10 +37,10 @@ modules\\**OnnxRuntimeModule** folder includes:
 
 6. Right-clicking on **config/deployment.arm32v7.json** file, select **[Create Deployment for Single Device]**, and choose the targeted IoT Edge device to deploy the container Image.
 
-7. Check detection result:
+7. Check the detection result:
 
     * Set your local machine to connect to the same Wi-Fi as Vision AI Dev Kit connecting.
     * Use `adb shell ifconfig wlan0` command to get the camera's wireless IP address or find the IP address from **rtst_addr** property shown in OnnxRuntimeModule's [Module Identity Twin] page.
     * Open a browser to browse http://CAMERA_IP:1080/media/result.jpg or http://CAMERA_IP:1080/media/result.html (auto refresh result.jpg every 2 sec) where CAMERA_IP is the camera's IP address you found above.
-    * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command to display the detection result in an OpenCV window.
+    * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.
 
