@@ -21,10 +21,10 @@ def main():
         try:  
             urllib.request.urlretrieve(img_url, "result.jpg")
             img = cv2.imread("result.jpg")
-            height, width = img.shape[:2]
-            height = int(height * 0.6)
-            width = int(width * 0.6)
-            img = cv2.resize(img, (width, height))
+            #height, width = img.shape[:2]
+            #height = int(height * 0.5)
+            #width = int(width * 0.5)
+            #img = cv2.resize(img, (width, height))
             cv2.imshow("result.jpg",img)
         except:
             print('Fail to read image!')

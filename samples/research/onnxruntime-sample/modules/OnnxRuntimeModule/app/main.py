@@ -157,6 +157,12 @@ def draw_bboxes(out, image, duration):
 
     #cv2.imshow(caption, image)
     #cv2.waitKey(1)
+
+    # Reduce image size to speed up image saving
+    height, width = image.shape[:2]
+    height = int(height * 0.5)
+    width = int(width * 0.5)
+    image = cv2.resize(image, (width, height))
     cv2.imwrite("output/result.jpg", image)
 
 def detect_image(session, input_name, image):
@@ -198,24 +204,37 @@ def detect_camera(preview_url):
     cap = cv2.VideoCapture(preview_url)
 
     has_frame = True
+    no_frame_count = 0
     while (cap.isOpened()):
         # Capture frame-by-frame
         try:
-            has_frame, frame = cap.read()
-            if has_frame == False:
-                cap.release()
-                cap = cv2.VideoCapture(preview_url)
+            if is_busy:
+                has_frame = cap.grab()  # don't retrieve frame if the previous frame processing hadn't finished
+            else:
+                has_frame, frame = cap.read()
+                if has_frame:
+                    # Detect frame
+                    detect_thread = threading.Thread(target=detect_image, args=(session, input_name, frame))
+                    detect_thread.start()
+
+            if has_frame:
+                no_frame_count = 0
+            else:
+                no_frame_count = no_frame_count + 1
+                time.sleep(1)
+                if no_frame_count > 3:
+                    no_frame_count = 0
+                    cap.release()
+                    cap = cv2.VideoCapture(preview_url)
+                    print('!!! No frame retry 3 times.  Re-call cv2.VideoCapture(preview_url) !!!')
+                
                 continue
+
         except Exception as ex:
             print("Exception in detect_camera: %s" % ex)
             cap.release()
             cap = cv2.VideoCapture(preview_url)
-            continue
-           
-        # Detect frame
-        if not is_busy:
-            detect_thread = threading.Thread(target=detect_image, args=(session, input_name, frame))
-            detect_thread.start()
+            continue        
 
         # Handle SIGTERM signal
         if (IsTerminationSignalReceived == True):
@@ -273,6 +292,7 @@ def main(protocol=None):
             prop = json.dumps(prop)            
             iot_hub_manager.send_property(prop)
 
+            preview_url = "rtsp://localhost:8900/live"
             detect_camera(preview_url)
 
         except IoTHubError as iothub_error:
