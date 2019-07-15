@@ -1,0 +1,45 @@
+FROM balenalib/raspberrypi3-python:latest-stretch-build
+
+#--------------------------------------------------#
+# Install required libs for onnxruntime and opencv #
+#--------------------------------------------------#
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libboost-python1.62.0 python3-pip libpython3-dev libatlas-base-dev \
+    libcurl4-openssl-dev libssl-dev \    
+    libopencv-dev libqtgui4 libqt4-test libjasper-dev libgstreamer1.0-0 \
+    tar wget &&\
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip 
+RUN pip install --upgrade setuptools
+RUN pip3 install requests
+RUN pip3 install websocket-client
+RUN pip3 install azure-iothub-device-client
+
+#RUN pip3 install numpy
+RUN wget http://www.piwheels.org/simple/numpy/numpy-1.16.4-cp35-cp35m-linux_armv7l.whl &&\
+    pip3 install numpy-1.16.4-cp35-cp35m-linux_armv7l.whl  &&\
+    rm -f numpy-1.16.4-cp35-cp35m-linux_armv7l.whl
+
+#RUN pip3 install opencv-python
+RUN wget https://www.piwheels.org/simple/opencv-python/opencv_python-3.4.4.19-cp35-cp35m-linux_armv7l.whl  &&\
+    pip3 install opencv_python-3.4.4.19-cp35-cp35m-linux_armv7l.whl  &&\
+    rm -f opencv_python-3.4.4.19-cp35-cp35m-linux_armv7l.whl
+
+#--------------------------------------------------------------------#
+# Install onnxruntime for arm32, app, and Tiny YOLOv2 1.3 onnx model #
+#--------------------------------------------------------------------#
+WORKDIR /app
+
+# Download Tiny YOLOv2 1.3 onnx model
+RUN wget https://onnxzoo.blob.core.windows.net/models/opset_8/tiny_yolov2/tiny_yolov2.tar.gz  &&\
+    tar -xzf tiny_yolov2.tar.gz &&\
+    rm -f tiny_yolov2.tar.gz
+
+COPY app /app
+
+RUN pip3 install onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl &&\
+    rm -f onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl
+
+CMD ["python3", "-u", "main.py"]

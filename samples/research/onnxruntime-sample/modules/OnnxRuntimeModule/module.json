@@ -1,0 +1,15 @@
+{
+  "$schema-version": "0.0.1",
+  "description": "",
+  "image": {
+    "repository": "$CONTAINER_REGISTRY_NAME/onnxrt-camera",
+    "tag": {
+      "version": "1.0.0",
+      "platforms": {
+        "arm32v7": "./Dockerfile.arm32v7"
+      }
+    },
+    "buildOptions": []
+  },
+  "language": "python"
+}
