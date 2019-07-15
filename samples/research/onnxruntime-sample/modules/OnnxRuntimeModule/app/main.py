@@ -26,6 +26,9 @@ IOT_HUB_PROTOCOL = IoTHubTransportProvider.MQTT
 
 iot_hub_manager = None
 
+# If enable to write IoT Edge messages, inference ONNX model will slow down periodically
+enable_iot = False
+
 # Define constants
 is_busy = False
 
@@ -138,14 +141,15 @@ def draw_bboxes(out, image, duration):
                 cv2.rectangle(image, (x1, y1 - 40), (x1 + 200, y1), color, -1)
                 cv2.putText(image, labels[detectedClass], (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255 - color[0], 255 - color[1], 255 - color[2]), 1, cv2.LINE_AA)
     
-                # Send message to IoT Hub
-                message = {
-                    "Label": labels[detectedClass],
-                    "Confidence": confidence,
-                    "BBox": [x1, y1, x2, y2],
-                    "TimeStamp": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-                }
-                iot_hub_manager.send_message_to_upstream(json.dumps(message))
+                if enable_iot:
+                    # Send message to IoT Hub
+                    message = {
+                        "Label": labels[detectedClass],
+                        "Confidence": confidence,
+                        "BBox": [x1, y1, x2, y2],
+                        "TimeStamp": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                    iot_hub_manager.send_message_to_upstream(json.dumps(message))
 
     # Write detection time        
     fps = 1.0 / duration
