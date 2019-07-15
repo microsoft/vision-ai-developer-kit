@@ -13,7 +13,7 @@ Use this IoT Edge solution to build and deploy an ONNX Runtime module to detect 
 ## Build a Local Container Image with a Single Module: OnnxRuntimeModule
 
 modules\\**OnnxRuntimeModule** folder includes:
-   * **app** folder: source code used to detect objects by a Tiny YOLOv2 ONNX model(https://onnxzoo.blob.core.windows.net/models/opset_8/tiny_yolov2/tiny_yolov2.tar.gz) from ONNX Model Zoo(https://github.com/onnx/models).
+   * **app** folder: source code used to detect objects by a [Tiny YOLOv2 ONNX model](https://onnxzoo.blob.core.windows.net/models/opset_8/tiny_yolov2/tiny_yolov2.tar.gz) from [ONNX Model Zoo](https://github.com/onnx/models).
    * **Dockerfile.arm32v7** file: instructions used to build this module image.
    * **module.json** file: config file for this module.
 
