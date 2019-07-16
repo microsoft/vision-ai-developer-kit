@@ -168,6 +168,7 @@ def draw_bboxes(out, image, duration):
     width = int(width * 0.5)
     image = cv2.resize(image, (width, height))
     cv2.imwrite("output/result.jpg", image)
+    del image
 
 def detect_image(session, input_name, image):
     global is_busy
@@ -189,6 +190,12 @@ def detect_image(session, input_name, image):
 
     except Exception as ex:
         print("Exception in detect_image: %s" % ex)
+    
+    
+    del image
+    del resized_image
+    del out
+    del result
 
     is_busy = False
 
