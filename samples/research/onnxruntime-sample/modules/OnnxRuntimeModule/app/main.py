@@ -26,8 +26,8 @@ IOT_HUB_PROTOCOL = IoTHubTransportProvider.MQTT
 
 iot_hub_manager = None
 
-# If enable to write IoT Edge messages, inference ONNX model will slow down periodically
-enable_iot = False
+# Disable iotedge for pure docker run
+enable_iot = True
 
 # Define constants
 is_busy = False
@@ -154,7 +154,7 @@ def draw_bboxes(out, image, duration):
     # Write detection time        
     fps = 1.0 / duration
     text = "Detect 1 frame : {:8.6f} sec | {:6.2f} fps" .format(duration, fps)
-    cv2.putText(image, text, (40, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(image, text, (40, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     # Display result image
     #caption = "Detection"      
@@ -168,7 +168,7 @@ def draw_bboxes(out, image, duration):
     width = int(width * 0.5)
     image = cv2.resize(image, (width, height))
     cv2.imwrite("output/result.jpg", image)
-    del image
+    image = None
 
 def detect_image(session, input_name, image):
     global is_busy
@@ -191,11 +191,11 @@ def detect_image(session, input_name, image):
     except Exception as ex:
         print("Exception in detect_image: %s" % ex)
 
-    del image
-    del resized_image
-    del input_image    
-    del out
-    del result
+    image = None
+    resized_image = None
+    input_image = None    
+    out = None
+    result = None
 
     is_busy = False
 
@@ -212,6 +212,10 @@ def detect_camera(preview_url):
     shutil.copy('result.html', 'output/result.html')
 
     # Read rtsp stream and detect each frame
+    # Note: Current OpenCV VideoCapture() has memory leak for reading RTST Steam:
+    #       https://github.com/opencv/opencv/issues/5715
+    #       If your application is actual a little bit slower than your configured fps you got a memory leak.
+    #       https://github.com/sgjava/motiondetector/issues/4
     cap = cv2.VideoCapture(preview_url)
 
     has_frame = True
@@ -281,9 +285,7 @@ def main(protocol=None):
     password = 'admin'
 
     with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
-
         try:
-
             if (enable_iot):
                 iot_hub_manager = IotHubManager(protocol, camera_client)
 
@@ -291,7 +293,7 @@ def main(protocol=None):
             print('supported encodetype: ' + str(camera_client.encodetype))
             print('supported bitrates: ' + str(camera_client.bitrates))
             print('supported framerates: ' + str(camera_client.framerates))
-            print(camera_client.configure_preview(resolution="1080P", display_out=1))
+            print(camera_client.configure_preview(resolution="1080P", framerate=24, display_out=1))
 
             camera_client.set_preview_state("on")
 

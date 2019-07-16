@@ -26,6 +26,7 @@ def main():
             #width = int(width * 0.5)
             #img = cv2.resize(img, (width, height))
             cv2.imshow("result.jpg",img)
+            img = None
         except:
             print('Fail to read image!')
 
