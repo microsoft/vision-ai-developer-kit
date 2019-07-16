@@ -190,10 +190,10 @@ def detect_image(session, input_name, image):
 
     except Exception as ex:
         print("Exception in detect_image: %s" % ex)
-    
-    
+
     del image
     del resized_image
+    del input_image    
     del out
     del result
 
@@ -284,7 +284,8 @@ def main(protocol=None):
 
         try:
 
-            iot_hub_manager = IotHubManager(protocol, camera_client)
+            if (enable_iot):
+                iot_hub_manager = IotHubManager(protocol, camera_client)
 
             print('supported resolutions: ' + str(camera_client.resolutions))
             print('supported encodetype: ' + str(camera_client.encodetype))
@@ -297,13 +298,14 @@ def main(protocol=None):
             preview_url = camera_client.preview_url
             print('preview_url = {}' .format(preview_url))
 
-            # Write rtsp_addr to twin
-            print ( "Sending rtsp_addr property..." )
-            prop = {"rtsp_addr": preview_url}
-            prop = json.dumps(prop)            
-            iot_hub_manager.send_property(prop)
+            if (enable_iot):
+                # Write rtsp_addr to twin
+                print ( "Sending rtsp_addr property..." )
+                prop = {"rtsp_addr": preview_url}
+                prop = json.dumps(prop)            
+                iot_hub_manager.send_property(prop)
 
-            preview_url = "rtsp://localhost:8900/live"
+            #preview_url = "rtsp://localhost:8900/live"
             detect_camera(preview_url)
 
         except IoTHubError as iothub_error:
