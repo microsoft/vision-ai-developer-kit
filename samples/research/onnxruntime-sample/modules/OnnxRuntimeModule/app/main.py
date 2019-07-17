@@ -213,9 +213,8 @@ def detect_camera(preview_url):
 
     # Read rtsp stream and detect each frame
     # Note: Current OpenCV VideoCapture() has memory leak for reading RTST Steam:
-    #       https://github.com/opencv/opencv/issues/5715
     #       If your application is actual a little bit slower than your configured fps you got a memory leak.
-    #       https://github.com/sgjava/motiondetector/issues/4
+    #       https://github.com/opencv/opencv/issues/5715
     cap = cv2.VideoCapture(preview_url)
 
     has_frame = True

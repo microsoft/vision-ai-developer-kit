@@ -1,6 +1,6 @@
 # Develop and deploy an IoT Edge module OnnxRuntimeModule
 
-Use this IoT Edge solution to build and deploy an ONNX Runtime module to detect objects by a Tiny YOLOv2 ONNX model.
+onnxruntime-sample IoT Edge solution sample is used to demo how to build and deploy an ONNX Runtime module.  This sample will input camera preview RTSP stream, detect objects by a Tiny YOLO V2 ONNX model, and save the detection result result.jpg to the /data/misc/qmmf folder.
 
 ## Setup Build Environment
 
@@ -43,4 +43,5 @@ modules\\**OnnxRuntimeModule** folder includes:
     * Use `adb shell ifconfig wlan0` command to get the camera's wireless IP address or find the IP address from **rtst_addr** property shown in OnnxRuntimeModule's [Module Identity Twin] page.
     * Open a browser to browse http://CAMERA_IP:1080/media/result.jpg or http://CAMERA_IP:1080/media/result.html (auto refresh result.jpg every 2 sec) where CAMERA_IP is the camera's IP address you found above.
     * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.
+    * A detection result sample is shown in **onnxruntime-sample\modules\OnnxRuntimeModule\test\result.jpg**.
 
