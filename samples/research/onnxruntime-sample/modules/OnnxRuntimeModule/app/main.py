@@ -219,6 +219,7 @@ def detect_camera(preview_url):
 
     has_frame = True
     no_frame_count = 0
+    detect_thread = None
     while (cap.isOpened()):
         # Capture frame-by-frame
         try:
@@ -228,6 +229,8 @@ def detect_camera(preview_url):
                 has_frame, frame = cap.read()
                 if has_frame:
                     # Detect frame
+                    if (detect_thread != None):
+                        detect_thread.join()
                     detect_thread = threading.Thread(target=detect_image, args=(session, input_name, frame))
                     detect_thread.start()
 
@@ -238,23 +241,26 @@ def detect_camera(preview_url):
                 time.sleep(1)
                 if no_frame_count > 3:
                     no_frame_count = 0
+                    if (detect_thread != None):
+                        detect_thread.join()
+                        detect_thread = None
                     cap.release()
                     cap = cv2.VideoCapture(preview_url)
                     print('!!! No frame retry 3 times.  Re-call cv2.VideoCapture(preview_url) !!!')
-                
-                continue
 
         except Exception as ex:
             print("Exception in detect_camera: %s" % ex)
             cap.release()
             cap = cv2.VideoCapture(preview_url)
-            continue        
 
         # Handle SIGTERM signal
         if (IsTerminationSignalReceived == True):
             print('!!! SIGTERM signal is received  !!!')
             break
 
+    if (detect_thread != None):
+        detect_thread.join()
+        detect_thread = None
     cap.release()
     #cv2.destroyAllWindows()
 
