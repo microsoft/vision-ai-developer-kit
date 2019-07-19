@@ -19,7 +19,7 @@ from iothub_client import IoTHubTransportProvider, IoTHubError
 
 # Handle SIGTERM signal when docker stops the current VisionSampleModule container
 import signal
-IsTerminationSignalReceived = False
+is_running = True
 
 # Choose HTTP, AMQP or MQTT as transport protocol.  Currently only MQTT is supported.
 IOT_HUB_PROTOCOL = IoTHubTransportProvider.MQTT
@@ -31,12 +31,11 @@ enable_iot = True
 
 # Define constants
 is_busy = False
+new_frame = []
 
 model_file = "tiny_yolov2/model.onnx"
 
-input_name = ""
-
-threshold = 0.4
+threshold = 0.5
 
 numClasses = 20
 labels = ["aeroplane","bicycle","bird","boat","bottle",
@@ -53,16 +52,13 @@ anchors = [1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52]
 
 def resize_and_pad(img, width, height, pad_value=114):
     
-    img_width = len(img[0])
-    img_height = len(img)
-    scale_w = img_width > img_height
-    target_w = width
-    target_h = height
+    img_height, img_width = img.shape[:2]
 
-    if scale_w:
-        target_h = int(np.round(img_height * float(width) / float(img_width)))
-    else:
-        target_w = int(np.round(img_width * float(height) / float(img_height)))
+    scale_w = 1.0 if (img_width >= img_height) else float(img_width / img_height)
+    scale_h = 1.0 if (img_height >= img_width) else float(img_height / img_width)
+
+    target_w = int(float(width) * scale_w)
+    target_h = int(float(height) * scale_h)
 
     resized = cv2.resize(img, (target_w, target_h), 0, 0, interpolation=cv2.INTER_NEAREST)
 
@@ -111,12 +107,12 @@ def draw_bboxes(out, image, duration):
                 for c in range(0,numClasses):
                     classes[c] = out[channel + 5 + c][cy][cx]
                 classes = softmax(classes)
-                detectedClass = classes.argmax()
+                class_index = classes.argmax()
                 
-                if (classes[detectedClass] * confidence < threshold):
+                if (classes[class_index] * confidence < threshold):
                     continue
 
-                color = colors[detectedClass]
+                color = colors[class_index]
                 x = x - w/2
                 y = y - h/2
 
@@ -139,13 +135,13 @@ def draw_bboxes(out, image, duration):
 
                 # write label
                 cv2.rectangle(image, (x1, y1 - 40), (x1 + 200, y1), color, -1)
-                cv2.putText(image, labels[detectedClass], (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255 - color[0], 255 - color[1], 255 - color[2]), 1, cv2.LINE_AA)
+                cv2.putText(image, labels[class_index], (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255 - color[0], 255 - color[1], 255 - color[2]), 1, cv2.LINE_AA)
     
                 if enable_iot:
                     # Send message to IoT Hub
                     message = {
-                        "Label": labels[detectedClass],
-                        "Confidence": confidence,
+                        "Label": labels[class_index],
+                        "Confidence": str(confidence),
                         "BBox": [x1, y1, x2, y2],
                         "TimeStamp": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
                     }
@@ -156,12 +152,6 @@ def draw_bboxes(out, image, duration):
     text = "Detect 1 frame : {:8.6f} sec | {:6.2f} fps" .format(duration, fps)
     cv2.putText(image, text, (40, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
-    # Display result image
-    #caption = "Detection"      
-
-    #cv2.imshow(caption, image)
-    #cv2.waitKey(1)
-
     # Reduce image size to speed up image saving
     height, width = image.shape[:2]
     height = int(height * 0.5)
@@ -170,39 +160,45 @@ def draw_bboxes(out, image, duration):
     cv2.imwrite("output/result.jpg", image)
     image = None
 
-def detect_image(session, input_name, image):
+def detect_image(session, input_name):
     global is_busy
+    global new_frame
+    global is_running
 
-    is_busy = True
+    while (is_running):
 
-    resized_image = resize_and_pad(image, 416, 416)
-    input_image = np.ascontiguousarray(np.array(resized_image, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
-    input_image = np.expand_dims(input_image, axis=0)
+        try:
+            if (len(new_frame) == 0):
+                #print('New frame not ready!')
+                time.sleep(0.1)
+                continue
 
-    try:
-        start_time = time.time()
-        result = session.run(None, {input_name: input_image})
-        end_time = time.time()
-        duration = end_time - start_time  # sec
+            image = new_frame
+            new_frame = []
 
-        out = result[0][0]
-        draw_bboxes(out, image, duration)
+            resized_image = resize_and_pad(image, 416, 416)
+            input_data = np.ascontiguousarray(np.array(resized_image, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
+            input_data = np.expand_dims(input_data, axis=0)
 
-    except Exception as ex:
-        print("Exception in detect_image: %s" % ex)
+            start_time = time.time()
+            result = session.run(None, {input_name: input_data})
+            end_time = time.time()
+            duration = end_time - start_time  # sec
 
-    image = None
-    resized_image = None
-    input_image = None    
-    out = None
-    result = None
+            out = result[0][0]
+            draw_bboxes(out, image, duration)
 
-    is_busy = False
+        except Exception as ex:
+            print("Exception in detect_image: %s" % ex)
+            time.sleep(0.1)
+
+        is_busy = False
 
 def detect_camera(preview_url):
     global is_busy
+    global new_frame
     global model_file
-    global IsTerminationSignalReceived
+    global is_running
 
     # Load model
     session = rt.InferenceSession(model_file)        
@@ -211,58 +207,47 @@ def detect_camera(preview_url):
 
     shutil.copy('result.html', 'output/result.html')
 
+    # Start a thread to detect a captured frame    
+    threading.Thread(target=detect_image, daemon=True, args=(session, input_name)).start()
+
     # Read rtsp stream and detect each frame
+
     # Note: Current OpenCV VideoCapture() has memory leak for reading RTST Steam:
     #       If your application is actual a little bit slower than your configured fps you got a memory leak.
     #       https://github.com/opencv/opencv/issues/5715
-    cap = cv2.VideoCapture(preview_url)
+    
+    while (is_running):
+        new_frame = []
+        has_frame = False
+        is_busy = False
 
-    has_frame = True
-    no_frame_count = 0
-    detect_thread = None
-    while (cap.isOpened()):
+        cap = cv2.VideoCapture(preview_url)
+        time.sleep(1)
+
         # Capture frame-by-frame
-        try:
-            if is_busy:
-                has_frame = cap.grab()  # don't retrieve frame if the previous frame processing hadn't finished
-            else:
-                has_frame, frame = cap.read()
-                if has_frame:
-                    # Detect frame
-                    if (detect_thread != None):
-                        detect_thread.join()
-                    detect_thread = threading.Thread(target=detect_image, args=(session, input_name, frame))
-                    detect_thread.start()
+        while (is_running and cap.isOpened() == True):
+            try:
+                if is_busy:
+                    has_frame = cap.grab()  # don't retrieve frame if the previous frame processing hadn't finished
+                else:
+                    has_frame, frame = cap.read()
+                    if (has_frame)                                     :
+                        new_frame = frame
+                        is_busy = True
 
-            if has_frame:
-                no_frame_count = 0
-            else:
-                no_frame_count = no_frame_count + 1
-                time.sleep(1)
-                if no_frame_count > 3:
-                    no_frame_count = 0
-                    if (detect_thread != None):
-                        detect_thread.join()
-                        detect_thread = None
+                # If WiFi connection speed is slow, cv2.VideoCapture(preview_url) will fail to capture frame frequently
+                if not has_frame: 
+                    new_frame = []
+                    print("No frame!  Restart cv2.VideoCapture()!  ")
                     cap.release()
-                    cap = cv2.VideoCapture(preview_url)
-                    print('!!! No frame retry 3 times.  Re-call cv2.VideoCapture(preview_url) !!!')
+                    break
 
-        except Exception as ex:
-            print("Exception in detect_camera: %s" % ex)
-            cap.release()
-            cap = cv2.VideoCapture(preview_url)
+            except Exception as ex:
+                print("Exception in detect_camera: %s" % ex)
+                cap.release()
+                break
 
-        # Handle SIGTERM signal
-        if (IsTerminationSignalReceived == True):
-            print('!!! SIGTERM signal is received  !!!')
-            break
-
-    if (detect_thread != None):
-        detect_thread.join()
-        detect_thread = None
     cap.release()
-    #cv2.destroyAllWindows()
 
 def getWlanIp():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -312,7 +297,7 @@ def main(protocol=None):
                 prop = json.dumps(prop)            
                 iot_hub_manager.send_property(prop)
 
-            #preview_url = "rtsp://localhost:8900/live"
+            preview_url = "rtsp://localhost:8900/live"  # comment it if running by pure docker run
             detect_camera(preview_url)
 
         except IoTHubError as iothub_error:
@@ -330,10 +315,11 @@ def main(protocol=None):
                 status = camera_client.logout()
                 print("Logout with status: %s" % status)
 
-# Handle SIGTERM signal when docker stops the current VisionSampleModule container
+# Handle SIGTERM signal when docker stops the current container
 def receive_termination_signal(signum, frame):
-    global IsTerminationSignalReceived
-    IsTerminationSignalReceived = True
+    global is_running
+    is_running = False
+    print('!!! SIGTERM signal received !!!')
 
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, receive_termination_signal)  # Handle SIGTERM signal
