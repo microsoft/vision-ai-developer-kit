@@ -34,7 +34,7 @@ new_frame = []
 
 model_file = "tiny_yolov2/model.onnx"
 
-threshold = 0.5
+threshold = 0.4
 
 numClasses = 20
 labels = ["aeroplane","bicycle","bird","boat","bottle",
@@ -136,14 +136,14 @@ def draw_bboxes(out, image, duration):
                 cv2.rectangle(image, (x1, y1 - 40), (x1 + 200, y1), color, -1)
                 cv2.putText(image, labels[class_index], (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255 - color[0], 255 - color[1], 255 - color[2]), 1, cv2.LINE_AA)
     
+                message = { "Label": labels[class_index],
+                            "Confidence": str(confidence),
+                            "BBox": [x1, y1, x2, y2],
+                            "TimeStamp": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+                           }
+                print('detection result: {}' .format(json.dumps(message)))
                 if enable_iot:
-                    # Send message to IoT Hub
-                    message = {
-                        "Label": labels[class_index],
-                        "Confidence": str(confidence),
-                        "BBox": [x1, y1, x2, y2],
-                        "TimeStamp": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-                    }
+                    # Send message to IoT Hub                    
                     iot_hub_manager.send_message_to_upstream(json.dumps(message))
 
     # Write detection time        
@@ -174,11 +174,11 @@ def detect_image(session, input_name):
             image = new_frame
 
             resized_image = resize_and_pad(image, 416, 416)
-            input_data = np.ascontiguousarray(np.array(resized_image, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
-            input_data = np.expand_dims(input_data, axis=0)
+            image_data = np.ascontiguousarray(np.array(resized_image, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
+            image_data = np.expand_dims(image_data, axis=0)
 
             start_time = time.time()
-            result = session.run(None, {input_name: input_data})
+            result = session.run(None, {input_name.name: image_data})
             end_time = time.time()
             duration = end_time - start_time  # sec
 
@@ -198,8 +198,8 @@ def detect_camera(preview_url):
 
     # Load model
     session = rt.InferenceSession(model_file)        
-    input_name = session.get_inputs()[0].name
-    print('\ninput node name = {}' .format(input_name))
+    input_name = session.get_inputs()[0]
+    print('\ninput node name = {}' .format(input_name.name))
 
     shutil.copy('result.html', 'output/result.html')
 
@@ -232,7 +232,7 @@ def detect_camera(preview_url):
                 # If WiFi connection speed is slow, cv2.VideoCapture(preview_url) will fail to capture frame frequently
                 if not has_frame: 
                     new_frame = []
-                    print("No frame!  Restart cv2.VideoCapture()! ")
+                    print("No frame!  Restart cv2.VideoCapture()!")
                     print("TimeStamp: {}" .format(datetime.datetime.utcnow()))
                     cap.release()
                     break
