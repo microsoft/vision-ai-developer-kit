@@ -37,9 +37,15 @@ RUN wget https://onnxzoo.blob.core.windows.net/models/opset_8/tiny_yolov2/tiny_y
     tar -xzf tiny_yolov2.tar.gz &&\
     rm -f tiny_yolov2.tar.gz
 
+# Download YOLO V3 onnx model
+RUN wget https://onnxzoo.blob.core.windows.net/models/opset_10/yolov3/yolov3.tar.gz &&\
+    tar -xzf yolov3.tar.gz &&\
+    rm -f yolov3.tar.gz
+
 COPY app /app
 
 RUN pip3 install onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl &&\
     rm -f onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl
 
 CMD ["python3", "-u", "main.py"]
+#CMD ["python3", "-u", "main_yolov3.py"]
