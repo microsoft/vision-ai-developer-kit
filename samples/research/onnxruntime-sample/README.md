@@ -45,3 +45,5 @@ modules\\**OnnxRuntimeModule** folder includes:
     * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.
     * A detection result sample is shown in **onnxruntime-sample\modules\OnnxRuntimeModule\test\result.jpg**.
 
+> **Note:** Need to use a faster WiFi connction to prevent cv2.cv2.VideoCapture() to read RTSP stream fail and need to be re-initialized frequently.
+
