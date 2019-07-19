@@ -1,6 +1,6 @@
 # Develop and deploy an IoT Edge module OnnxRuntimeModule
 
-onnxruntime-sample IoT Edge solution sample is used to demo how to build and deploy an ONNX Runtime module.  This sample will input camera preview RTSP stream, detect objects by a Tiny YOLO V2 ONNX model, and save the detection result result.jpg to the /data/misc/qmmf folder.
+onnxruntime-sample IoT Edge solution sample is used to demo how to build and deploy an ONNX Runtime module.  This sample will input camera preview RTSP stream, detect objects by a Tiny YOLO V2 ONNX model, and save the detection result result.jpg to the /data/misc/qmmf folder under CPU mode.
 
 ## Setup Build Environment
 
@@ -13,11 +13,15 @@ onnxruntime-sample IoT Edge solution sample is used to demo how to build and dep
 ## Build a Local Container Image with a Single Module: OnnxRuntimeModule
 
 modules\\**OnnxRuntimeModule** folder includes:
-   * **app** folder: source code used to detect objects by a [Tiny YOLOv2 ONNX model](https://onnxzoo.blob.core.windows.net/models/opset_8/tiny_yolov2/tiny_yolov2.tar.gz) from [ONNX Model Zoo](https://github.com/onnx/models).
-   * **Dockerfile.arm32v7** file: instructions used to build this module image.
+   * **app** folder: source code used to detect objects.
+       * main.py: is used to detect objects by a [Tiny YOLOv2 ONNX model](https://onnxzoo.blob.core.windows.net/models/opset_8/tiny_yolov2/tiny_yolov2.tar.gz) from [ONNX Model Zoo](https://github.com/onnx/models).
+       * main_yolov3.py: is used to detect objects by a [YOLO V3 ONNX model](https://onnxzoo.blob.core.windows.net/models/opset_10/yolov3/yolov3.tar.gz) from [ONNX Model Zoo](https://github.com/onnx/models).
+   * **Dockerfile.arm32v7** file: instructions used to build container image.
+       * `CMD ["python3", "-u", "main.py"]` command is used to run Tiny YOLOv2 ONNX model detection.
+       * `CMD ["python3", "-u", "main_yolov3.py"]` command is used to run YOLO V3 ONNX model detection.
    * **module.json** file: config file for this module.
 
-1. Launch **Visual Studio Code**, open folder to onnxruntime-sample located folder, and set Default Platform to be "arm32v7".
+1. Launch **Visual Studio Code**, open folder to onnxruntime-sample located folder, and set Default Platform to be **arm32v7**.
 
 2. Update the **.env** file with the values for your container image name and container registry.  Refer to [**Create a container registry**](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
      ```<language>
@@ -40,10 +44,14 @@ modules\\**OnnxRuntimeModule** folder includes:
 7. Check the detection result:
 
     * Set your local machine to connect to the same Wi-Fi as Vision AI Dev Kit connecting.
-    * Use `adb shell ifconfig wlan0` command to get the camera's wireless IP address or find the IP address from **rtst_addr** property shown in OnnxRuntimeModule's [Module Identity Twin] page.
+    * Use `adb shell ifconfig wlan0` command to get the camera's wireless IP address or find the IP address from **rtst_addr** property shown in OnnxRuntimeModule's **Module Identity Twin** page.
     * Open a browser to browse http://CAMERA_IP:1080/media/result.jpg or http://CAMERA_IP:1080/media/result.html (auto refresh result.jpg every 2 sec) where CAMERA_IP is the camera's IP address you found above.
-    * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.
+    * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.  Type any key in the OpenCV window to exit show_result.py._
     * A detection result sample is shown in **onnxruntime-sample\modules\OnnxRuntimeModule\test\result.jpg**.
 
-> **Note:** Need to use a faster WiFi connction to prevent cv2.cv2.VideoCapture() to read RTSP stream fail and need to be re-initialized frequently.
+> **Note:**
+> * This is a POC sample and its purpose is used to prove ONNX Runtime package can be installed to Vision AI DevKit, and it can use ONNX Runtime APIs to load ONNX models listed in ONNX Model Zoo and detect objects from the images captured by Vision AI DevKit.  So we will ignore the following unstable/lag/delay issues and focus on detection results:
+>     * Currently there is no API can be used to capture frames from camera directly in the current Camera SDK, so this sample capture frames from camera's preview RTSP stream.  And it needs to use a faster WiFi connction, otherwise cv2.VideoCapture() will read RTSP stream fail and need to be re-initialized frequently caused by the RTSP sream is not stable.
+>     * Currently there is no API can be used to draw labels and bounding boxes to HDMI display directly, so this sample saves the detection result to a disk file and the result content update will be delayed about 5 to 10 sec longer than the preview.
+>     * The detection accruacy for YOLO V3 model is better than YOLO V2 model, but YOLO V3's inference rate 0.15 fps is much slower than YOLO V2's 1 fps.  So it's better to run YOLO V3 model under DSP mode in the future. Check [result_yolov3.jpg](./modules/OnnxRuntimeModule/test/result_yolov3.jpg) vs [result_tinyyolov2.jpg](./modules/OnnxRuntimeModule/test/result_tinyyolov2.jpg).
 
