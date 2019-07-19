@@ -27,10 +27,9 @@ IOT_HUB_PROTOCOL = IoTHubTransportProvider.MQTT
 iot_hub_manager = None
 
 # Disable iotedge for pure docker run
-enable_iot = True
+enable_iot = False
 
 # Define constants
-is_busy = False
 new_frame = []
 
 model_file = "tiny_yolov2/model.onnx"
@@ -161,7 +160,6 @@ def draw_bboxes(out, image, duration):
     image = None
 
 def detect_image(session, input_name):
-    global is_busy
     global new_frame
     global is_running
 
@@ -174,7 +172,6 @@ def detect_image(session, input_name):
                 continue
 
             image = new_frame
-            new_frame = []
 
             resized_image = resize_and_pad(image, 416, 416)
             input_data = np.ascontiguousarray(np.array(resized_image, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
@@ -192,10 +189,9 @@ def detect_image(session, input_name):
             print("Exception in detect_image: %s" % ex)
             time.sleep(0.1)
 
-        is_busy = False
+        new_frame = []
 
 def detect_camera(preview_url):
-    global is_busy
     global new_frame
     global model_file
     global is_running
@@ -219,7 +215,6 @@ def detect_camera(preview_url):
     while (is_running):
         new_frame = []
         has_frame = False
-        is_busy = False
 
         cap = cv2.VideoCapture(preview_url)
         time.sleep(1)
@@ -227,13 +222,12 @@ def detect_camera(preview_url):
         # Capture frame-by-frame
         while (is_running and cap.isOpened() == True):
             try:
-                if is_busy:
+                if len(new_frame) > 0:  # detect_image() thread hand't finished to detect the latest frame
                     has_frame = cap.grab()  # don't retrieve frame if the previous frame processing hadn't finished
                 else:
                     has_frame, frame = cap.read()
                     if (has_frame)                                     :
                         new_frame = frame
-                        is_busy = True
 
                 # If WiFi connection speed is slow, cv2.VideoCapture(preview_url) will fail to capture frame frequently
                 if not has_frame: 
