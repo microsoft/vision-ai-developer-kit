@@ -20,6 +20,7 @@ from iothub_client import IoTHubTransportProvider, IoTHubError
 # Handle SIGTERM signal when docker stops the current VisionSampleModule container
 import signal
 is_running = True
+is_busy = False
 
 # Choose HTTP, AMQP or MQTT as transport protocol.  Currently only MQTT is supported.
 IOT_HUB_PROTOCOL = IoTHubTransportProvider.MQTT
@@ -129,6 +130,7 @@ def draw_bboxes(result, image, duration):
 def detect_image(session, input_name, input_size):
     global new_frame
     global is_running
+    global is_busy
 
     while (is_running):
 
@@ -159,11 +161,13 @@ def detect_image(session, input_name, input_size):
             time.sleep(0.1)
 
         new_frame = []
+        is_busy = False
 
 def detect_camera(preview_url):
     global new_frame
     global model_file
     global is_running
+    global is_busy
 
     # Load model
     session = rt.InferenceSession(model_file)        
@@ -191,12 +195,13 @@ def detect_camera(preview_url):
         # Capture frame-by-frame
         while (is_running and cap.isOpened() == True):
             try:
-                if len(new_frame) > 0:  # detect_image() thread hand't finished to detect the latest frame
+                if is_busy:  # detect_image() thread hand't finished to detect the latest frame
                     has_frame = cap.grab()  # don't retrieve frame if the previous frame processing hadn't finished
                 else:
                     has_frame, frame = cap.read()
                     if (has_frame)                                     :
                         new_frame = frame
+                        is_busy = True
 
                 # If WiFi connection speed is slow, cv2.VideoCapture(preview_url) will fail to capture frame frequently
                 if not has_frame: 
