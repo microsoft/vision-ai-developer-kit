@@ -6,14 +6,21 @@ import cv2
 import urllib.request
 import sys
 
+is_recording = False
+is_yolov3 = False
+
 image_file = "result.jpg"
-
-is_saved_video = False
-
 video_file = "result.mp4"
+
 video_width = 960
 video_heigth = 540
-video_fps = 2
+
+if is_yolov3:
+    wait_time = 3000  # ms
+    video_fps = 1
+else:
+    wait_time = 500  # ms
+    video_fps = 2
 
 def main():    
     img_url = None
@@ -26,19 +33,19 @@ def main():
         print('For example: python show_result.py "http://192.168.0.2:1080/media/result.jpg"')
         return
 
-    if is_saved_video:
+    if is_recording:
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(video_file, fourcc, video_fps, (video_width, video_heigth))
         
     while True:
         try:  
-            urllib.request.urlretrieve(img_url, "result.jpg")
+            urllib.request.urlretrieve(img_url, image_file)
             img = cv2.imread(image_file)
             #height, width = img.shape[:2]
             #height = int(height * 0.5)
             #width = int(width * 0.5)
             #img = cv2.resize(img, (width, height))
-            if is_saved_video:
+            if is_recording:
                 out.write(img)
             cv2.imshow("Detect " + image_file, img)
             
@@ -46,10 +53,10 @@ def main():
         except Exception as ex:
             print('Exception for reading image: {}' .format(ex))
 
-        if (cv2.waitKey(500) & 0xFF) == ord('q'):
+        if (cv2.waitKey(wait_time) & 0xFF) == ord('q'):
             break
 
-    if is_saved_video:
+    if is_recording:
         out.release()
 
     cv2.destroyAllWindows()
