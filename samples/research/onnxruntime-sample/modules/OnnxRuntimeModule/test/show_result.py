@@ -5,6 +5,7 @@
 import cv2
 import urllib.request
 import sys
+import numpy as np
 
 is_recording = False
 is_yolov3 = False
@@ -39,12 +40,18 @@ def main():
         
     while True:
         try:  
-            urllib.request.urlretrieve(img_url, image_file)
-            img = cv2.imread(image_file)
+            #urllib.request.urlretrieve(img_url, image_file)
+            #img = cv2.imread(image_file)
+
             #height, width = img.shape[:2]
             #height = int(height * 0.5)
             #width = int(width * 0.5)
             #img = cv2.resize(img, (width, height))
+
+            req = urllib.request.urlopen(img_url)
+            data = np.asarray(bytearray(req.read()), dtype=np.uint8)
+            img = cv2.imdecode(data, cv2.IMREAD_COLOR) 
+
             if is_recording:
                 out.write(img)
             cv2.imshow("Detect " + image_file, img)
