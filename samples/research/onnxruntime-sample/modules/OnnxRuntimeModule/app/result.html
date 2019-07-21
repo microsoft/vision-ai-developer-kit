@@ -2,33 +2,33 @@
 
 <html>
 <head>
+    <title>Detection Result</title>
+    <script type="text/JavaScript">
+        var interval = 500; //ms
+        var img;
 
-<title>Detection Result</title>
+        function init() {
+            var canvas = document.getElementById("img_result");
+            var context = canvas.getContext("2d");
 
-<script type="text/JavaScript">
-var refreshInterval = 500; //ms
-var img;
+            // Auto refresh image without flicker
+            img = new Image();
+            img.onload = function() {
+                canvas.setAttribute("width", img.width)
+                canvas.setAttribute("height", img.height)
+                context.drawImage(this, 0, 0);
+            };
 
-function init() {
-    var canvas = document.getElementById("canvas");
-    var context = canvas.getContext("2d");
-    img = new Image();
-    img.onload = function() {
-        canvas.setAttribute("width", img.width)
-        canvas.setAttribute("height", img.height)
-        context.drawImage(this, 0, 0);
-    };
-    refresh();
-}
+            setInterval(refresh, interval);
+        }
 
-function refresh() {
-    img.src = "media/result.jpg#" + Math.random();
-    setTimeout("refresh()",refreshInterval);
-}
-</script>
+        function refresh() {
+            img.src = "media/result.jpg#" + Math.random();
+        }
+    </script>
 </head>
 
 <body onload="JavaScript:init();">
-<canvas id="canvas"/>
+    <canvas id="img_result"/>
 </body>
 </html>
