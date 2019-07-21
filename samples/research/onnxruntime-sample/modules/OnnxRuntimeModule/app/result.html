@@ -2,12 +2,33 @@
 
 <html>
 <head>
-    <!-- Auto refresh this web page every 2 sec -->
-    <!-- https://en.wikipedia.org/wiki/Meta_refresh -->
-    <meta http-equiv="refresh" content="2">
+
+<title>Detection Result</title>
+
+<script type="text/JavaScript">
+var refreshInterval = 500; //ms
+var img;
+
+function init() {
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+    img = new Image();
+    img.onload = function() {
+        canvas.setAttribute("width", img.width)
+        canvas.setAttribute("height", img.height)
+        context.drawImage(this, 0, 0);
+    };
+    refresh();
+}
+
+function refresh() {
+    img.src = "media/result.jpg#" + Math.random();
+    setTimeout("refresh()",refreshInterval);
+}
+</script>
 </head>
 
-<body>
-    <img src="media/result.jpg" style="position:fixed;margin: 2% 2%;height:90%;width:90%" >
+<body onload="JavaScript:init();">
+<canvas id="canvas"/>
 </body>
 </html>
