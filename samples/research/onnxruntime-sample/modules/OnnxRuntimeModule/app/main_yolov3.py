@@ -147,7 +147,7 @@ def detect_image(session, input_name, input_size):
             image_data /= 255.
             image_data = np.expand_dims(image_data, axis=0)
             
-            image_size = np.array([image.shape[0], image.shape[1]], dtype=np.int).reshape(1, 2)
+            image_size = np.array([image.shape[0], image.shape[1]], dtype=np.int32).reshape(1, 2)
 
             start_time = time.time()
             result = session.run(None, {input_name.name: image_data, input_size.name: image_size})
