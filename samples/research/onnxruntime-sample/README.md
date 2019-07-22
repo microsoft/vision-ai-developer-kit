@@ -46,12 +46,14 @@ modules\\**OnnxRuntimeModule** folder includes:
     * Set your local machine to connect to the same Wi-Fi as Vision AI Dev Kit connecting.
     * Use `adb shell ifconfig wlan0` command to get the camera's wireless IP address or find the IP address from **rtst_addr** property shown in OnnxRuntimeModule's **Module Identity Twin** page.
     * Open a browser to browse http://CAMERA_IP:1080/media/result.jpg or http://CAMERA_IP:1080/media/result.html (using Edge to auto refresh result.jpg) where CAMERA_IP is the camera's IP address you found above.
-    * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.  Type 'q' key in the OpenCV window to quit show_result.py.
+    * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.
+        * Type 'q' key in the OpenCV window to quit show_result.py.
+        * Set **is_recording** flag to be **True** to record detection results to a video file.
     * A detection result sample is shown in **onnxruntime-sample\modules\OnnxRuntimeModule\test\result.jpg**.
 
 > **Note:**
 > * This is a POC sample and its purpose is used to prove ONNX Runtime package can be installed on Vision AI DevKit, and it can use ONNX Runtime APIs to load ONNX models from ONNX Model Zoo and detect objects by the images captured from Vision AI DevKit.  So we will ignore the following unstable/lag/delay issues and focus on the detection results:
->     * Currently there is no API can be used to capture frames from camera directly in the current Camera SDK, so this sample capture frames from camera's preview RTSP stream.  And it needs to use a faster WiFi connction, otherwise cv2.VideoCapture() will read RTSP stream fail and need to be re-initialized frequently caused by the RTSP sream is not stable.
->     * Currently there is no API can be used to draw labels and bounding boxes to HDMI display directly, so this sample saves the detection result to a disk file and the result content update will be delayed about 5 to 10 sec longer than the preview.
+>     * There is no API can be used to captures frames from camera directly in the current Camera SDK, so this sample capture frames from camera's preview RTSP stream.  And it needs to use a faster WiFi connection, otherwise cv2.VideoCapture() will read RTSP stream fail and need to be re-initialized frequently caused by the RTSP sream is not stable.
+>     * There is no API can be used to draw labels and bounding boxes to HDMI display directly, so this sample saves the detection result to a disk file and the result content update will be delayed about 5 to 10 sec longer than the preview.
 >     * The detection accruacy for YOLO V3 model is better than YOLO V2 model, but YOLO V3's inference rate 0.15 fps is much slower than YOLO V2's 1 fps.  So it's better to run YOLO V3 model under DSP mode in the future. Check [result_yolov3.jpg](./modules/OnnxRuntimeModule/test/result_yolov3.jpg) vs [result_tinyyolov2.jpg](./modules/OnnxRuntimeModule/test/result_tinyyolov2.jpg).
 
