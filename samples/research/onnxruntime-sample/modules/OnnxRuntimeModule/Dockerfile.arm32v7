@@ -47,5 +47,4 @@ COPY app /app
 RUN pip3 install onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl &&\
     rm -f onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl
 
-CMD ["python3", "-u", "main.py"]
-#CMD ["python3", "-u", "main_yolov3.py"]
+ENTRYPOINT ["python3", "-u", "main.py"]

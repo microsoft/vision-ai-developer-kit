@@ -85,7 +85,8 @@
                     "EndpointsConfig": {
                       "host": {}
                     }
-                  }
+                  },
+                  "CMD": ["tinyyolov2"]
                 }
               }
             }
