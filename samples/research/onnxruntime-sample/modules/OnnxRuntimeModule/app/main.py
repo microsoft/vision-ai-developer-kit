@@ -148,8 +148,8 @@ def main(protocol=None):
             print('supported encodetype: ' + str(camera_client.encodetype))
             print('supported bitrates: ' + str(camera_client.bitrates))
             print('supported framerates: ' + str(camera_client.framerates))
-            print(camera_client.configure_preview(resolution="1080P", encode='AVC/H.264', framerate=24, display_out=1))
 
+            camera_client.configure_preview(resolution="1080P", encode='AVC/H.264', framerate=24, display_out=1)
             camera_client.set_preview_state("on")
 
             preview_url = camera_client.preview_url

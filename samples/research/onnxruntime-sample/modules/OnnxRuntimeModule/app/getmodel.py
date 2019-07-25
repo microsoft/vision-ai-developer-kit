@@ -122,18 +122,18 @@ class TinyYOLOv2Class():
                     y = y - h/2
 
                     # draw BBOX on the original image
-                    ori_h, ori_w = image.shape[:2]
-                    scale = max(ori_w, ori_h)
+                    image_h, image_w = image.shape[:2]
+                    scale = max(image_w, image_h)
                 
-                    x = x * scale / 416 - (scale - ori_w) / 2
-                    y = y * scale / 416 - (scale - ori_h) / 2
+                    x = x * scale / 416 - (scale - image_w) / 2
+                    y = y * scale / 416 - (scale - image_h) / 2
                     w = w * scale / 416
                     h = h * scale / 416
 
                     x1 = max(int(np.round(x)), 0)
                     y1 = max(int(np.round(y)), 0)
-                    x2 = min(int(np.round(x + w)), ori_w)
-                    y2 = min(int(np.round(y + h)), ori_h)
+                    x2 = min(int(np.round(x + w)), image_w)
+                    y2 = min(int(np.round(y + h)), image_h)
 
                     # Draw labels and bbox and output message
                     draw_object(image, self.colors[class_index], self.labels[class_index], confidence, 
@@ -146,8 +146,9 @@ class TinyYOLOv2Class():
     def detect_image(self, image):
         try:
             # Preprocess input image
-            resized_image = resize_and_pad(image, 416, 416)
-            image_data = np.ascontiguousarray(np.array(resized_image, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
+            img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # BGR => RGB
+            img = resize_and_pad(img, 416, 416)
+            image_data = np.ascontiguousarray(np.array(img, dtype=np.float32).transpose(2, 0, 1)) # HWC -> CHW
             image_data = np.expand_dims(image_data, axis=0)
 
             # Detect image
@@ -162,6 +163,9 @@ class TinyYOLOv2Class():
         except Exception as ex:
             print("Exception in detect_image: %s" % ex)
             time.sleep(0.1)
+
+        img = None
+        image_data = None
 
 class YOLOV3Class():
     def __init__(self, iot_hub_manager, enable_iot):
@@ -197,18 +201,17 @@ class YOLOV3Class():
 
     def draw_bboxes(self, result, image, duration):
         out_boxes, out_scores, out_classes = result[:3]
-        #print('out_classes = {}, {}' .format(len(out_classes), out_classes))
-
+        image_h, image_w = image.shape[:2]
         for i in range(len(out_classes)):
             batch_index, class_index, box_index = out_classes[i][:3]
             confidence = out_scores[batch_index][class_index][box_index]
             if confidence >= self.threshold:
                 y1, x1, y2, x2 = out_boxes[batch_index][box_index]
 
-                x1 = int(x1)
-                y1 = int(y1)
-                x2 = int(x2)
-                y2 = int(y2)
+                x1 = max(int(np.round(x1)), 0)
+                y1 = max(int(np.round(y1)), 0)
+                x2 = min(int(np.round(x2)), image_w)
+                y2 = min(int(np.round(y2)), image_h)
 
                 # Draw labels and bbox and output message
                 draw_object(image, self.colors[class_index], self.labels[class_index], confidence, 
@@ -221,8 +224,9 @@ class YOLOV3Class():
     def detect_image(self, image):
         try:
             # Preprocess input image
-            resized_image = resize_and_pad(image, 416, 416)
-            image_data = np.ascontiguousarray(np.array(resized_image, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
+            img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # BGR => RGB
+            img = resize_and_pad(img, 416, 416)
+            image_data = np.ascontiguousarray(np.array(img, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
             image_data /= 255.
             image_data = np.expand_dims(image_data, axis=0)
 
@@ -240,3 +244,6 @@ class YOLOV3Class():
         except Exception as ex:
             print("Exception in detect_image: %s" % ex)
             time.sleep(0.1)
+
+        img = None
+        image_data = None
