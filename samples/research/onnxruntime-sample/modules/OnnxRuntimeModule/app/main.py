@@ -34,7 +34,7 @@ is_busy = False
 # Choose HTTP, AMQP or MQTT as transport protocol.  Currently only MQTT is supported.
 IOT_HUB_PROTOCOL = IoTHubTransportProvider.MQTT
 
-# Default to disable sending messages to IoT Hub to prevent consuming network bandwidth 
+# Default to disable sending D2C messages to IoT Hub to prevent consuming network bandwidth 
 # and reduce the frequency of cv2.VideoCapture() fail to capture frame from RTSP stream.
 enable_iot = False
 iot_hub_manager = None
@@ -61,16 +61,16 @@ def detect_image():
         new_frame = []
         is_busy = False
 
-def detect_object(preview_url):
+def capture_frames(preview_url):
     global new_frame
     global model_class
     global is_busy
 
     # Get model_class 
     if model_name in model_map:
-        model_class = model_map[model_name](iot_hub_manager, enable_iot)
+        model_class = model_map[model_name](iot_hub_manager)
     else:
-        model_class = model_map[default_model](iot_hub_manager, enable_iot)
+        model_class = model_map[default_model](iot_hub_manager)
 
     # Start a thread to detect a captured frame    
     threading.Thread(target=detect_image, daemon=True, args=()).start()
@@ -140,9 +140,7 @@ def main(protocol=None):
     password = 'admin'
 
     with CameraClient.connect(ip_address=ip_addr, username=username, password=password) as camera_client:
-        try:
-            if (enable_iot):
-                iot_hub_manager = IotHubManager(protocol, camera_client)
+        try:                
 
             print('supported resolutions: ' + str(camera_client.resolutions))
             print('supported encodetype: ' + str(camera_client.encodetype))
@@ -152,26 +150,27 @@ def main(protocol=None):
             camera_client.configure_preview(resolution="1080P", encode='AVC/H.264', framerate=24, display_out=1)
             camera_client.set_preview_state("on")
 
-            preview_url = camera_client.preview_url
-            print('preview_url = {}' .format(preview_url))
-
             # Write rtsp_addr to twin
-            if (enable_iot):                
-                print ( "Sending rtsp_addr property..." )
-                prop = {"rtsp_addr": preview_url}
-                prop = json.dumps(prop)            
-                iot_hub_manager.send_property(prop)
+            preview_url = camera_client.preview_url
+            iot_hub_manager = IotHubManager(protocol, camera_client)
+            print ( "Sending rtsp_addr property..." )
+            prop = {"rtsp_addr": preview_url}
+            prop = json.dumps(prop)            
+            iot_hub_manager.send_property(prop)
+
+            if not enable_iot:  # won't send D2C messages to IoT Hub
+                iot_hub_manager = None
 
             # Start to detect object
             preview_url = "rtsp://localhost:8900/live"  # comment it if running by pure docker run
-            detect_object(preview_url)
+            capture_frames(preview_url)
 
         except IoTHubError as iothub_error:
             print("Unexpected error %s from IoTHub" % iothub_error)
             return
         
-        except KeyboardInterrupt:
-            print("IoTHubModuleClient sample stopped")
+        except Exception as ex:
+            print("Exception in main(): {}" .format(ex))
             return
 
         finally:

@@ -38,7 +38,7 @@ def softmax(x):
     scoreMatExp = np.exp(np.asarray(x))
     return scoreMatExp / scoreMatExp.sum(0)
 
-def draw_object(image, color, label, confidence, x1, y1, x2, y2, enable_iot, iot_hub_manager):
+def draw_object(image, color, label, confidence, x1, y1, x2, y2, iot_hub_manager):
     cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
     cv2.rectangle(image, (x1, y1 - 40), (x1 + 200, y1), color, -1)
     cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255 - color[0], 255 - color[1], 255 - color[2]), 1, cv2.LINE_AA)
@@ -49,7 +49,7 @@ def draw_object(image, color, label, confidence, x1, y1, x2, y2, enable_iot, iot
                 "TimeStamp": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
               }
     print('detection result: {}' .format(json.dumps(message)))
-    if enable_iot:
+    if iot_hub_manager is not None:
         # Send message to IoT Hub                    
         iot_hub_manager.send_message_to_upstream(json.dumps(message))
 
@@ -67,7 +67,7 @@ def output_result(image, duration):
     cv2.imwrite("output/result.jpg", image)
 
 class TinyYOLOv2Class():
-    def __init__(self, iot_hub_manager, enable_iot):
+    def __init__(self, iot_hub_manager):
         self.model_file = 'tiny_yolov2/model.onnx'
         self.threshold = 0.4
         self.numClasses = 20
@@ -84,7 +84,6 @@ class TinyYOLOv2Class():
         self.anchors = [1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52]
 
         self.iot_hub_manager = iot_hub_manager
-        self.enable_iot = enable_iot
 
         # Load model
         self.session = rt.InferenceSession(self.model_file)        
@@ -137,7 +136,7 @@ class TinyYOLOv2Class():
 
                     # Draw labels and bbox and output message
                     draw_object(image, self.colors[class_index], self.labels[class_index], confidence, 
-                                x1, y1, x2, y2, self.enable_iot, self.iot_hub_manager)
+                                x1, y1, x2, y2, self.iot_hub_manager)
 
         # Output detection result
         output_result(image, duration)
@@ -146,7 +145,7 @@ class TinyYOLOv2Class():
     def detect_image(self, image):
         try:
             # Preprocess input image
-            img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # BGR => RGB
+            img = image[:, :, [2, 1, 0]]  # BGR => RGB
             img = resize_and_pad(img, 416, 416)
             image_data = np.ascontiguousarray(np.array(img, dtype=np.float32).transpose(2, 0, 1)) # HWC -> CHW
             image_data = np.expand_dims(image_data, axis=0)
@@ -168,7 +167,7 @@ class TinyYOLOv2Class():
         image_data = None
 
 class YOLOV3Class():
-    def __init__(self, iot_hub_manager, enable_iot):
+    def __init__(self, iot_hub_manager):
         self.model_file = 'yolov3/yolov3.onnx'
         self.threshold = 0.5
         self.numClasses = 80
@@ -193,7 +192,6 @@ class YOLOV3Class():
         self.anchors = [1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52]
 
         self.iot_hub_manager = iot_hub_manager
-        self.enable_iot = enable_iot
 
         # Load model
         self.session = rt.InferenceSession(self.model_file)        
@@ -215,7 +213,7 @@ class YOLOV3Class():
 
                 # Draw labels and bbox and output message
                 draw_object(image, self.colors[class_index], self.labels[class_index], confidence, 
-                            x1, y1, x2, y2, self.enable_iot, self.iot_hub_manager)
+                            x1, y1, x2, y2, self.iot_hub_manager)
 
         # Output detection result
         output_result(image, duration)
@@ -224,7 +222,7 @@ class YOLOV3Class():
     def detect_image(self, image):
         try:
             # Preprocess input image
-            img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # BGR => RGB
+            img = image[:, :, [2, 1, 0]]  # BGR => RGB
             img = resize_and_pad(img, 416, 416)
             image_data = np.ascontiguousarray(np.array(img, dtype=np.float32).transpose(2, 0, 1)) # BGR => RGB
             image_data /= 255.
