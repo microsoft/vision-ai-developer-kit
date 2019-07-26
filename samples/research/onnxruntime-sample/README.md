@@ -46,6 +46,7 @@ modules\\**OnnxRuntimeModule** folder includes:
     * **tinyyolov2**: Tiny YOLO V2 (it's default model)
     * **yolov3**: YOLO V3
     * **fasterrcnn**: Faster R-CNN
+        > **Note:** if OnnxRuntimeModule fail to restart after changing to Faster R-CNN model, please check its log by using `adb shell docker logs -f OnnxRuntimeModule` commannd.  If it prompts "Exception in detect_image: Method run failed due to: [ONNXRuntimeError] : 1 : GENERAL ERROR : std::bad_alloc" exception, it means not enough memory and you'd better use `adb reboot` to restart the device.
 
 8. Check the detection result:
 
