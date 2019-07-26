@@ -61,10 +61,10 @@ def output_result(image, duration):
     cv2.putText(image, text, (40, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     # Reduce image size to speed up image saving
-    height, width = image.shape[:2]
-    height = int(height * 0.5)
-    width = int(width * 0.5)
-    image = cv2.resize(image, (width, height))
+    image_h, image_w = image.shape[:2]
+    image_h = int(image_h * 0.5)
+    image_w = int(image_w * 0.5)
+    image = cv2.resize(image, (image_w, image_h))
     cv2.imwrite("output/result.jpg", image)
 
 class TinyYOLOv2Class():
@@ -123,22 +123,25 @@ class TinyYOLOv2Class():
                     if (classes[class_index] * confidence < self.threshold):
                         continue
 
-                    x = x - w/2
-                    y = y - h/2
+                    x = x - w/2  # left on the resized image
+                    y = y - h/2  # top on the resized image
 
                     # draw BBOX on the original image
                     image_h, image_w = image.shape[:2]
-                    scale = max(image_w, image_h)
+                    is_based_w = float(self.size_h) >= (image_h * self.size_w / float(image_w))
+                    if  is_based_w:
+                        scale = float(image_w) / self.size_w
+                        offset = (self.size_h - image_h * self.size_w / float(image_w)) / 2
+                        y -= offset
+                    else:
+                        scale = float(image_h) / self.size_h
+                        offset = (self.size_w - image_w * self.size_h / float(image_h)) / 2
+                        x -= offset
                 
-                    x = x * scale / 416 - (scale - image_w) / 2
-                    y = y * scale / 416 - (scale - image_h) / 2
-                    w = w * scale / 416
-                    h = h * scale / 416
-
-                    x1 = max(int(np.round(x)), 0)
-                    y1 = max(int(np.round(y)), 0)
-                    x2 = min(int(np.round(x + w)), image_w)
-                    y2 = min(int(np.round(y + h)), image_h)
+                    x1 = max(int(np.round(x * scale)), 0)
+                    y1 = max(int(np.round(y * scale)), 0)
+                    x2 = min(int(np.round((x + w) * scale)), image_w)
+                    y2 = min(int(np.round((y + h) * scale)), image_h)
 
                     # Draw labels and bbox and output message
                     draw_object(image, self.colors[class_index], self.labels[class_index], confidence, 
@@ -300,19 +303,11 @@ class FasterRCNNClass():
         for bbox, class_index, confidence in zip(out_boxes, out_classes, out_scores):
             if confidence >= self.threshold:
                 x1, y1, x2, y2 = bbox[:4]
-
-                w = x2 - x1
-                h = y2 - y1
                 
-                x = x1 * image_w / self.size_w
-                y = y1 * image_h / self.size_h
-                w = w * image_w / self.size_w
-                h = h * image_h / self.size_h    
-
-                x1 = max(int(np.round(x)), 0)
-                y1 = max(int(np.round(y)), 0)
-                x2 = min(int(np.round(x1 + w)), image_w)
-                y2 = min(int(np.round(y1 + h)), image_h)
+                x1 = max(int(np.round(x1 * image_w / self.size_w)), 0)
+                y1 = max(int(np.round(y1 * image_h / self.size_h)), 0)
+                x2 = min(int(np.round(x2 * image_w / self.size_w)), image_w)
+                y2 = min(int(np.round(y2 * image_h / self.size_h)), image_h)
 
                 # Draw labels and bbox and output message
                 draw_object(image, self.colors[class_index], self.labels[class_index], confidence, 
