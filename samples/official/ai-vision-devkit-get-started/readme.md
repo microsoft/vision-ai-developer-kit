@@ -30,7 +30,7 @@ Refer to [modules/AIVisionDevKitGetStartedModule/python_iotcc_sdk/README.md](mod
 1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
     - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
 
-1. Copy the files DLC, labels.txt, and va-snpe-engine-library_config.json to the modules\AIVisionDevKitGetStartedModule\model folder.
+1. The default AI model (DLC, labels.txt, and va-snpe-engine-library_config.json) for AIVisionDevKitGetStartedModule is located in  modules\AIVisionDevKitGetStartedModule\model folder. In case you want to use your own model, please change the files in that folder.
 
 1. Open modules\AIVisionDevKitGetStartedModule\module.json and change the version setting in the tag property for creating a new version of the module image.
 
