@@ -56,12 +56,11 @@ def draw_object(image, color, label, confidence, x1, y1, x2, y2, iot_hub_manager
         iot_hub_manager.send_message_to_upstream(json.dumps(message))
 
 def output_result(image, duration):
-    # Write detection time
-    if duration == 0.0:
-        duration = 0.001       
-    fps = 1.0 / duration
-    text = "Detect 1 frame : {:8.6f} sec | {:6.2f} fps" .format(duration, fps)
-    cv2.putText(image, text, (40, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+    if duration > 0.0:
+        # Write detection time
+        fps = 1.0 / duration
+        text = "Detect 1 frame : {:8.6f} sec | {:6.2f} fps" .format(duration, fps)
+        cv2.putText(image, text, (40, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     # Reduce image size to speed up image saving
     image_h, image_w = image.shape[:2]
@@ -348,7 +347,7 @@ class FasterRCNNClass():
 class EmotionClass():
     def __init__(self, iot_hub_manager = None):
         self.model_file = 'emotion_ferplus/model.onnx'
-        self.face_classifier_file = 'haarcascade_frontalface_default.xml'
+        self.face_classifier_file = 'emotion_ferplus/haarcascade_frontalface_default.xml'
         self.threshold = 0.5
         self.numClasses = 8
         self.labels = ["neutral", "happiness", "surprise", "sadness", "anger", "disgust", "fear", "contempt"]
@@ -378,7 +377,7 @@ class EmotionClass():
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
-            start_time = time.time()
+            duration = 0.0
             for (x, y, w, h) in faces:
                 # Preprocess input image
                 image_data = gray[y:y+h, x:x+w]
@@ -386,8 +385,11 @@ class EmotionClass():
                 image_data = np.array(image_data, dtype=np.float32)
                 image_data = np.resize(image_data, self.input_shape)
 
-                # Detect image                
-                result = self.session.run(None, {self.inputs[0].name: image_data})                
+                # Detect image
+                start_time = time.time()
+                result = self.session.run(None, {self.inputs[0].name: image_data})
+                end_time = time.time()
+                duration = end_time - start_time  # sec
 
                 # Postprocess output data and draw emotion label
                 scores = result[0][0]
@@ -395,11 +397,10 @@ class EmotionClass():
                     scores[i] = max(scores[i], 1e-9)   # convert negative value to be 1e-9
                 scores = softmax(scores)
                 class_index = np.argmax(scores)
-                draw_object(image, self.colors[class_index], self.labels[class_index], scores[class_index], 
-                            x, y, x + w, y + h, self.iot_hub_manager)
-
-            end_time = time.time()
-            duration = end_time - start_time  # sec
+                confidence = scores[class_index]
+                if confidence >= self.threshold:
+                    draw_object(image, self.colors[class_index], self.labels[class_index], confidence, 
+                                x, y, x + w, y + h, self.iot_hub_manager)
 
             # Ouput detection result
             output_result(image, duration)
