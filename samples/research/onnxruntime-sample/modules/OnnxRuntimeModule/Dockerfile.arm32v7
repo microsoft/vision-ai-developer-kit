@@ -52,6 +52,8 @@ RUN wget https://onnxzoo.blob.core.windows.net/models/opset_8/emotion_ferplus/em
     tar -xf emotion_ferplus.tar.gz emotion_ferplus/model.onnx &&\
     rm -f emotion_ferplus.tar.gz
 
+#ADD https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml  emotion_ferplus/.
+
 RUN ls -lhR .
 
 COPY app /app

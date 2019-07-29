@@ -14,13 +14,14 @@ import iothub_client
 from camera import CameraClient
 from iot_hub_manager import IotHubManager
 from iothub_client import IoTHubTransportProvider, IoTHubError
-from getmodel import TinyYOLOv2Class, YOLOV3Class, FasterRCNNClass
+from getmodel import TinyYOLOv2Class, YOLOV3Class, FasterRCNNClass, EmotionClass
 
 # Define model map
 model_map = {
     'tinyyolov2': TinyYOLOv2Class,
     'yolov3': YOLOV3Class,
-    'fasterrcnn': FasterRCNNClass
+    'fasterrcnn': FasterRCNNClass,
+    'emotion': EmotionClass
 }
 
 default_model = 'tinyyolov2'

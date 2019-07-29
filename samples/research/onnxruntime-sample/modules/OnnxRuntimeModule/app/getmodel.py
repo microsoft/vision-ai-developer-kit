@@ -21,7 +21,8 @@ def resize_and_pad(image, size_w, size_h, pad_value=114):
         target_w = int(np.round(image_w * size_h / float(image_h)))
         target_h = size_h
         
-    image = cv2.resize(image, (target_w, target_h), 0, 0, interpolation=cv2.INTER_NEAREST)
+    #image = cv2.resize(image, (target_w, target_h), 0, 0, interpolation=cv2.INTER_NEAREST)
+    image = cv2.resize(image, (target_w, target_h), 0, 0, interpolation=cv2.INTER_LINEAR)
 
     top = int(max(0, np.round((size_h - target_h) / 2)))
     left = int(max(0, np.round((size_w - target_w) / 2)))
@@ -46,7 +47,7 @@ def draw_object(image, color, label, confidence, x1, y1, x2, y2, iot_hub_manager
 
     message = { "Label": label,
                 "Confidence": "{:6.4f}".format(confidence),
-                "Position": [x1, y1, x2, y2],
+                "Position": [int(x1), int(y1), int(x2), int(y2)],
                 "TimeStamp": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
               }
     print('detection result: {}' .format(json.dumps(message)))
@@ -55,15 +56,17 @@ def draw_object(image, color, label, confidence, x1, y1, x2, y2, iot_hub_manager
         iot_hub_manager.send_message_to_upstream(json.dumps(message))
 
 def output_result(image, duration):
-    # Write detection time        
+    # Write detection time
+    if duration == 0.0:
+        duration = 0.001       
     fps = 1.0 / duration
     text = "Detect 1 frame : {:8.6f} sec | {:6.2f} fps" .format(duration, fps)
     cv2.putText(image, text, (40, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     # Reduce image size to speed up image saving
     image_h, image_w = image.shape[:2]
-    image_h = int(image_h * 0.5)
-    image_w = int(image_w * 0.5)
+    image_h = int(image_h / 2)
+    image_w = int(image_w / 2)
     image = cv2.resize(image, (image_w, image_h))
     cv2.imwrite("output/result.jpg", image)
 
@@ -281,7 +284,6 @@ class FasterRCNNClass():
                         (255,0,0),(0,255,0),(0,0,255),(128,0,0),(0,128,0),(0,0,128),(255,255,0),(0,255,255),(255,0,255),(128,128,0),
                         (0,128,128),(128,0,128),(255,128,128),(128,255,128),(128,128,255),(128,64,64),(64,128,64),(64,64,128),(255,64,64),(64,255,64)
                        ]
-        self.anchors = [1.08, 1.19, 3.42, 4.41, 6.63, 11.38, 9.42, 5.11, 16.62, 10.52]
 
         # size_w and size_h need to be divisible of 32 as mentioned in 
         # https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/faster-rcnn#preprocessing-steps
@@ -342,3 +344,69 @@ class FasterRCNNClass():
             time.sleep(0.1)
 
         image_data = None
+
+class EmotionClass():
+    def __init__(self, iot_hub_manager = None):
+        self.model_file = 'emotion_ferplus/model.onnx'
+        self.face_classifier_file = 'haarcascade_frontalface_default.xml'
+        self.threshold = 0.5
+        self.numClasses = 8
+        self.labels = ["neutral", "happiness", "surprise", "sadness", "anger", "disgust", "fear", "contempt"]
+        self.colors = [(255,0,0),(0,255,0),(0,0,255),(0,255,255),(255,0,255),(255,255,0),(0,0,64),(0,64,0)]
+
+        # size_w and size_h need to be divisible of 32 as mentioned in 
+        # https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/faster-rcnn#preprocessing-steps
+        self.size_w = 64
+        self.size_h = 64        
+        self.input_shape = (1, 1, 64, 64)
+
+        self.iot_hub_manager = iot_hub_manager
+
+        # Load OpenCV pretrained Haar-cascade face classifier
+        # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html#haar-cascade-detection-in-opencv
+        self.face_cascade = cv2.CascadeClassifier(self.face_classifier_file)
+
+        # Load model
+        self.session = rt.InferenceSession(self.model_file)        
+        self.inputs = self.session.get_inputs()
+        for i in range(len(self.inputs)):
+            print("input[{}] name = {}, type = {}" .format(i, self.inputs[i].name, self.inputs[i].type))
+
+    def detect_image(self, image):
+        try:
+            # get faces in image
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
+
+            start_time = time.time()
+            for (x, y, w, h) in faces:
+                # Preprocess input image
+                image_data = gray[y:y+h, x:x+w]
+                image_data = resize_and_pad(image_data, self.size_w, self.size_h, 0)
+                image_data = np.array(image_data, dtype=np.float32)
+                image_data = np.resize(image_data, self.input_shape)
+
+                # Detect image                
+                result = self.session.run(None, {self.inputs[0].name: image_data})                
+
+                # Postprocess output data and draw emotion label
+                scores = result[0][0]
+                for i in range(len(scores)):
+                    scores[i] = max(scores[i], 1e-9)   # convert negative value to be 1e-9
+                scores = softmax(scores)
+                class_index = np.argmax(scores)
+                draw_object(image, self.colors[class_index], self.labels[class_index], scores[class_index], 
+                            x, y, x + w, y + h, self.iot_hub_manager)
+
+            end_time = time.time()
+            duration = end_time - start_time  # sec
+
+            # Ouput detection result
+            output_result(image, duration)
+
+        except Exception as ex:
+            print("Exception in detect_image: %s" % ex)
+            time.sleep(0.1)
+
+        image_data = None
+        image = None
