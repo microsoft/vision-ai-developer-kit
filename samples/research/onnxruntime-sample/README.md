@@ -14,25 +14,25 @@ onnxruntime-sample IoT Edge solution sample is used to demo how to build and dep
 
 modules\\**OnnxRuntimeModule** folder includes:
    * **app** folder: source code used to detect objects.
-       * **main.py**: is the main program used to detect objects by an ONNX model from [ONNX Model Zoo](https://github.com/onnx/models).
+       * **main.py**: main program used to detect objects by some ONNX models from [ONNX Model Zoo](https://github.com/onnx/models).
        * **getmodel.py**: used to preprocess input data and parse output data for the following ONNX models:
            * [Tiny YOLOv2](https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/tiny_yolov2)
            * [YOLO V3](https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/yolov3)
            * [Faster R-CNN](https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/faster-rcnn)
            * [Emotion FERPlus](https://github.com/onnx/models/tree/master/vision/body_analysis/emotion_ferplus) 
-   * **Dockerfile.arm32v7** file: include instructions used to install ONNX Runtime and the related Python packages, download ONNX models, upload sample code and build the container image.
+   * **Dockerfile.arm32v7** file: include instructions used to install ONNX Runtime and its related Python packages, download ONNX models, and copy sample code to build the container image.
    * **module.json** file: config file for this module.
 
-1. Launch **Visual Studio Code**, open folder to onnxruntime-sample located folder, and set Default Platform to be **arm32v7**.
+1. Launch **Visual Studio Code**, open folder to **onnxruntime-sample** located folder, and set Default Platform to be **arm32v7**.
 
-2. Update the **.env** file with the values for your container image name and container registry.  Refer to [**Create a container registry**](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
+2. Update the **.env** file with the values for your container registry.  Refer to [**Create a container registry**](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal#create-a-container-registry) for more detail about ACR.
      ```<language>
      CONTAINER_REGISTRY_NAME="Your ACR address"
      CONTAINER_REGISTRY_USERNAME="Your ACR username"
      CONTAINER_REGISTRY_PASSWORD="Your ACR password"
      ```
 
-3. Sign in **Azure Container Registry** by entering the following command in the **Visual Studio Code** integrated terminal (replace <CONTAINER_REGISTRY_NAME>, <CONTAINER_REGISTRY_USERNAME>, and <CONTAINER_REGISTRY_PASSWORD> to your container registry values set in the **.env** file):
+3. Sign in **Azure Container Registry** by entering the following command in the **Visual Studio Code** integrated terminal (replace <CONTAINER_REGISTRY_NAME>, <CONTAINER_REGISTRY_USERNAME>, and <CONTAINER_REGISTRY_PASSWORD> to your container registry values specified in the **.env** file):
     ```<language>
     docker login <CONTAINER_REGISTRY_NAME> -u <CONTAINER_REGISTRY_USERNAME> -p <CONTAINER_REGISTRY_PASSWORD> 
     ```
@@ -43,19 +43,19 @@ modules\\**OnnxRuntimeModule** folder includes:
 
 6. Right-clicking on **config/deployment.arm32v7.json** file, select **[Create Deployment for Single Device]**, and choose the targeted IoT Edge device to deploy the container Image.
 
-7. Modify deployment.arm32v7.json to test other ONNX models by changing the model value for **CMD** option.  Available ONNX model values:
+7. Modify **deployment.arm32v7.json** by changing the model value for **CMD** option and deploy it again to run other ONNX models .  Available ONNX model values:
     * **tinyyolov2**: Tiny YOLO V2 (it's default model)
     * **yolov3**: YOLO V3
     * **fasterrcnn**: Faster R-CNN
-        > **Note:** if OnnxRuntimeModule fail to restart after changing to Faster R-CNN model, please check its log by using `adb shell docker logs -f OnnxRuntimeModule` commannd.  If it prompts "Exception in detect_image: Method run failed due to: [ONNXRuntimeError] : 1 : GENERAL ERROR : std::bad_alloc" exception, it means not enough memory and you'd better use `adb reboot` to restart the device.
+        > **Note:** if OnnxRuntimeModule fails to restart after changing to Faster R-CNN model, please check its log by using `adb shell docker logs -f OnnxRuntimeModule` commannd.  If it prompts "Exception in detect_image: Method run failed due to: [ONNXRuntimeError] : 1 : GENERAL ERROR : std::bad_alloc" exception, it means not enough memory and you'd better use `adb reboot` to restart the device.
     * **emotion**: Emotion FERPlus
 
 8. Check the detection result:
     * Set your local machine to connect to the same Wi-Fi as Vision AI Dev Kit connecting.
     * Use `adb shell ifconfig wlan0` command to get the camera's wireless IP address or find the IP address from **rtst_addr** property shown in OnnxRuntimeModule's **Module Identity Twin** page.
-    * Open a browser to browse http://CAMERA_IP:1080/media/result.jpg or http://CAMERA_IP:1080/media/result.html (using Edge to auto refresh result.jpg) where CAMERA_IP is the camera's IP address you found above.
+    * Open a browser to browse `http://CAMERA_IP:1080/media/result.jpg` or `http://CAMERA_IP:1080/media/result.html` (it will auto refresh result.jpg by using Edge) where CAMERA_IP is the camera's IP address you found above.
     * Or execute `python show_result.py "http://CAMERA_IP:1080/media/result.jpg"` command from **onnxruntime-sample\modules\OnnxRuntimeModule\test** folder to display the detection result in an OpenCV window.
-        * Type 'q' key in the OpenCV window to quit show_result.py.
+        * Type any key in the OpenCV window to quit show_result.py.
         * Set **is_recording** flag to be **True** to record detection results to a video file.
     * Detection results:
         * Tiny YOLO V2: [result.jpg](./modules/OnnxRuntimeModule/test/result.jpg), [result.mp4](./modules/OnnxRuntimeModule/test/result.mp4)

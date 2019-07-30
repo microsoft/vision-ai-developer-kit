@@ -17,8 +17,8 @@ video_width = 960
 video_heigth = 540
 
 if is_yolov3:
-    wait_time = 3000  # ms
-    video_fps = 1
+    wait_time = 1000  # ms
+    video_fps = 4
 else:
     wait_time = 500  # ms
     video_fps = 2
@@ -60,7 +60,7 @@ def main():
         except Exception as ex:
             print('Exception for reading image: {}' .format(ex))
 
-        if (cv2.waitKey(wait_time) & 0xFF) == ord('q'):
+        if cv2.waitKey(wait_time) > 0:
             break
 
     if is_recording:
