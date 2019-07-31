@@ -23,8 +23,8 @@ def resize_and_pad(image, size_w, size_h, pad_value=114):
         target_w = int(np.round(image_w * size_h / float(image_h)))
         target_h = size_h
         
-    #image = cv2.resize(image, (target_w, target_h), 0, 0, interpolation=cv2.INTER_NEAREST)
-    image = cv2.resize(image, (target_w, target_h), 0, 0, interpolation=cv2.INTER_LINEAR)
+    image = cv2.resize(image, (target_w, target_h), 0, 0, interpolation=cv2.INTER_NEAREST)
+    #image = cv2.resize(image, (target_w, target_h), 0, 0, interpolation=cv2.INTER_LINEAR)
 
     top = int(max(0, np.round((size_h - target_h) / 2)))
     left = int(max(0, np.round((size_w - target_w) / 2)))
