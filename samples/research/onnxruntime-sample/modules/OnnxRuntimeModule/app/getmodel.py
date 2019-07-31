@@ -10,6 +10,8 @@ import datetime
 import sys
 import json
 
+is_showing = False  # Ture: use cv2.imshow(); False: use cv2.imwrite()
+
 def resize_and_pad(image, size_w, size_h, pad_value=114):
     image_h, image_w = image.shape[:2]
 
@@ -67,11 +69,15 @@ def output_result(image, duration):
     image_h = int(image_h / 2)
     image_w = int(image_w / 2)
     image = cv2.resize(image, (image_w, image_h))
-    cv2.imwrite("output/result.jpg", image)
+
+    if is_showing:
+        cv2.imshow("Detection Result", image)
+    else:        
+        cv2.imwrite("output/result.jpg", image)
 
 class TinyYOLOv2Class():
     def __init__(self, iot_hub_manager = None):
-        self.model_file = 'tiny_yolov2/model.onnx'
+        self.model_file = 'models/tiny_yolov2/Model.onnx'
         self.threshold = 0.4
         self.numClasses = 20
         self.labels = ["aeroplane","bicycle","bird","boat","bottle",
@@ -178,7 +184,7 @@ class TinyYOLOv2Class():
 
 class YOLOV3Class():
     def __init__(self, iot_hub_manager = None):
-        self.model_file = 'yolov3/yolov3.onnx'
+        self.model_file = 'models/yolov3/yolov3.onnx'
         self.threshold = 0.5
         self.numClasses = 80
         self.labels = [ "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat", "traffic light", 
@@ -262,7 +268,7 @@ class YOLOV3Class():
 
 class FasterRCNNClass():
     def __init__(self, iot_hub_manager = None):
-        self.model_file = 'faster_rcnn_R_50_FPN_1x.onnx'
+        self.model_file = 'models/faster_rcnn/faster_rcnn_R_50_FPN_1x.onnx'
         self.threshold = 0.5
         self.numClasses = 81
         self.labels = [ "__background", "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat", "traffic light", 
@@ -346,8 +352,8 @@ class FasterRCNNClass():
 
 class EmotionClass():
     def __init__(self, iot_hub_manager = None):
-        self.model_file = 'emotion_ferplus/model.onnx'
-        self.face_classifier_file = 'emotion_ferplus/haarcascade_frontalface_default.xml'
+        self.model_file = 'models/emotion_ferplus/model.onnx'
+        self.face_classifier_file = 'models/emotion_ferplus//haarcascade_frontalface_default.xml'
         self.threshold = 0.5
         self.numClasses = 8
         self.labels = ["neutral", "happiness", "surprise", "sadness", "anger", "disgust", "fear", "contempt"]

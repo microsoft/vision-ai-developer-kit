@@ -31,21 +31,29 @@ RUN wget https://www.piwheels.org/simple/opencv-python/opencv_python-3.4.4.19-cp
 # Install onnxruntime for arm32, app, and Tiny YOLOv2 1.3 onnx model #
 #--------------------------------------------------------------------#
 WORKDIR /app
+RUN mkdir output && mkdir models
 
 # Download Tiny YOLOv2 1.3 onnx model
 RUN wget https://onnxzoo.blob.core.windows.net/models/opset_8/tiny_yolov2/tiny_yolov2.tar.gz  &&\
-    tar -xf tiny_yolov2.tar.gz tiny_yolov2/model.onnx &&\
-    rm -f tiny_yolov2.tar.gz
+    tar -tf tiny_yolov2.tar.gz &&\
+    tar -xf tiny_yolov2.tar.gz tiny_yolov2/./Model.onnx &&\
+    rm -f tiny_yolov2.tar.gz &&\
+    mv tiny_yolov2 models/.
 
 # Download YOLO V3 onnx model
 RUN wget https://onnxzoo.blob.core.windows.net/models/opset_10/yolov3/yolov3.tar.gz &&\
+    tar -tf yolov3.tar.gz &&\
     tar -xf yolov3.tar.gz yolov3/yolov3.onnx &&\
-    rm -f yolov3.tar.gz
+    rm -f yolov3.tar.gz &&\
+    mv yolov3 models/.
 
 # Download Faster RCNN onnx model
 RUN wget https://onnxzoo.blob.core.windows.net/models/opset_10/faster_rcnn/faster_rcnn_R_50_FPN_1x.tar.gz &&\
+    tar -tf faster_rcnn_R_50_FPN_1x.tar.gz &&\
     tar -xf faster_rcnn_R_50_FPN_1x.tar.gz faster_rcnn_R_50_FPN_1x.onnx &&\
-    rm -f faster_rcnn_R_50_FPN_1x.tar.gz
+    rm -f faster_rcnn_R_50_FPN_1x.tar.gz &&\
+    mkdir models/faster_rcnn &&\
+    mv faster_rcnn_R_50_FPN_1x.onnx models/faster_rcnn/.
 
 # Download Emotion FERPlus onnx model
 RUN wget https://onnxzoo.blob.core.windows.net/models/opset_8/emotion_ferplus/emotion_ferplus.tar.gz &&\
@@ -53,11 +61,12 @@ RUN wget https://onnxzoo.blob.core.windows.net/models/opset_8/emotion_ferplus/em
     rm -f emotion_ferplus.tar.gz
 
 RUN wget "https://github.com/opencv/opencv/raw/master/data/haarcascades/haarcascade_frontalface_default.xml" &&\
-    mv haarcascade_frontalface_default.xml emotion_ferplus/.
-
-RUN ls -lhR .
+    mv haarcascade_frontalface_default.xml emotion_ferplus/. &&\
+    mv emotion_ferplus models/.
 
 COPY app /app
+
+RUN ls -lhR .
 
 RUN pip3 install onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl &&\
     rm -f onnxruntime-0.4.0-cp35-cp35m-linux_armv7l.whl
