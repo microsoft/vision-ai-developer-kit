@@ -93,7 +93,7 @@
             },
             "env": {
               "RTSP_IP": {
-                "value": "192.168.0.101"
+                "value": "192.168.0.100"
               },
               "RTSP_PORT": {
                 "value": "8900"
@@ -114,10 +114,10 @@
                 "value": "11002"
               },
               "REACT_APP_LOCAL_STORAGE_ACCOUNT_NAME": {
-                "value": "camerataggingstorage"
+                "value": "<local-storage-account-name>"
               },
               "REACT_APP_LOCAL_STORAGE_ACCOUNT_KEY": {
-                "value": "lTkMQ4UZS1cNAuy4P9wthUWxU3+e5OwsMjIp43PbVbNzaHH6I7UVbo+Fx1SuKKeRUf0nvTmh5NqjlS1FyOIt/g=="
+                "value": "<local_storage_key>"
               }
             }
           },
@@ -147,8 +147,8 @@
               "image": "mcr.microsoft.com/azure-blob-storage:latest",
               "createOptions": {
                 "Env":[
-                  "LOCAL_STORAGE_ACCOUNT_NAME=camerataggingstorage",
-                  "LOCAL_STORAGE_ACCOUNT_KEY=lTkMQ4UZS1cNAuy4P9wthUWxU3+e5OwsMjIp43PbVbNzaHH6I7UVbo+Fx1SuKKeRUf0nvTmh5NqjlS1FyOIt/g=="
+                  "LOCAL_STORAGE_ACCOUNT_NAME=<local-storage-account-name>",
+                  "LOCAL_STORAGE_ACCOUNT_KEY=<key>"
                  ],
                  "HostConfig":{
                    "Binds": ["/data/containerdata:/blobroot"],
@@ -176,7 +176,7 @@
     },
     "VisionSampleModule": {
       "properties.desired": {
-        "ModelZipUrl": "https://nandhinistorage.blob.core.windows.net/windowwall/Train.VAIDK.zip",
+        "ModelZipUrl": "",
         "TimeBetweenMessagesInSeconds": 12,
         "ObjectsOfInterest": "[\"ALL\"]",
         "ShowVideoOverlay": true,
@@ -199,10 +199,10 @@
         "deviceToCloudUploadProperties": {
           "uploadOn": true,
           "uploadOrder": "OldestFirst",
-          "cloudStorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=nandhinistorage;AccountKey=jafIBZlc1JE+8LdC/V43UfKsvodIUqYFFCUJHuEK1EpFACB1o9/AS4ym0kjP2QX6x2fEasrBph9UZsbwoHvFew==;EndpointSuffix=core.windows.net",
+          "cloudStorageConnectionString": "<connection-string>",
           "storageContainersForUpload": {
-            "camerataggingstorage": {
-              "target": "cameratagging"
+            "<source-local-storage-account-name>": {
+              "target": "<destination-storage-name>"
             }
           },
           "deleteAfterUpload": true

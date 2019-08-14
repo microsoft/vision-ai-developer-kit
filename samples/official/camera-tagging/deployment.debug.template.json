@@ -11,9 +11,9 @@
             "loggingOptions": "",
             "registryCredentials": {
               "nandhinitestregistry": {
-                "username": "$CONTAINER_REGISTRY_USERNAME_nandhinitestregistry",
-                "password": "$CONTAINER_REGISTRY_PASSWORD_nandhinitestregistry",
-                "address": "nandhinitestregistry.azurecr.io"
+                "username": "$CONTAINER_REGISTRY_USERNAME",
+                "password": "$CONTAINER_REGISTRY_PASSWORD",
+                "address": "$CONTAINER_REGISTRY_NAME"
               }
             }
           }
