@@ -31,9 +31,10 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0.4",
               "createOptions": {
                 "HostConfig": {
+                  "Dns": ["8.8.8.8"],
                   "PortBindings": {
                     "5671/tcp": [
                       {
