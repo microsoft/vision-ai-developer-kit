@@ -1,0 +1,66 @@
+.container {
+    min-height: 96vh;
+    height: 100%;
+    overflow: auto;
+}
+
+.page-container {
+    display: flex;
+    min-height: 96vh;
+    margin: 0px;
+    width: 100%;
+}
+
+.sidebar {
+    width: 15vw;
+    min-width: 200px;
+    background-color: rgb(220,220,220);
+    padding-top: 60px;
+}
+
+.sidebar p {
+    color: black;
+    font-size: 24px;
+    font-weight: 400;
+}
+.sidebar ul li {
+    margin-top: 10px;
+}
+
+.sidebar-list .listItem {
+    display: flex;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.sidebar-list .listItem p {
+    box-sizing: border-box;
+    transition: all 300ms ease-in;
+    margin-left: 20px;
+    font-size: 18px;
+    font-weight: 250;
+    color: lighten(black, 20%);
+    border-bottom: 1px transparent;
+}
+
+.sidebar-list .listItem p:hover {
+    cursor: pointer;
+    border-bottom: 1px solid rgb(37, 64, 105);
+}
+
+.sidebar-list .active {
+    background-color: rgb(37, 64, 105);
+}
+
+.sidebar-list .active p {
+    color: white;
+}
+
+.sidebar-list .active p:hover {
+    cursor: pointer;
+    border-bottom: 1px solid white;
+}
+
+.right-child {
+    width: 80vw;
+}

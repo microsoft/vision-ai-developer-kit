@@ -1,0 +1,14 @@
+.logo-bar {
+    background-color: rgb(37, 64, 105);
+    text-align: left;
+    min-height: 20px;
+    height: 4vh;
+    width: 100%;
+    position: absolute;
+}
+
+.microsoftLogo {
+    height: 2vmin;
+    min-height: 10px;
+    padding: 1vmin;
+}
