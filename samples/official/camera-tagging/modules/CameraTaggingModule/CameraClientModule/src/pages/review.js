@@ -160,6 +160,10 @@ class ReviewPage extends Component {
       });
   }
 
+  /**
+   * Renders the table of the captured images.
+   * Each image is a trigger for a popup that allows image detail to be edited.
+   */
   renderImageTable = () => {
     const { imageToTag, nameToImage, isImageSelected } = this.state;
     var self = this;
@@ -225,6 +229,10 @@ class ReviewPage extends Component {
     return imgs;
   }
 
+  /**
+   * Renders the list of tags within the image detail popup.
+   * Each tag is the trigger for a popup that will allow you to delete the tag.
+   */
   renderTagsTable = (tags, fileName) => {
     var self = this;
     var tagElem = [];
@@ -281,7 +289,6 @@ class ReviewPage extends Component {
 
   onClickImageDelete = (fileName) => {
     const { imageToTag } = this.state;
-    console.log("delete this image: " + fileName);
 
     // Get all of the folders (tags) this file is in
     var folders = imageToTag[fileName];
@@ -292,6 +299,10 @@ class ReviewPage extends Component {
     }
   }
 
+  /**
+   * Deletes the tag for an image by deleting the image
+   * itself from the folder corresponding to the tag.
+   */
   deleteTag = (folderName, fileName) => {
     axios
       .post(path + '/review/delete-image',
@@ -313,7 +324,9 @@ class ReviewPage extends Component {
   }
 
   /**
-   * Add a new tag to an existing image
+   * Add a new tag to an existing image.
+   * This saves the existing image to the folder 
+   * corresponding to the tag name.
    */
   onAddNewTag = (e, fileName) => {
     var { nameToImage, imageToTag } = this.state;
@@ -417,7 +430,9 @@ class ReviewPage extends Component {
     return (
       <AppWithSideBar listElements={this.sidebarOptions} >
         <div className="review-container">
+          {/* Top Filter Bar */}
           <div className="review-filter-container">
+            {/* Select Tag */}
             <form className="review-filter-form">
                 <label key="Select All">
                   {"Select All"}
@@ -430,6 +445,7 @@ class ReviewPage extends Component {
                 </label>
               ))}
             </form>
+            {/* Delete Selected Images */}
             <Popup className="delete-Popup" 
                     contentStyle={deletePopupContentStyle} 
                     trigger={<img className="deleteButton" src={DeleteButton} alt="delete"/>} 
@@ -449,6 +465,7 @@ class ReviewPage extends Component {
             </Popup>
           </div>
 
+          {/* Image Table */}
           <div className="review-image-container">
             {(loaded) && (
               <div className="thumbnail-grid-container">

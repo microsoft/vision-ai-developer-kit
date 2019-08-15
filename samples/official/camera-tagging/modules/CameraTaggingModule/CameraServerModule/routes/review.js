@@ -4,11 +4,15 @@ module.exports = (app) => {
 
     const dataRoot = 'CustomVision/data'
 
-    // Get tags
+    /**
+     * Get all the existing tags (folderNames)
+     */
     app.post('/review/get-tags', async(req, res) => {
         var tags = [];
 
         try {
+            console.log("Retrieve all existing tags...");
+
             // Loop through each folder in the directory
             fs.readdirSync(dataRoot).forEach(folderName => {
                 tags.push(folderName);
@@ -17,7 +21,7 @@ module.exports = (app) => {
         } catch (e) {
             console.log(e);
             return res.status(500).send({
-                error: 'Failed to retrieve tag to image',
+                error: 'Failed to retrieve tags',
                 code: 500,
             });
         }
@@ -32,9 +36,8 @@ module.exports = (app) => {
             fileName
         } = req.body;
 
-        console.log("Delete image " + fileName  + " from folder " + folderName);
-
         try {
+            console.log(`Delete image ${fileName} from folder ${folderName}`);
 
             // Delete the image
             fs.unlinkSync(dataRoot+'/'+folderName+'/'+fileName);
@@ -47,6 +50,7 @@ module.exports = (app) => {
             });
             
             if(numFiles === 0) {
+                console.log(`${folderName} is empty. Deleting folder.`);
                 fs.rmdirSync(dataRoot+'/'+folderName);
             }
 
@@ -159,14 +163,14 @@ module.exports = (app) => {
         }
 
         try {
-            console.log("Saving image");
+            console.log(`Saving image ${imageName} with tag ${tag}`);
             // Create the folder
             fs.mkdir(dataRoot+'/'+tag, { recursive: true }, (err) => {
                 if (err) {
                     console.log(err);
                 }
                 else {
-                    console.log("Directory created successfully");
+                    console.log(`${tag} directory created successfully`);
                 }
             });
 
@@ -178,7 +182,7 @@ module.exports = (app) => {
                     console.log(err);
                 }
                 else {
-                    console.log("File created successfully");
+                    console.log(`${imageName} saved successfully in ${tag}`);
                 }
             });
             return res.status(200).send("Image successfully saved");

@@ -56,10 +56,8 @@ class PushBlobStorePage extends Component {
     ];
 
     componentWillMount () {
-        console.log(local_storage_account_key, " ", local_storage_account_name, " ", local_storage_port, " ", local_storage_module_name);
         // Check if local storage environment variables set
         if(!local_storage_account_key || !local_storage_account_name || !local_storage_port || !local_storage_module_name) {
-            console.log(this.state.hasLocalStorage);
             this.setState({
                 hasLocalStorage: false
             });
@@ -91,7 +89,6 @@ class PushBlobStorePage extends Component {
                 message: '',
                 hasConnectionString: true
             });
-            console.log(response.data);
         })
         .catch(rejected => {
             console.log(rejected);
@@ -130,8 +127,6 @@ class PushBlobStorePage extends Component {
         // Keep the form from switching pages
         e.preventDefault();
 
-        console.log("Push to Blob Store");
-
         // Get the container name
         var containerName = null;
         if(chooseNewContainer) {
@@ -153,7 +148,7 @@ class PushBlobStorePage extends Component {
             });
         })
         .catch(rejected => {
-            console.log(rejected.response); // rejected.response.data.error.body.message
+            console.log(rejected.response);
             this.setState({
                 message: 'Failed to push to blob store.'
             });

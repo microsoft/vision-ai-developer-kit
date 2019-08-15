@@ -15,6 +15,8 @@ module.exports = (app) => {
     } = req.body;
 
     try {
+      console.log(`Obtain container names associated with connection string: ${connectionString}...`);
+      
       const blobService = azure.createBlobService(connectionString);
       var containers = [];
 

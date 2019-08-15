@@ -47,7 +47,7 @@ export const Sidebar = ({ listElements = [] }) => {
 Sidebar.propTypes = SidebarProps;
 
 /**
- * This component is basically a template with the side
+ * This component is a template with the side
  * navigation bar and logo bar already in place.
  * It places the rest of the elements of a page appropriately.
  */

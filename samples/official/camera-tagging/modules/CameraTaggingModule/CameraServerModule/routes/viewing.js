@@ -17,7 +17,7 @@ module.exports = (app) => {
                     console.log(err);
                 }
                 else {
-                    console.log("Directory created successfully");
+                    console.log(`${dataRoot} directory created successfully.`);
                 }
             });
 
@@ -27,7 +27,7 @@ module.exports = (app) => {
                     console.log(err);
                 }
                 else {
-                    console.log("Directory created successfully");
+                    console.log(`${metadataRoot} directory created successfully`);
                 }
             });
 
@@ -35,7 +35,7 @@ module.exports = (app) => {
             console.log(e);
 
             return res.status(500).send({
-                error: 'Failed to capture image',
+                error: 'Failed to create initial directories',
                 code: 500,
             });
         }
@@ -64,13 +64,15 @@ module.exports = (app) => {
         }
 
         try {
+            console.log(`Saving ${imageName} to folder ${tag}.`);
+
             // Create the folder
             fs.mkdirSync(dataRoot+'/'+tag, { recursive: true }, (err) => {
                 if (err) {
                     console.log(err);
                 }
                 else {
-                    console.log("Directory created successfully");
+                    console.log(`${tag} directory created successfully.`);
                 }
             });
 
@@ -82,7 +84,7 @@ module.exports = (app) => {
                     console.log(err);
                 }
                 else {
-                    console.log("File created successfully");
+                    console.log(`${imageName} successfully saved to ${tag}.`);
                 }
             });
 
@@ -103,7 +105,7 @@ module.exports = (app) => {
      */
     app.post('/viewing/filenames/', async(req, res) => {
 
-        console.log("Get all the filenames");
+        console.log("Get all the filenames from every folder...");
 
         var filenames = [];
 
@@ -141,7 +143,7 @@ module.exports = (app) => {
             cameras
         } = req.body;
 
-        console.log("Save camera");
+        console.log("Saving cameras.");
 
         try {
             var jsonCam = JSON.stringify(cameras);
@@ -152,7 +154,7 @@ module.exports = (app) => {
                     console.log(err);
                 }
                 else {
-                    console.log("File created successfully");
+                    console.log("cameras.json file created successfully");
                 }
             });
         } catch (e) {
@@ -171,7 +173,7 @@ module.exports = (app) => {
      */
     app.post('/viewing/get-cameras', async(req, res) => {
 
-        console.log("Get cameras");
+        console.log("Get all camera metadata.");
 
         var cameras;
 

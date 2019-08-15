@@ -101,8 +101,6 @@ class PushCustomVisionPage extends Component {
         // Keep the form from switching pages
         e.preventDefault();
 
-        console.log("Push to Custom Vision");
-
         // Get the project name
         var projectName = null;
         if(chooseNewProject) {
@@ -142,7 +140,7 @@ class PushCustomVisionPage extends Component {
             });
         })
         .catch(rejected => {
-            console.log(rejected.response); // rejected.response.data.error.body.message
+            console.log(rejected.response);
 
             this.setState({
                 message: 'Could not push to Custom Vision.',

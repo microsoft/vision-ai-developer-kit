@@ -12,6 +12,9 @@ const targetExportPlatform = 'VAIDK';
 
 module.exports = (app) => {
 
+    /**
+     * Get all the existing projects associated with the training key.
+     */
     app.post('/push-custom-vision/get-projects/', async(req, res) => {
         const {
             trainingKey,
@@ -34,6 +37,8 @@ module.exports = (app) => {
         }
 
         try {
+            console.log(`Get all existing projects associated with training key: ${trainingKey}...`);
+
             const trainer = new TrainingApiClient.TrainingAPIClient(trainingKey, endpoint);
 
             // Get all projects
@@ -57,6 +62,9 @@ module.exports = (app) => {
         }
     });
 
+    /**
+     * Push all images to the specified Custom Vision Project
+     */
     app.post('/push-custom-vision/push/', async(req, res) => {
         const {
             trainingKey,
@@ -117,11 +125,11 @@ module.exports = (app) => {
 
                 // Else, create a new tag
                 if (!imageTag) {
-                    console.log("Creating tag: "+folder);
+                    console.log(`Creating tag: ${folder}`);
                     imageTag = await trainer.createTag(project.id, folder);
                 }
 
-                console.log("Adding images for tag: " + folder);
+                console.log(`Adding images for tag: ${folder}`);
 
                 // Upload each image in the folder to Custom Vision
                 const taggedImages = fs.readdirSync(dataRoot+'/'+folder);

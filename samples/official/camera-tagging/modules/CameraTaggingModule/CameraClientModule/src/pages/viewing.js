@@ -117,6 +117,10 @@ class ViewingPage extends Component {
     });
   }
 
+  /**
+   * Sets up logic for receiving data through the
+   * web socket for the video stream.
+   */
   onSocketOpen = () => {
     console.log("Socket Open");
 
@@ -313,8 +317,6 @@ class ViewingPage extends Component {
    * Dynamically add tags to the input form
    */
   onClickAddTag = () => {
-    console.log("Adding tag input field.");
-    
     // Create the input element
     var inputElem = document.createElement("input");
     inputElem.setAttribute('type', 'text');
@@ -372,8 +374,6 @@ class ViewingPage extends Component {
    * Send the new rtsp stream to the server
    */
   onSelectCamera = (e) => {
-    console.log("Stream selected: ", e.target.value);
-
     // Change the IP of the live stream on the server side
     this.state.socket.emit('change-camera', e.target.value);
     this.state.socket.disconnect();
