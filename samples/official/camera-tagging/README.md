@@ -4,9 +4,17 @@
 
 This repository contains the modules necessary to allow individuals to capture images from an RTSP stream, tag them, and upload them to train a Custom Vision model or simply to a Blob store.
 
-It reads 9 environment variables from which 3 are used to build the default URI to the RTSP stream (i.e. rtsp://<RTSP_IP>:<RTSP_PORT>/<RTSP_PATH>), and 4 are used to describe the local blob store. These environment variables can be specified in the docker deployment config.
+It reads 9 environment variables from which 3 are used to build the default URI to the RTSP stream (i.e. rtsp://<RTSP_IP>:<RTSP_PORT>/<RTSP_PATH>), and 4 are used to describe the local blob store. These environment variables can be specified in the file deployment.template.json.
 
-## Build and push the Client and Server Container Images
+This module is currently only supports the ARM32 and AMD64 platforms and it does not support the Windows file system.
+
+## Building Container Images
+
+### ARM32
+
+#### Build and push the Client and Server Container Images
+
+Arm32 devices require the base client and server docker images to be built on an arm32 device because certain installation commands are only supported by that platform.
 
 1. Copy over all the folders from **CameraTaggingModule/Arm32Base/** to a folder on an arm32v7 device.
 
@@ -19,7 +27,7 @@ It reads 9 environment variables from which 3 are used to build the default URI 
 
 1. Repeat steps 2 & 3 for TaggingServerDocker.
 
-## Build a Local Container Image
+#### Build a Local Container Image
 
 1. Launch Visual Studio Code, and select **File > Open Folder...** command to open the camera-tagging directory as workspace root.
 
@@ -36,25 +44,7 @@ It reads 9 environment variables from which 3 are used to build the default URI 
 
 1. Open **CameraTaggingModule/module.json** and change the version setting in the tag property to create a new version of the module image.
 
-1. Open deployment.template.json and find **env** under **CameraTaggingModule**.  
-    - You can update the following environment variables here:
-        - RTSP_IP
-        - RTSP_PORT
-        - RTSP_PATH
-        - REACT_APP_LOCAL_STORAGE_MODULE_NAME
-        - REACT_APP_LOCAL_STORAGE_PORT
-        - REACT_APP_LOCAL_STORAGE_ACCOUNT_NAME
-        - REACT_APP_LOCAL_STORAGE_ACCOUNT_KEY
-        - REACT_APP_SERVER_PORT
-        - REACT_APP_WEB_SOCKET_PORT
-    - If you do not wish to set the RTSP environment variables, you can enter them from the web page itself.
-    - If you do not wish to set up the Local Storage environment variables, you will have the option to push images directly to blob storage in the cloud.
-        - Alternatively, you can push to local storage from the *Push to Blob Store* web page by constructing a connection string to your local blob storage and inputting the name of your local storage container under the field *Container Name*.
-        - Local Blob Store Connection String: `DefaultEndpointsProtocol=http;BlobEndpoint=http://<local_storage_module_name>:<local_storage_port>/<local_storage_account_name>;AccountName=<local_storage_account_name>;AccountKey=<local_storage_account_key>`
-    - If you do not wish to set the port environment variables, they will default to the following:
-        - REACT_APP_SERVER_PORT: 3003
-        - REACT_APP_WEB_SOCKET_PORT: 3002
-        > Note: Make sure to appropriately bind the REACT_APP_SERVER_PORT and REACT_APP_WEB_SOCKET_PORT under the **PortBindings** section.
+1. Fill in the environment variables found in deployment.template.json 
 
 1. Right-click on deployment.template.json and select the **Build and Push IoT Edge Solution** command to generate a new deployment.json file in the config folder, build a module image, and push the image to the specified ACR repository.
     > Note: Some red warnings "Unknown host QEMU_IFLA type: ##" and "qemu: Unsupported syscall: ##" displayed during the building process can be ignored.
@@ -62,6 +52,56 @@ It reads 9 environment variables from which 3 are used to build the default URI 
 1. Right-click on config/deployment.json, select **Create Deployment for Single Device**, and choose the targeted IoT Edge device to deploy the container image.
 
 1. You'll find troubleshooting steps at <https://visionaidevkitsupport.azurewebsites.net/>.
+
+### AMD64
+
+1. Launch Visual Studio Code, and select **File > Open Folder...** command to open the camera-tagging directory as workspace root.
+
+1. Update the .env file with the values for your container registry. Refer to [Create a container registry](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
+
+    CONTAINER_REGISTRY_NAME=<YourAcrUri>  
+    CONTAINER_REGISTRY_USERNAME=<YourAcrUserName>  
+    CONTAINER_REGISTRY_PASSWORD=<YourAcrPassword>  
+
+1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
+    - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
+
+1. Open **CameraTaggingModule/module.json** and change the version setting in the tag property to create a new version of the module image.
+
+1. Set the environment variables found in deployment.template.json
+
+1. Right-click on deployment.template.json and select the **Build and Push IoT Edge Solution** command to generate a new deployment.json file in the config folder, build a module image, and push the image to the specified ACR repository.
+    > Note: Some red warnings "Unknown host QEMU_IFLA type: ##" and "qemu: Unsupported syscall: ##" displayed during the building process can be ignored.
+
+1. Right-click on config/deployment.json, select **Create Deployment for Single Device**, and choose the targeted IoT Edge device to deploy the container image.
+
+1. You'll find troubleshooting steps at <https://visionaidevkitsupport.azurewebsites.net/>.
+
+### Setting Environment Variables
+
+Open deployment.template.json and find **env** under **CameraTaggingModule**.
+
+- You can update the following environment variables here:
+    | Variable Name                        | Description                                 | Default Value  |
+    |--------------------------------------|---------------------------------------------|:--------------:|
+    | RTSP_IP                              | IP address for the rtsp stream              | None           |
+    | RTSP_PORT                            | Port for the rtsp stream                    | 554            |
+    | RTSP_PATH                            | Path for the rtsp stream                    | ''             |
+    | REACT_APP_LOCAL_STORAGE_MODULE_NAME  | Module name of local storage                | None           |
+    | REACT_APP_LOCAL_STORAGE_PORT         | Local storage port                          | None           |
+    | REACT_APP_LOCAL_STORAGE_ACCOUNT_NAME | Local storage account name                  | None           |
+    | REACT_APP_LOCAL_STORAGE_ACCOUNT_KEY  | Local storage account key                   | None           |
+    | REACT_APP_SERVER_PORT                | Port by which client and server communicate | 3003           |
+    | REACT_APP_WEB_SOCKET_PORT            | Port by which client receives video stream  | 3002           |
+
+- If you do not wish to set the RTSP environment variables, you can enter them from the web page itself.
+- If you do not wish to set up the Local Storage environment variables, you will have the option to push images directly to blob storage in the cloud.
+  - Alternatively, you can push to local storage from the *Push to Blob Store* web page by constructing a connection string to your local blob storage and inputting the name of your local storage container under the field *Container Name*.
+  - Local Blob Store Connection String: `DefaultEndpointsProtocol=http;BlobEndpoint=http://<local_storage_module_name>:<local_storage_port>/<local_storage_account_name>;AccountName=<local_storage_account_name>;AccountKey=<local_storage_account_key>`
+- If you do not wish to set the port environment variables, they will default to the following:
+  - REACT_APP_SERVER_PORT: 3003
+  - REACT_APP_WEB_SOCKET_PORT: 3002
+  > Note: Make sure to appropriately bind the REACT_APP_SERVER_PORT and REACT_APP_WEB_SOCKET_PORT under the **PortBindings** section.
 
 ## Access the Webpage
 
@@ -80,20 +120,36 @@ Open a browser to http://DEVICE_IP:3000 where DEVICE_IP is the IP address you fo
 
 - Method Name: capture
 - Payload:
-    - RTSP_IP: Required
-    - RTSP_PORT
-    - RTSP_PATH
-    - TAGS: An array of tags [] - Required
+    {
+        "RTSP_IP":"<rtsp-ip>",
+        "RTSP_PORT":"<rtsp-port>",
+        "RTSP_PATH":"<rtsp-path>",
+        "TAGS":"[<tags>]"
+    }
+    | Variable Name  | Required  | Default Value  |
+    |----------------|:---------:|:--------------:|
+    | RTSP_IP        | True      | None           |
+    | RTSP_PORT      | False     | 554            |
+    | RTSP_PATH      | False     | ''             |
+    | TAGS           | True      | None           |
 
 ### Push to Local Blob Storage
 
 - Method Name: push
 - Payload:
-    - MODULE_NAME: Required
-    - STORAGE_PORT: Required
-    - ACCOUNT_NAME: Required
-    - ACCOUNT_KEY: Required
-    - DELETE: Optional Flag - Include "DELETE":"true" to delete all images. Not including the DELETE flag will retain images.
+    {
+        "MODULE_NAME":"<module-name>",
+        "STORAGE_PORT":"<storage-port>",
+        "ACCOUNT_NAME":"<account-name>",
+        "DELETE":"true"
+    }
+    | Variable Name  | Required  | Description                                           |
+    |----------------|:---------:|-------------------------------------------------------|
+    | MODULE_NAME    | True      | Azure IoT Local Storage Module name                   |
+    | STORAGE_PORT   | True      | Port the local storage module operates through        |
+    | ACCOUNT_NAME   | True      | Name of the local storage account                     |
+    | ACCOUNT_KEY    | True      | Local storage account key                             |
+    | DELETE         | False     | Optional flag that will delete all images once pushed |
 
 ### Delete All Images
 
