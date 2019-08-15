@@ -30,7 +30,8 @@ class ViewingPage extends Component {
       filenames: [],
       socket: openSocket(`http://${document.location.hostname}:${wsPort}`), // Socket for ffmpeg data
       cameras: [],
-      currentCamIp: 'Select Camera'
+      currentCamIp: 'Select Camera',
+      selectedCamIp: ''
     }
   }
 
@@ -374,6 +375,10 @@ class ViewingPage extends Component {
    * Send the new rtsp stream to the server
    */
   onSelectCamera = (e) => {
+    this.setState({
+      selectedCamIp: e.target.value
+    });
+
     // Change the IP of the live stream on the server side
     this.state.socket.emit('change-camera', e.target.value);
     this.state.socket.disconnect();
@@ -422,7 +427,7 @@ class ViewingPage extends Component {
   }
 
   render() {
-    const {message, mediaSource, isVideoStreaming, saveMessage, currentCamIp} = this.state;
+    const {message, mediaSource, isVideoStreaming, saveMessage, currentCamIp, selectedCamIp} = this.state;
 
     return (
       <AppWithSideBar listElements={this.sidebarOptions} >
@@ -445,6 +450,7 @@ class ViewingPage extends Component {
               handleAddCam={this.onAddCamera}
               handleSave={this.onStartCamera}
               currentCamIp={currentCamIp}
+              selectedCamIp={selectedCamIp}
             /><br/>
 
             <button className="capture-button" onClick={this.onClickCapture}>Capture</button>

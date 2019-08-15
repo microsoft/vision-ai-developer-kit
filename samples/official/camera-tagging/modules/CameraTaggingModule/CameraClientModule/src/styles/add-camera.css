@@ -1,5 +1,7 @@
-.add-camera {
-    padding-bottom: 15px;
+.add-cam-popup {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .change-cam-btn {
@@ -38,9 +40,35 @@
     padding: 10px 5px;
 }
 
+.select-camera-label {
+    font-weight: 400;
+    margin: 0px;
+    color: #282c34;
+}
+
+.camera-list {
+    width: 25vmin;
+    height: 2vmin;
+    min-width: 100px;
+    min-height: 32px;
+    max-width: 300px;
+    max-height: 50px;
+    text-overflow: ellipsis;
+	color: #444;
+	padding: .6em 1.4em .5em .8em;
+	border: 1px solid #aaa;
+	box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+    margin-top: 20px;
+    overflow-y: scroll;
+}
+
 .add-cam-input {
     width: 25vmin;
     height: 5vmin;
+    min-width: 100px;
+    min-height: 32px;
+    max-width: 300px;
+    max-height: 50px;
     padding: 12px 20px;
     margin-bottom: 5px;
     margin-top: 5px;
@@ -53,11 +81,14 @@
     color: black;
     width: 25vmin;
     height: 5vmin;
+    min-width: 100px;
+    min-height: 32px;
+    max-width: 300px;
+    max-height: 50px;
     margin-bottom: 5px;
     margin-top: 5px;
     box-sizing: border-box;
     border-radius: 15px 15px 15px 15px;
-    padding: 0px 30px;
     letter-spacing: 1.5px;
     font-size: 1em;
     border: 3px solid #cfcece;
@@ -70,18 +101,6 @@
 .add-cam-button:hover {
     color: white;
     cursor: pointer;
-    width: 25vmin;
-    height: 5vmin;
-    margin-bottom: 5px;
-    margin-top: 5px;
-    box-sizing: border-box;
-    border-radius: 15px 15px 15px 15px;
-    padding: 0px 30px;
-    letter-spacing: 1.5px;
-    font-size: 1em;
     border: 3px solid #cfcece;
     background-color: rgb(37, 64, 105);
-    border-radius: 15px 15px 15px 15px;
-    -webkit-transition: all 0.3s;
-    transition: all 0.3s;
 }

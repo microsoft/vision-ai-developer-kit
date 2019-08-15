@@ -9,8 +9,8 @@
   width: 110vmin;
   height: 75vmin;
   margin-left: 2%;
-  margin-top: 30px;
-  float:left;
+  margin-top: 5vh;
+  float: left;
 }
 
 .video-container video {

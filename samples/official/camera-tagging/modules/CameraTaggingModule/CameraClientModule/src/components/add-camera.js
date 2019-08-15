@@ -22,7 +22,8 @@ const AddCameraProps = {
   handleSelect: PropTypes.func.isRequired,
   handleAddCam: PropTypes.func.isRequired,
   handleSave: PropTypes.func.isRequired,
-  currentCamIp: PropTypes.string.isRequired
+  currentCamIp: PropTypes.string.isRequired,
+  selectedCamIp: PropTypes.string.isRequired
 };
 
 /**
@@ -31,7 +32,7 @@ const AddCameraProps = {
  * streams already saved, or enter a new camera name
  * and associated rtsp stream.
  */
-export const AddCamera = ({ listElements = [], handleSelect, handleAddCam, handleSave, currentCamIp }) => {
+export const AddCamera = ({ listElements = [], handleSelect, handleAddCam, handleSave, currentCamIp, selectedCamIp }) => {
   return (
     <Popup className="add-cam-popup" 
             contentStyle={popupContentStyle} 
@@ -49,10 +50,11 @@ export const AddCamera = ({ listElements = [], handleSelect, handleAddCam, handl
               <option value="Select Camera" hidden disabled >Select Camera</option>
               {listElements.map(
                 ({ name, rtspAddress }, index) => (
-                  <option key={index} value={rtspAddress}>{name}</option>
+                  <option title={rtspAddress} key={index} value={rtspAddress}>{name}</option>
                 )
               )}
-            </select>
+            </select><br/>
+            <h4 className="select-camera-label">Selected: {selectedCamIp}</h4>
           </div>
 
           {/* Section to add a new camera name and associated rtsp stream */}
