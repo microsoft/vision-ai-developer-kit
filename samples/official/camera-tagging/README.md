@@ -33,9 +33,9 @@ Arm32 devices require the base client and server docker images to be built on an
 
 1. Update the .env file with the values for your container registry. Refer to [Create a container registry](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
 
-    CONTAINER_REGISTRY_NAME=<YourAcrUri>  
-    CONTAINER_REGISTRY_USERNAME=<YourAcrUserName>  
-    CONTAINER_REGISTRY_PASSWORD=<YourAcrPassword>  
+    CONTAINER_REGISTRY_NAME=<Your_Acr_Uri>  
+    CONTAINER_REGISTRY_USERNAME=<Your_Acr_UserName>  
+    CONTAINER_REGISTRY_PASSWORD=<Your_Acr_Password>  
 
 1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
     - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
@@ -59,9 +59,9 @@ Arm32 devices require the base client and server docker images to be built on an
 
 1. Update the .env file with the values for your container registry. Refer to [Create a container registry](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
 
-    CONTAINER_REGISTRY_NAME=<YourAcrUri>  
-    CONTAINER_REGISTRY_USERNAME=<YourAcrUserName>  
-    CONTAINER_REGISTRY_PASSWORD=<YourAcrPassword>  
+    CONTAINER_REGISTRY_NAME=<Your_Acr_Uri>  
+    CONTAINER_REGISTRY_USERNAME=<Your_Acr_UserName>  
+    CONTAINER_REGISTRY_PASSWORD=<Your_Acr_Password>    
 
 1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
     - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
@@ -82,17 +82,18 @@ Arm32 devices require the base client and server docker images to be built on an
 Open deployment.template.json and find **env** under **CameraTaggingModule**.
 
 - You can update the following environment variables here:
-    | Variable Name                        | Description                                 | Default Value  |
-    |--------------------------------------|---------------------------------------------|:--------------:|
-    | RTSP_IP                              | IP address for the rtsp stream              | None           |
-    | RTSP_PORT                            | Port for the rtsp stream                    | 554            |
-    | RTSP_PATH                            | Path for the rtsp stream                    | ''             |
-    | REACT_APP_LOCAL_STORAGE_MODULE_NAME  | Module name of local storage                | None           |
-    | REACT_APP_LOCAL_STORAGE_PORT         | Local storage port                          | None           |
-    | REACT_APP_LOCAL_STORAGE_ACCOUNT_NAME | Local storage account name                  | None           |
-    | REACT_APP_LOCAL_STORAGE_ACCOUNT_KEY  | Local storage account key                   | None           |
-    | REACT_APP_SERVER_PORT                | Port by which client and server communicate | 3003           |
-    | REACT_APP_WEB_SOCKET_PORT            | Port by which client receives video stream  | 3002           |
+
+    | Variable Name                        | Description                                 | Default Value  |  
+    | ------------------------------------ | ------------------------------------------- | :------------: |  
+    | RTSP_IP                              | IP address for the rtsp stream              | None           |  
+    | RTSP_PORT                            | Port for the rtsp stream                    | 554            |  
+    | RTSP_PATH                            | Path for the rtsp stream                    | ''             |  
+    | REACT_APP_LOCAL_STORAGE_MODULE_NAME  | Module name of local storage                | None           |  
+    | REACT_APP_LOCAL_STORAGE_PORT         | Local storage port                          | None           |  
+    | REACT_APP_LOCAL_STORAGE_ACCOUNT_NAME | Local storage account name                  | None           |  
+    | REACT_APP_LOCAL_STORAGE_ACCOUNT_KEY  | Local storage account key                   | None           |  
+    | REACT_APP_SERVER_PORT                | Port by which client and server communicate | 3003           |  
+    | REACT_APP_WEB_SOCKET_PORT            | Port by which client receives video stream  | 3002           |  
 
 - If you do not wish to set the RTSP environment variables, you can enter them from the web page itself.
 - If you do not wish to set up the Local Storage environment variables, you will have the option to push images directly to blob storage in the cloud.
@@ -120,12 +121,13 @@ Open a browser to http://DEVICE_IP:3000 where DEVICE_IP is the IP address you fo
 
 - Method Name: capture
 - Payload:
-    {
-        "RTSP_IP":"<rtsp-ip>",
-        "RTSP_PORT":"<rtsp-port>",
-        "RTSP_PATH":"<rtsp-path>",
-        "TAGS":"[<tags>]"
-    }
+    {  
+        "RTSP_IP":"<rtsp_ip>",  
+        "RTSP_PORT":"<rtsp_port>",  
+        "RTSP_PATH":"<rtsp_path>",  
+        "TAGS":"[<tags>]"  
+    }  
+    
     | Variable Name  | Required  | Default Value  |
     |----------------|:---------:|:--------------:|
     | RTSP_IP        | True      | None           |
@@ -137,12 +139,13 @@ Open a browser to http://DEVICE_IP:3000 where DEVICE_IP is the IP address you fo
 
 - Method Name: push
 - Payload:
-    {
-        "MODULE_NAME":"<module-name>",
-        "STORAGE_PORT":"<storage-port>",
-        "ACCOUNT_NAME":"<account-name>",
-        "DELETE":"true"
-    }
+    {  
+        "MODULE_NAME":"<module_name>",  
+        "STORAGE_PORT":"<storage_port>",  
+        "ACCOUNT_NAME":"<account_name>",  
+        "DELETE":"true"  
+    }  
+    
     | Variable Name  | Required  | Description                                           |
     |----------------|:---------:|-------------------------------------------------------|
     | MODULE_NAME    | True      | Azure IoT Local Storage Module name                   |
