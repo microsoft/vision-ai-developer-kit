@@ -1,0 +1,213 @@
+{
+  "$schema-template": "1.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "containerRegistry": {
+                "username": "$CONTAINER_REGISTRY_USERNAME",
+                "password": "$CONTAINER_REGISTRY_PASSWORD",
+                "address": "$CONTAINER_REGISTRY_NAME"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "CameraTaggingModule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.CameraTaggingModule}",
+              "createOptions": {
+                "ExposedPorts": {
+                  "3000/tcp": {},
+                  "3002/tcp": {},
+                  "3003/tcp": {}
+                },
+                "HostConfig": {
+                  "PortBindings": {
+                    "3000/tcp": [
+                      {
+                        "HostPort": "3000"
+                      }
+                    ],
+                    "3002/tcp": [
+                      {
+                        "HostPort": "3002"
+                      }
+                    ],
+                    "3003/tcp": [
+                      {
+                        "HostPort": "3003"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "RTSP_IP": {
+                "value": "192.168.0.100"
+              },
+              "RTSP_PORT": {
+                "value": "8900"
+              },
+              "RTSP_PATH": {
+                "value": "live"
+              },
+              "REACT_APP_SERVER_PORT": {
+                "value": "3003"
+              },
+              "REACT_APP_WEB_SOCKET_PORT": {
+                "value": "3002"
+              },
+              "REACT_APP_LOCAL_STORAGE_MODULE_NAME": {
+                "value": "azureblobstorageoniotedge"
+              },
+              "REACT_APP_LOCAL_STORAGE_PORT": {
+                "value": "11002"
+              },
+              "REACT_APP_LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "<local-storage-account-name>"
+              },
+              "REACT_APP_LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "<local_storage_key>"
+              }
+            }
+          },
+          "VisionSampleModule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.VisionSampleModule}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/data/misc/camera:/app/vam_model_folder",
+                    "/run/systemd:/run/systemd"
+                  ]
+                }
+              }
+            }
+          },
+          "azureblobstorageoniotedge": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azure-blob-storage:latest",
+              "createOptions": {
+                "Env":[
+                  "LOCAL_STORAGE_ACCOUNT_NAME=<local-storage-account-name>",
+                  "LOCAL_STORAGE_ACCOUNT_KEY=<key>"
+                 ],
+                 "HostConfig":{
+                   "Binds": ["/data/containerdata:/blobroot"],
+                   "PortBindings":{
+                     "11002/tcp": [{"HostPort":"11002"}]
+                   }
+                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "VisionSampleModuleToIoTHub": "FROM /messages/modules/VisionSampleModule/outputs/* INTO $upstream",
+          "azureblobstorageoniotedgeToIoTHub": "FROM /messages/modules/azureblobstorageoniotedge/outputs/* INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    },
+    "VisionSampleModule": {
+      "properties.desired": {
+        "ModelZipUrl": "",
+        "TimeBetweenMessagesInSeconds": 12,
+        "ObjectsOfInterest": "[\"ALL\"]",
+        "ShowVideoOverlay": true,
+        "Bitrate": "1.5Mbps",
+        "Resolution": "1080P",
+        "VideoOverlayConfig": "inference",
+        "FrameRate": 30,
+        "HdmiDisplayActive": true,
+        "VideoAnalyticsEnabled": true,
+        "ShowVideoPreview": true,
+        "Codec": "AVC/H.264"
+      }
+    },
+    "azureblobstorageoniotedge":{
+      "properties.desired": {
+        "deviceAutoDeleteProperties": {
+          "deleteOn": false,
+          "retainWhileUploading": true
+        },
+        "deviceToCloudUploadProperties": {
+          "uploadOn": true,
+          "uploadOrder": "OldestFirst",
+          "cloudStorageConnectionString": "<connection-string>",
+          "storageContainersForUpload": {
+            "<source-local-storage-account-name>": {
+              "target": "<destination-storage-name>"
+            }
+          },
+          "deleteAfterUpload": true
+        }
+      }
+    }
+  }
+}

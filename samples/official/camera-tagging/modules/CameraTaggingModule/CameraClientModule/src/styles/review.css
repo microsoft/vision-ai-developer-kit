@@ -1,0 +1,215 @@
+.review-container {
+    text-align: center;
+    margin-top: 30px;
+}
+.thumbnail-grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    padding: 10px;
+}
+
+.thumbnails {
+    padding: 20px;
+    font-size: 30px;
+    text-align: center;
+}
+
+.thumbImage {
+    min-width: 256px;
+    width: 40vh;
+    min-height: 192px;
+    height: 28vh;
+    padding: 2px;
+}
+
+.thumbImage:hover {
+    cursor: pointer;
+}
+
+.thumbImage-selected {
+    min-width: 256px;
+    width: 40vh;
+    min-height: 192px;
+    height: 28vh;
+    padding: 2px;
+    border: 5px solid rgb(0, 120, 215);
+}
+
+.close {
+    cursor: pointer;
+    position: absolute;
+    display: block;
+    padding: 2px 5px;
+    line-height: 20px;
+    right: -10px;
+    top: -10px;
+    font-size: 24px;
+    background: rgb(220,220,220);
+    border-radius: 18px;
+    border: 1px solid #cfcece;
+}
+
+.close:hover {
+    background: white;
+}
+
+.review-popup-header {
+    border-bottom: 1px solid gray;
+    font-size: 18px;
+    text-align: center;
+    padding: 10px;
+}
+
+.review-popup-main {
+    height: 100%;
+}
+
+.review-popup-image-container {
+    text-align: center;
+    width: 75%;
+    float: left;
+    border-right: solid;
+}
+
+.review-popup-image {
+    display: block;
+    min-width: 256px;
+    width: 90%;
+    min-height: 192px;
+    height: auto;
+    padding-right: 2vh;
+    padding-top: 10px;
+    margin: auto;
+}
+
+.review-popup-tags-container {
+    width: 25%;
+    padding-left: 75%;
+}
+
+.review-popup-new-tag {
+    max-width: 90%;
+    width: 25vmin;
+    max-height: 40px;
+    height: 5vmin;
+    padding-left: 5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border: 1px solid #cfcece;
+    border-radius: 15px 15px 15px 15px;
+}
+
+.review-popup-tags-label {
+    font-size: large;
+    display: block;
+    text-align: start;
+}
+
+.deleteButton {
+    width: 35px;
+    height: 35px;
+    border: none;
+    background: none;
+}
+
+.deleteButton:hover {
+    cursor: pointer;
+    background: none;
+    border-radius: 50%;
+    border: 1px solid rgb(37, 64, 105);
+}
+
+.thumbnails h4 {
+    margin: 0px;
+    font-size: 30px;
+    font-weight: 100;
+}
+
+.delete-Popup {
+    max-width: 500px;
+    width: 30%;
+    height: auto;
+    border-radius: 30px;
+    border-color: rgb(37, 64, 105);
+    border-width: 3px;
+}
+
+.popUpButton {
+    position: absolute;
+    color: #000000;
+    cursor: pointer;
+    padding: 0px 30px;
+    display: inline-block;
+    margin: 10px 15px;
+    text-transform: uppercase;
+    line-height: 2em;
+    letter-spacing: 1.5px;
+    font-size: 1em;
+    outline: none;
+    position: relative;
+    font-size: 14px;
+    border: 3px solid #cfcece;
+    background-color: #ffffff;
+    border-radius: 15px 15px 15px 15px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+.popUpButton:hover {
+    color: white;
+    cursor: pointer;
+    background-color: rgb(37, 64, 105);
+}
+
+.tag-block {
+    position: relative;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+    border-radius: 30px 30px 30px 30px;
+    color: black;
+    background-color: #e5e5e5;
+}
+
+.delete-tag-button {
+    display: inline-block;
+    height: 30px;
+    margin-left: 10px;
+    color: black;
+    font-size: 14px;
+    vertical-align: top;
+    background: transparent;
+    border: hidden;
+    cursor: pointer;
+}
+
+.tag-title {
+    display: inline-block;
+    height: 30px;
+    max-width: 118px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: bottom;
+    font-family: "Segoe UI","Helvetica Neue","Arial","sans-serif";
+    font-size: 18px;
+}
+
+.review-filter-container {
+    display: inline-flex;
+    text-align: center;
+    border: 1px solid black;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 20px;
+    padding: 10px;
+    overflow: auto;
+}
+
+.review-filter-checkbox {
+    margin-right: 20px;
+}

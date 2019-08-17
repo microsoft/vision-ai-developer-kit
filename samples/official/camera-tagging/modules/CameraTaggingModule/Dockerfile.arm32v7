@@ -1,0 +1,20 @@
+# Copy all files from the client into the client container
+FROM nandhinitestregistry.azurecr.io/taggingclient:v0.0.7 as client
+COPY /CameraClientModule/. .
+
+# The base container is the server container
+FROM nandhinitestregistry.azurecr.io/taggingserver:v0.0.6
+
+# Copy all files from the server into the server container
+WORKDIR /app/server
+COPY /CameraServerModule/. /app/server/.
+
+# Copy the image from the client here
+COPY --from=client . /app/client/.
+
+# Copy the package.json to run the client and server together
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+
+CMD ["npm", "start"]

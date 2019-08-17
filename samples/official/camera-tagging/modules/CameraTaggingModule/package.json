@@ -1,0 +1,16 @@
+{
+  "name": "Camera-Tagging",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "client": "cd client && npm start",
+    "server": "cd server && npm start",
+    "start": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "keywords": [],
+  "author": "Nandhini Namasivayam",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "3.5.1"
+  }
+}
