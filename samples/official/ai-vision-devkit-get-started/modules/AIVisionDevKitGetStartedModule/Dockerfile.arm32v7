@@ -40,9 +40,7 @@ RUN apt-get update && \
 RUN pip install --upgrade setuptools 
 
 COPY requirements.txt ./
-COPY iotccsdk-0.1.0+dev.tar.gz ./
 RUN pip install -r requirements.txt
-RUN pip install iotccsdk-0.1.0+dev.tar.gz
 
 COPY . .
 
