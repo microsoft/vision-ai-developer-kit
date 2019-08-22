@@ -4,7 +4,7 @@ This solution is used to build and deploy a new AIVisionDevKitGetStartedModule d
 
 ## Setup Build Environment
 
-1. Refer to the "Setup Visual Studio Code Development Environment" section in [VisionSample README.md](../../VisionSample/README.md) to setup a build environment.
+1. Refer to the "Setup Visual Studio Code Development Environment" section in [VisionSample README.md](../../research/VisionSample/README.md) to setup a build environment.
 
 1. Install [Docker Community Edition (CE)](https://docs.docker.com/install/#supported-platforms). Don't sign in to Docker Desktop after Docker CE is installed.
 
