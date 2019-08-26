@@ -1,0 +1,33 @@
+FROM node:8-alpine
+
+# To build the client
+WORKDIR /app
+
+COPY /CameraClientModule/package*.json /app/client/
+COPY /CameraClientModule/yarn.lock /app/client/
+
+WORKDIR /app/client
+RUN yarn install
+
+# To build the server
+WORKDIR /app
+
+COPY package*.json /app/server/
+
+WORKDIR /app/server
+RUN npm install -q \
+    && npm prune --production
+
+# copy all the files from client and server to the right folder
+WORKDIR /app
+
+COPY /CameraClientModule/. /app/client/.
+COPY /CameraServerModule/. /app/server/.
+
+# Copy the package.json to run the client and server together
+COPY package*.json ./
+RUN npm install
+
+EXPOSE 3000 3002 3003
+
+CMD ["npm", "start"]

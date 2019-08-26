@@ -1,0 +1,82 @@
+.blob-store-container {
+    text-align: center;
+}
+
+.blob-buttons-container {
+    margin-top: 15%;
+}
+
+.blob-form-container {
+    width: 50%;
+    padding-left: 25%;
+    padding-right: 25%;
+    padding-top: 10%;
+}
+
+.blob-form-label {
+    font-size: 32px;
+}
+
+.blob-form-text {
+    width: 70vmin;
+    height: 5vmin;
+    font-size: 20px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    outline: none;
+}
+
+.blob-form-text:focus {
+    background-color: rgb(220,220,220);
+}
+
+.blob-form-button {
+    width: 70vmin;
+    margin-top: 20px;
+    font-size: 32px;
+    font-weight: 500;
+    color: white;
+    background-color: rgb(37, 64, 105);
+    border: 1px solid black;
+    height: 8vmin;
+    width: 45vmin;
+    margin-bottom: 10px;
+}
+
+.blob-form-button:hover {
+    background-color: rgb(0, 120, 215);
+    cursor: pointer;
+}
+
+.blob-form-select {
+    width: 70vmin;
+    text-overflow: ellipsis;
+	font-size: 16px;
+	font-weight: 600;
+	color: #444;
+	padding: .6em 1.4em .5em .8em;
+	border: 1px solid #aaa;
+	box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+    margin-top: 20px;
+    overflow-y: scroll;
+}
+
+.blob-form-select:hover {
+    cursor: pointer;
+}
+
+.blob-form-new-container-button {
+    float: start;
+    background: transparent;
+    border: none;
+    border-bottom: solid;
+    color: blue;
+    margin-bottom: 20px;
+}
+
+.blob-form-new-container-button:hover {
+    cursor: pointer;
+}

@@ -1,0 +1,202 @@
+/* @import 'colors';
+
+.push-container {
+    text-align: center;
+}
+
+.form-container {
+
+    width: 50%;
+    padding-left: 25%;
+    padding-right: 25%;
+    padding-top: 10%;
+
+    input[type=text] {
+        width: 70vmin;
+        height: 5vmin;
+        font-size: 20px;
+        padding: 12px 20px;
+        margin-bottom: 40px;
+        margin-top: 10px;
+        box-sizing: border-box;
+        border: 1px solid #555;
+        outline: none;
+    }
+
+    input[type=text]:focus {
+        background-color: $light-grey;
+    }
+
+    label {
+        font-size: 32px;
+    }
+
+    input[type=submit] {
+        width: 70vmin;
+        font-size: 32px;
+        font-weight: 500;
+        color: white;
+        background-color: $dark-blue;
+        border: 1px solid black;
+        height: 8vmin;
+        margin-bottom: 10px;
+    }
+
+    input[type=submit]:hover {
+        background-color: $blue;
+        cursor: pointer;
+    }
+
+    button {
+        width: 70vmin;
+        font-size: 32px;
+        font-weight: 500;
+        color: white;
+        background-color: $blue;
+        border: 1px solid black;
+        height: 8vmin;
+        margin-bottom: 10px;
+    }
+
+    button:hover {
+        background-color: $dark-blue;
+        cursor: pointer;
+    }
+}
+
+.push-training {
+    font-size: 30px;
+  }
+  
+  .push-training:after {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    animation: ellipsis steps(4,end) 1.5s infinite;
+    content: "\2026"; /* ascii code for the ellipsis character */
+    /* width: 0px;
+  }
+  
+  @keyframes ellipsis {
+    to {
+      width: 1em;    
+    }
+  }
+ */
+
+ .push-container {
+    text-align: center;
+}
+
+.form-container {
+
+    width: 50%;
+    padding-left: 25%;
+    padding-right: 25%;
+    padding-top: 10%;
+
+}
+
+.form-container input[type=text] {
+    width: 70vmin;
+    height: 5vmin;
+    font-size: 20px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    border: 1px solid #555;
+    outline: none;
+}
+
+.form-container input[type=text]:focus {
+    background-color: rgb(220,220,220);
+}
+
+.form-container label {
+    font-size: 32px;
+}
+
+.form-container input[type=submit] {
+    width: 70vmin;
+    margin-top: 20px;
+    font-size: 32px;
+    font-weight: 500;
+    color: white;
+    background-color: rgb(37, 64, 105);
+    border: 1px solid black;
+    height: 8vmin;
+    width: 45vmin;
+    margin-bottom: 10px;
+}
+
+.form-container input[type=submit]:hover {
+    background-color: rgb(0, 120, 215);
+    cursor: pointer;
+}
+
+.push-form-button {
+    width: 70vmin;
+    font-size: 32px;
+    font-weight: 500;
+    color: white;
+    background-color: rgb(37, 64, 105);
+    border: 1px solid black;
+    height: 8vmin;
+    width: 45vmin;
+    margin-bottom: 10px;
+}
+
+.push-form-button:hover {
+    background-color: rgb(0, 120, 215);
+    cursor: pointer;
+}
+
+.push-form-select {
+    width: 70vmin;
+    text-overflow: ellipsis;
+	font-size: 16px;
+	font-weight: 600;
+	color: #444;
+	padding: .6em 1.4em .5em .8em;
+	border: 1px solid #aaa;
+	box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+    margin-top: 20px;
+    overflow-y: scroll;
+}
+
+.push-form-select:hover {
+    cursor: pointer;
+}
+
+.push-form-new-project-button {
+    float: start;
+    background: transparent;
+    border: none;
+    border-bottom: solid;
+    color: blue;
+    margin-bottom: 20px;
+}
+
+.push-form-new-project-button:hover {
+    cursor: pointer;
+}
+
+.push-training {
+    font-size: 30px;
+}
+  
+.push-training:after {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    animation: ellipsis steps(4,end) 1.5s infinite;
+    content: "\2026"; /* ascii code for the ellipsis character */
+    width: 0px;
+}
+  
+@keyframes ellipsis {
+    to {
+        width: 1em;
+    }    
+}
