@@ -23,7 +23,7 @@ More details about quickstart setup instructions are located [here](https://docs
 From the Notebook VM launch the Jupyter web interface as descriped in step #3 above. Click New -> Terminal on the upper right corner of the web interface. You will get a new browser tab with the bash prompt. 
 You can use regular `git clone --recursive https://github.com/microsoft/vision-ai-developer-kit` command line commands to clone this repository into a desired folder.
 
-**Impoartant** update jupyter in the Notebook VM: _(this is a temporary step)_
+**Important** update _jupyter_ in the Notebook VM: _(this is a temporary step)_
 
 `pip install –upgrade notebook`
 
