@@ -150,7 +150,7 @@
         "Resolution": "1080P",
         "VideoOverlayConfig": "inference",
         "FrameRate": 30,
-        "HdmiDisplayActive": true,
+        "HdmiDisplayActive": false,
         "VideoAnalyticsEnabled": true,
         "ShowVideoPreview": true,
         "Codec": "AVC/H.264"

@@ -61,7 +61,7 @@ class CameraProperties:
         self.resolution = "1080P"
         self.video_rtsp_url = ""
         self.__analytics_state = SETTING_ON
-        self.__display_out = 1
+        self.__display_out = 0
         self.__overlay_state = SETTING_ON
         self.__preview_state = SETTING_ON
         self.__supported_bitrates = ""
