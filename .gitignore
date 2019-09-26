@@ -343,3 +343,4 @@ camera-sdk/iotccsdk.egg-info/*
 camera-sdk/dist/*
 camera-sdk/build/*
 
+samples/official/ai-vision-devkit-get-started/.env
