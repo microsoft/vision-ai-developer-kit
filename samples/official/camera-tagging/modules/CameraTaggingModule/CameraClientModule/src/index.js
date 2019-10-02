@@ -11,12 +11,10 @@ require('dotenv').config();
 
 const routing = (
     <Router>
-        <div>
-            <Route exact path="/" component={ViewingPage} />
-            <Route path="/review" component={ReviewPage} />
-            <Route path="/push-custom-vision" component={PushCustomVisionPage} />
-            <Route path="/push-blob-store" component={PushBlobStorePage} />
-        </div>
+        <Route exact path="/" component={ViewingPage} />
+        <Route path="/review" component={ReviewPage} />
+        <Route path="/push-custom-vision" component={PushCustomVisionPage} />
+        <Route path="/push-blob-store" component={PushBlobStorePage} />
     </Router>
 );
 

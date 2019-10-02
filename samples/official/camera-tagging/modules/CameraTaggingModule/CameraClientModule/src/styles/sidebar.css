@@ -7,6 +7,7 @@
 .page-container {
     display: flex;
     min-height: 96vh;
+    height :100%;
     margin: 0px;
     width: 100%;
 }
