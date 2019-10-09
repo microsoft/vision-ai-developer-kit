@@ -31,6 +31,8 @@ module.exports = (app) => {
                 }
             });
 
+            return res.status(201).send('directories created');
+
         } catch (e) {
             console.log(e);
 
@@ -106,10 +108,15 @@ module.exports = (app) => {
     app.post('/viewing/filenames/', async(req, res) => {
 
         console.log("Get all the filenames from every folder...");
-
         var filenames = [];
 
         try {
+
+            if (!fs.existsSync(metadataRoot+'/'+'cameras.json'))
+            {
+                return res.status(204).send(null);
+            }
+
             // Loop through each folder in the directory
             fs.readdirSync(dataRoot).forEach(folderName => {
 
@@ -127,7 +134,6 @@ module.exports = (app) => {
 
         } catch (e) {
             console.log(e);
-
             return res.status(500).send({
                 error: 'Failed to return filenames',
                 code: 500,
@@ -174,19 +180,21 @@ module.exports = (app) => {
     app.post('/viewing/get-cameras', async(req, res) => {
 
         console.log("Get all camera metadata.");
-
         var cameras;
 
         try {
             // Get cameras from JSON file
+            if (!fs.existsSync(metadataRoot+'/'+'cameras.json'))
+            {
+                return res.status(204).send(null);
+            }
+
             var cameras = fs.readFileSync(metadataRoot+'/'+'cameras.json', 'utf8');
             camerasObj = JSON.parse(cameras);
-
             return res.status(200).send(camerasObj);
 
         } catch (e) {
-            console.log(e);
-            
+            console.log(e);           
             return res.status(500).send({
                 error: 'Failed to get camera data',
                 code: 500

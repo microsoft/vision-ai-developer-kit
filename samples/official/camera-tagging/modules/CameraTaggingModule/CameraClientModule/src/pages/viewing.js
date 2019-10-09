@@ -10,6 +10,7 @@ const server_port = (process.env.REACT_APP_SERVER_PORT) ? process.env.REACT_APP_
 const wsPort = (process.env.REACT_APP_WEB_SOCKET_PORT) ? process.env.REACT_APP_WEB_SOCKET_PORT : '3002';
 const path = `http://${document.location.hostname}:${server_port}`;
 
+console.log(`Viewing:: opening socket - http://${document.location.hostname}:${wsPort}`);
 
 /**
  * This is the page from which you can view the
@@ -24,7 +25,7 @@ class ViewingPage extends Component {
       message: 'Live Stream ',
       saveMessage: '',
       isVideoStreaming: false,
-      mediaSource: new MediaSource(),
+      mediaSource: null,
       queue: [],
       buffer: null,
       filenames: [],
@@ -70,36 +71,8 @@ class ViewingPage extends Component {
     }
   ];
 
-  componentWillMount = () => {
+  UNSAFE_componentWillMount = () => {
     var self = this;
-
-    // Create data and metadata folders
-    axios.post(path+'/viewing/set-up');
-
-    // Get the cameras
-    axios
-    .post(path+'/viewing/get-cameras')
-    .then(response => {
-      console.log(response.data);
-      this.setState({
-        cameras: response.data
-      });
-    })
-    .catch(rejected => {
-      console.log(rejected);
-    });
-
-    // Get the names of all files already saved
-    axios
-    .post(path+'/viewing/filenames')
-    .then(response => {
-      this.setState({ 
-        filenames: response.data
-      }); 
-    })
-    .catch(rejected => {
-      console.log(rejected);
-    });
 
     /** Set up Socket Logic **/
     this.state.socket.on('connect', function() {
@@ -123,53 +96,44 @@ class ViewingPage extends Component {
    * web socket for the video stream.
    */
   onSocketOpen = () => {
-    console.log("Socket Open");
+    console.log(`Viewing::Socket Open - http://${document.location.hostname}:${wsPort}`);
 
     var {buffer, queue, mediaSource} = this.state;
     var self = this;
 
-    mediaSource = new MediaSource();
+    self.getPageInitSetting();
 
+    mediaSource = new MediaSource();
     mediaSource.addEventListener('sourceopen', function (e){
       console.log('MediaSource sourceopen fired: ' + mediaSource.readyState);
 
-      // Begin playing the video when the media source is opened
-      const playPromise = self.refs.vidRef.play();
-      if (playPromise !== undefined) {
-        playPromise.then(_ => {
-            // Autoplay started!
-        }).catch(error => {
-            // Autoplay was prevented.
-        });
-      }
-
       buffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
-      console.log(buffer);
+      buffer.mode = "sequence";
+
       self.setState({
         buffer: buffer
       });
 
       buffer.addEventListener('updatestart', function (e) {
-          // console.log('buffer updatestart: ' + mediaSource.readyState);
+          //console.log('buffer updatestart: ' + mediaSource.readyState);
       });
       buffer.addEventListener('update', function (e) {
-          // console.log('buffer update: ' + mediaSource.readyState);
+          //console.log('buffer update: ' + mediaSource.readyState + ', queue length: ' +queue.length);;
+          if (queue.length > 0 && !buffer.updating) {
+            buffer.appendBuffer(queue.shift());
+          }
       });
       buffer.addEventListener('updateend', function (e) {
-          // console.log('buffer updateend: ' + mediaSource.readyState);
+          //console.log('buffer updateend: ' + mediaSource.readyState);
       });
       buffer.addEventListener('error', function (e) {
           console.log('buffer error: ' + mediaSource.readyState);
       });
       buffer.addEventListener('abort', function (e) {
           console.log('buffer abort: ' + mediaSource.readyState);
-      });
-      buffer.addEventListener('update', function (e) {
-          if (queue.length > 0 && !buffer.updating) {
-              buffer.appendBuffer(queue.shift());
-          }
-      });
+      });  
     }, false);
+
 
     mediaSource.addEventListener('sourceended', function (e) {
       console.log('sourceended: ' + mediaSource.readyState);
@@ -426,6 +390,43 @@ class ViewingPage extends Component {
     this.state.socket.connect();
   }
 
+  getPageInitSetting = () =>{
+    // Create data and metadata folders
+    axios.post(path+'/viewing/set-up');
+
+    // Get the cameras
+    axios
+    .post(path+'/viewing/get-cameras')
+    .then(response => {
+        if (response.data !== "")
+        {
+          this.setState({
+            cameras: response.data
+          });
+        }
+    })
+    .catch(rejected => {
+      console.log(`Viewing::GetCameras::rejected`);
+      console.log(rejected);
+    });
+
+    // Get the names of all files already saved
+    axios
+    .post(path+'/viewing/filenames')
+    .then(response => {
+      if (response.data !== "")
+      {
+        this.setState({ 
+          filenames: response.data
+        });
+      }
+    })
+    .catch(rejected => {
+      console.log(`Viewing::GetFilenames::rejected`);
+      console.log(rejected);
+    });
+  }
+
   render() {
     const {message, mediaSource, isVideoStreaming, saveMessage, currentCamIp, selectedCamIp} = this.state;
 
@@ -438,7 +439,7 @@ class ViewingPage extends Component {
             <video ref='vidRef' key={mediaSource} hidden={(isVideoStreaming) ? '' : 'hidden'} controls autoPlay playsInline={true} muted="muted">
               <source src={mediaSource}/>
             </video>
-            <button ref='playButton' onClick={this.playVideo} hidden={true}>Play</button>
+
             <h3>{message}{(isVideoStreaming) && currentCamIp}</h3>
           </div>
 

@@ -15,9 +15,8 @@ class Mpeg4Stream {
         this.secret = secret;
         this.streamingPort = streamingPort;
         this.wsPort = wsPort;
-
         this.ffmpegProcess = undefined;
-
+        
         this.rtspUrl = null;
 
         // Check for default rtsp url in environment variables
@@ -33,6 +32,7 @@ class Mpeg4Stream {
         }
         
         this.rtspUrl = `rtsp://${rtspIp}:${rtspPort}/${rtspPath}`;
+
     }
 
     isVideoStreaming() {
@@ -57,13 +57,8 @@ class Mpeg4Stream {
                 console.log(`ffmpeg exited with code ${code} and signal ${signal}`);
             });
         }
-        else {
-            this.stopVideo();
-            this.startVideo();
-        }
     }
 
-    
     // Stop video streaming
     stopVideo() {
         if (this.ffmpegProcess === undefined) {
@@ -81,8 +76,6 @@ class Mpeg4Stream {
         }
     }
 
-
-    
     // Starts up the streaming server to listen to ffmpeg-source video stream, and relays that stream
     // to clients connected over web sockets
     startStreamingServer() {
@@ -91,7 +84,16 @@ class Mpeg4Stream {
         io.on('connection', function(socket) {
             self.startVideo();
 
-            console.log(`New client connected: ${socket.client.server})`);
+            if(socket.server.connectionCount == undefined)
+            {
+                socket.server.connectionCount = 1;
+            }
+            else
+            {
+                socket.server.connectionCount++;
+            }
+
+            console.log(`New client connected: total ${socket.server.connectionCount} clients.`);
 
             // Let the client know what the current rtsp stream is
             socket.emit('current-camera', self.rtspUrl);
@@ -104,9 +106,13 @@ class Mpeg4Stream {
 
             socket.on('disconnect', function(code, message) {
                 // TODO: Add logic so multiple clients can receive the stream
-                console.log('Connected clients dropped to 0, so stopping video streaming');
-                self.stopVideo();
-                return;
+                if(--socket.server.connectionCount == 0)
+                {
+                    console.log('Connected clients dropped to 0, so stopping video streaming');
+                    self.stopVideo();
+                    return;
+                }
+                console.log(`A client disconnected; (${socket.server.connectionCount} clients remaining).`);
             });
         });
 
