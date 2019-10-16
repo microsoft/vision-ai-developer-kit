@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:10-alpine
 
 # install ffmpeg binary
 RUN apk update && \
@@ -19,7 +19,7 @@ WORKDIR /app
 COPY /CameraServerModule/package*.json /app/server/
 
 WORKDIR /app/server
-RUN npm install -q &&\
+RUN npm install -q --no-optional &&\
     npm prune --production
 
 # copy all the files from client and server to the right folder

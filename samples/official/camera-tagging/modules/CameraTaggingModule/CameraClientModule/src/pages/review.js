@@ -8,8 +8,6 @@ import '../styles/review.css';
 const server_port = (process.env.REACT_APP_SERVER_PORT) ? process.env.REACT_APP_SERVER_PORT : '3003';
 const path = `http://${document.location.hostname}:${server_port}`;
 
-console.log(`Reviewing Page`);
-
 const popupContentStyle = {
   width: "auto",
   height: "auto",
@@ -44,24 +42,19 @@ class ReviewPage extends Component {
 
   sidebarOptions = [
     {
-      name: 'Live Stream',
+      name: 'Capture',
       handleClick: () => this.props.history.push('/'),
       children: []
     },
     {
-      name: 'Review',
+      name: 'Images',
       handleClick: () => this.props.history.push('/review'),
       children: [],
       isActive: true
     },
     {
-      name: 'Push to Custom Vision',
-      handleClick: () => this.props.history.push('/push-custom-vision'),
-      children: []
-    },
-    {
-      name: 'Push to Blob Store',
-      handleClick: () => this.props.history.push('/push-blob-store'),
+      name: 'Upload Settings',
+      handleClick: () => this.props.history.push('/upload'),
       children: []
     }
   ];
@@ -69,7 +62,7 @@ class ReviewPage extends Component {
   /**
    * Get all the images, tags, and the association of image: tag
    */
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getImages(true);
     this.getImageTagMap();
     this.getTags(true);
@@ -441,6 +434,8 @@ class ReviewPage extends Component {
       <AppWithSideBar listElements={this.sidebarOptions} >
         <div className="review-container">
           {/* Top Filter Bar */}
+          <h1>Images</h1>
+          <p>only non uploaded iamges show up here</p>
           <div className="review-filter-container">
             {/* Select Tag */}
             <form className="review-filter-form">

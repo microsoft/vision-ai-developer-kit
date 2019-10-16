@@ -3,8 +3,7 @@ FROM arm32v7/node:10-slim
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    ffmpeg \
+    && apt-get install -y --no-install-recommends ffmpeg \
     && ls /var/lib/apt/lists \
     && rm -rf /var/lib/apt/lists/*
 

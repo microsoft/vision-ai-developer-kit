@@ -1,0 +1,22 @@
+.upload-container {
+    text-align: center;
+    margin-top: 4vh;
+}
+
+.upload-option-button {
+    font-size: 32px;
+    font-weight: 500;
+    color: white;
+    background-color: rgb(37, 64, 105);
+    border: 1px solid black;
+    height: 25vmin;
+    width: 25vmin;
+    min-width: 120px;
+    min-height: 120px;
+    margin: 1vmin;
+  }
+  
+  .upload-option-button:hover {
+    background-color: rgb(0, 120, 215);
+    cursor: pointer;
+  }

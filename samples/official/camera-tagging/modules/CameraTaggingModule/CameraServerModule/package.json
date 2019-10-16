@@ -22,5 +22,8 @@
     "nodemon": "^1.19.1",
     "socket.io": "^2.2.0",
     "ws": "^7.0.0"
+  },
+  "nodemonConfig":{
+    "ignore": ["CustomVision/*"] 
   }
 }

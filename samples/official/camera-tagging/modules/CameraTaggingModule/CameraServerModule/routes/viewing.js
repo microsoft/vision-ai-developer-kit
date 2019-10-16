@@ -11,30 +11,25 @@ module.exports = (app) => {
     app.post('/viewing/set-up', async(req, res) => {
         console.log('Creating directories');
         try {
+
             // Make the data folder
             fs.mkdir(dataRoot, { recursive: true }, (err) => {
                 if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log(`${dataRoot} directory created successfully.`);
+                    console.error(`Failed to create ${dataRoot} directory created. Error:${err}`);
                 }
             });
 
             // Make the metadata folder
             fs.mkdir(metadataRoot, { recursive: true }, (err) => {
                 if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log(`${metadataRoot} directory created successfully`);
+                    console.error(`Failed to create ${metadataRoot} directory created. Error:${err}`);
                 }
             });
 
             return res.status(201).send('directories created');
 
         } catch (e) {
-            console.log(e);
+            console.error(e);
 
             return res.status(500).send({
                 error: 'Failed to create initial directories',
@@ -150,6 +145,7 @@ module.exports = (app) => {
         } = req.body;
 
         console.log("Saving cameras.");
+        console.log(`save-camera::json:: ${cameras}`);
 
         try {
             var jsonCam = JSON.stringify(cameras);

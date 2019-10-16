@@ -1,5 +1,5 @@
 {
-  "name": "Camera-Tagging",
+  "name": "camera-tagging",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
-  "author": "Nandhini Namasivayam",
+  "author": "Nandhini Namasivayam, Mary Chau",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "3.5.1"

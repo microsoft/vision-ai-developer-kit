@@ -1,8 +1,8 @@
 .view-container {
-  display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   text-align: center;
+  margin-top: 4vh;
 }
 
 .video-container {

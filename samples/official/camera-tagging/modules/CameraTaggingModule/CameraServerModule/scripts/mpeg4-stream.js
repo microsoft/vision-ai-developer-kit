@@ -101,7 +101,9 @@ class Mpeg4Stream {
             // Handle when the client chooses to change the rtsp stream
             socket.on('change-camera', function(rtspUrl) {
                 self.rtspUrl = rtspUrl;
-                console.log("Stream changed to: ", rtspUrl);
+                self.stopVideo();
+                self.startVideo();
+                console.log(`Stream changed to: ${rtspUrl}`);
             })
 
             socket.on('disconnect', function(code, message) {
@@ -135,7 +137,7 @@ class Mpeg4Stream {
             });
 
             request.on('end', function() {
-                console.log("Stream closed.");
+                console.log("Video stream closed.");
             });
         });
 

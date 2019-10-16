@@ -141,18 +141,6 @@ module.exports = (app) => {
             // Wait for all files to upload
             await Promise.all(fileUploadPromises);
 
-            console.log("Training...");
-            let trainingIteration = await trainer.trainProject(project.id);
-
-            // Wait for training to complete
-            console.log("Training started...");
-            while (trainingIteration.status == "Training") {
-                console.log("Training status: " + trainingIteration.status);
-                await setTimeoutPromise(1000, null);
-                trainingIteration = await trainer.getIteration(project.id, trainingIteration.id)
-            }
-            console.log("Training status: " + trainingIteration.status);
-
             return res.status(200).send("Success");
 
         } catch (e) {
@@ -166,4 +154,66 @@ module.exports = (app) => {
         }
     });
 
+    /**
+     * train Custom Vision Project
+     */
+    app.post('/push-custom-vision/train/', async(req, res) => {
+        const {
+            trainingKey,
+            endpoint,
+            projectName
+        } = req.body;
+
+        // Ensure all data is received
+        if(!projectName) {
+            return res.status(400).send({
+                error: 'Please enter a project name',
+                code: 400,
+            });
+        }
+
+        try {
+            const trainer = new TrainingApiClient.TrainingAPIClient(trainingKey, endpoint);
+            const projects = await trainer.getProjects();
+            var project = null;
+
+            // If the project already exists, just update it
+            for(var index in projects) {
+                if(projects[index].name === projectName) {
+                    projectExists = true;
+                    project = projects[index];
+                }
+            }
+
+            if(projectExists)
+            {
+                console.log("Training...");
+                let trainingIteration = await trainer.trainProject(project.id);
+    
+                // Wait for training to complete
+                console.log("Training started...");
+                while (trainingIteration.status == "Training") {
+                    console.log("Training status: " + trainingIteration.status);
+                    await setTimeoutPromise(1000, null);
+                    trainingIteration = await trainer.getIteration(project.id, trainingIteration.id)
+                }
+                console.log("Training status: " + trainingIteration.status);
+    
+                return res.status(200).send("Success");
+            }
+            else
+            {
+                return res.status(400).send(`Cannot find project with name - ${projectName}.`);
+            }
+
+        } catch (e) {
+
+            console.log(e);
+            
+            return res.status(500).send({
+                error: e,
+                code: 500,
+            });
+        }
+    });
 };

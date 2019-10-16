@@ -22,8 +22,7 @@ const AddCameraProps = {
   handleSelect: PropTypes.func.isRequired,
   handleAddCam: PropTypes.func.isRequired,
   handleSave: PropTypes.func.isRequired,
-  currentCamIp: PropTypes.string.isRequired,
-  selectedCamIp: PropTypes.string.isRequired
+  currentCamIp: PropTypes.string.isRequired
 };
 
 /**
@@ -50,7 +49,7 @@ export const AddCamera = ({ listElements = [], handleSelect, handleAddCam, handl
               <option value="Select Camera" hidden disabled >Select Camera</option>
               {listElements.map(
                 ({ name, rtspAddress }, index) => (
-                  <option title={rtspAddress} key={index} value={rtspAddress}>{name}</option>
+                  <option title={rtspAddress} key={index} value={rtspAddress}>{name} - {rtspAddress}</option>
                 )
               )}
             </select><br/>
@@ -61,7 +60,7 @@ export const AddCamera = ({ listElements = [], handleSelect, handleAddCam, handl
           <div className="add-cam-content">
             To add a new camera, enter the RTSP address in the form "rtsp://x.x.x.x:PORT/PATH"
             <form className="add-cam-form" id="add-cam-form" onSubmit={(e) => handleAddCam(document.getElementById("add-cam-form"), e)}>
-              <input className="add-cam-input" name="camName" type="text" placeholder="Camera Name..."/><br/>
+              <input className="add-cam-input" name="camName" type="text" placeholder="Camera Name..." onInput={()=>{}}/><br/>
               <input className="add-cam-input" name="rtspAddress" type="text" placeholder="RTSP Address..."/><br/>
               <input className="add-cam-button" name="addCam" type="submit" value="Add Camera" />
             </form>
