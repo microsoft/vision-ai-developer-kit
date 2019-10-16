@@ -11,28 +11,25 @@ module.exports = (app) => {
     app.post('/viewing/set-up', async(req, res) => {
         console.log('Creating directories');
         try {
+
             // Make the data folder
             fs.mkdir(dataRoot, { recursive: true }, (err) => {
                 if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log(`${dataRoot} directory created successfully.`);
+                    console.error(`Failed to create ${dataRoot} directory created. Error:${err}`);
                 }
             });
 
             // Make the metadata folder
             fs.mkdir(metadataRoot, { recursive: true }, (err) => {
                 if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log(`${metadataRoot} directory created successfully`);
+                    console.error(`Failed to create ${metadataRoot} directory created. Error:${err}`);
                 }
             });
 
+            return res.status(201).send('directories created');
+
         } catch (e) {
-            console.log(e);
+            console.error(e);
 
             return res.status(500).send({
                 error: 'Failed to create initial directories',
@@ -106,10 +103,15 @@ module.exports = (app) => {
     app.post('/viewing/filenames/', async(req, res) => {
 
         console.log("Get all the filenames from every folder...");
-
         var filenames = [];
 
         try {
+
+            if (!fs.existsSync(metadataRoot+'/'+'cameras.json'))
+            {
+                return res.status(204).send(null);
+            }
+
             // Loop through each folder in the directory
             fs.readdirSync(dataRoot).forEach(folderName => {
 
@@ -127,7 +129,6 @@ module.exports = (app) => {
 
         } catch (e) {
             console.log(e);
-
             return res.status(500).send({
                 error: 'Failed to return filenames',
                 code: 500,
@@ -144,6 +145,7 @@ module.exports = (app) => {
         } = req.body;
 
         console.log("Saving cameras.");
+        console.log(`save-camera::json:: ${cameras}`);
 
         try {
             var jsonCam = JSON.stringify(cameras);
@@ -174,19 +176,21 @@ module.exports = (app) => {
     app.post('/viewing/get-cameras', async(req, res) => {
 
         console.log("Get all camera metadata.");
-
         var cameras;
 
         try {
             // Get cameras from JSON file
+            if (!fs.existsSync(metadataRoot+'/'+'cameras.json'))
+            {
+                return res.status(204).send(null);
+            }
+
             var cameras = fs.readFileSync(metadataRoot+'/'+'cameras.json', 'utf8');
             camerasObj = JSON.parse(cameras);
-
             return res.status(200).send(camerasObj);
 
         } catch (e) {
-            console.log(e);
-            
+            console.log(e);           
             return res.status(500).send({
                 error: 'Failed to get camera data',
                 code: 500

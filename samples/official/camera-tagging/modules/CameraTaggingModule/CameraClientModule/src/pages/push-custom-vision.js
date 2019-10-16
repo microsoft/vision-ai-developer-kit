@@ -6,7 +6,6 @@ import '../styles/push-custom-vision.css';
 const server_port = (process.env.REACT_APP_SERVER_PORT) ? process.env.REACT_APP_SERVER_PORT : '3003';
 const path = `http://${document.location.hostname}:${server_port}`;
 
-
 /**
  * This is the page from which you can push
  * the tagged images to Custom Vision in
@@ -32,25 +31,20 @@ class PushCustomVisionPage extends Component {
 
     sidebarOptions = [
         {
-          name: 'Live Stream',
-          handleClick: () => this.props.history.push('/'),
-          children: []
-        },
-        {
-          name: 'Review',
-          handleClick: () => this.props.history.push('/review'),
-          children: []
-        },
-        {
-          name: 'Push to Custom Vision',
-          handleClick: () => this.props.history.push('/push-custom-vision'),
-          children: [],
-          isActive: true
-        },
-        {
-            name: 'Push to Blob Store',
-            handleClick: () => this.props.history.push('/push-blob-store'),
+            name: 'Capture',
+            handleClick: () => this.props.history.push('/'),
             children: []
+        },
+        {
+            name: 'Images',
+            handleClick: () => this.props.history.push('/review'),
+            children: []
+        },
+        {
+            name: 'Upload Settings',
+            handleClick: () => this.props.history.push('/upload'),
+            children: [],
+            isActive: true
         }
     ];
 
@@ -201,6 +195,7 @@ class PushCustomVisionPage extends Component {
             <AppWithSideBar listElements={this.sidebarOptions} >
                 <div className="push-container">
                     <div className="form-container">
+                        <h1>Custome Vision API Settings</h1>
                         {/* Get the endpoint and training key */}
                         <form id="pushForm" method="post" onSubmit={this.onSaveKeyAndEndpoint}>
                             <label className="push-form-label" key="endpoint">

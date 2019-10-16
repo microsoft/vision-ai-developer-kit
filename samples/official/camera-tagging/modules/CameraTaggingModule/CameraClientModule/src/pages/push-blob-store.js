@@ -4,7 +4,6 @@ import '../styles/push-blob-store.css';
 import AppWithSideBar from "../components/sidebar"
 
 const server_port = (process.env.REACT_APP_SERVER_PORT) ? process.env.REACT_APP_SERVER_PORT : '3003';
-console.log(process.env.REACT_APP_SERVER_PORT);
 const path = `http://${document.location.hostname}:${server_port}`;
 
 const local_storage_module_name = process.env.REACT_APP_LOCAL_STORAGE_MODULE_NAME;
@@ -33,29 +32,24 @@ class PushBlobStorePage extends Component {
 
     sidebarOptions = [
         {
-            name: 'Live Stream',
+            name: 'Capture',
             handleClick: () => this.props.history.push('/'),
             children: []
         },
         {
-            name: 'Review',
+            name: 'Images',
             handleClick: () => this.props.history.push('/review'),
             children: []
         },
         {
-            name: 'Push to Custom Vision',
-            handleClick: () => this.props.history.push('/push-custom-vision'),
-            children: []
-        },
-        {
-            name: 'Push to Blob Store',
-            handleClick: () => this.props.history.push('/push-blob-store'),
+            name: 'Upload Settings',
+            handleClick: () => this.props.history.push('/upload'),
             children: [],
             isActive: true
         }
     ];
 
-    componentWillMount () {
+    UNSAFE_componentWillMount () {
         // Check if local storage environment variables set
         if(!local_storage_account_key || !local_storage_account_name || !local_storage_port || !local_storage_module_name) {
             this.setState({
@@ -199,6 +193,7 @@ class PushBlobStorePage extends Component {
         return (
             <AppWithSideBar listElements={this.sidebarOptions} >
                 <div className="blob-store-container">
+                    <h1>Blob Storage Options</h1>
                     {(hasLocalStorage) && (
                         <div className="blob-buttons-container">
                             <button className="blob-form-button" onClick={this.handlePushLocalStore}>Push to Local Storage</button><br/>

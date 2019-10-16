@@ -10,6 +10,7 @@ const server_port = (process.env.REACT_APP_SERVER_PORT) ? process.env.REACT_APP_
 const wsPort = (process.env.REACT_APP_WEB_SOCKET_PORT) ? process.env.REACT_APP_WEB_SOCKET_PORT : '3002';
 const path = `http://${document.location.hostname}:${server_port}`;
 
+console.log(`Viewing:: opening socket - http://${document.location.hostname}:${wsPort}`);
 
 /**
  * This is the page from which you can view the
@@ -24,20 +25,21 @@ class ViewingPage extends Component {
       message: 'Live Stream ',
       saveMessage: '',
       isVideoStreaming: false,
-      mediaSource: new MediaSource(),
+      mediaSource: null,
       queue: [],
       buffer: null,
       filenames: [],
       socket: openSocket(`http://${document.location.hostname}:${wsPort}`), // Socket for ffmpeg data
       cameras: [],
-      currentCamIp: 'Select Camera',
-      selectedCamIp: ''
+      currentCamIp: '- Need to setup Camera -',
+      selectedCamIp: "",
+      resetStream: false
     }
   }
 
   sidebarOptions = [
     {
-      name: 'Live Stream ',
+      name: 'Capture',
       handleClick: () => { 
         this.props.history.push('/')
       },
@@ -45,7 +47,7 @@ class ViewingPage extends Component {
       isActive: true
     },
     {
-      name: 'Review',
+      name: 'Images',
       handleClick: () => {
         this.state.socket.disconnect();
         this.props.history.push('/review');
@@ -53,56 +55,20 @@ class ViewingPage extends Component {
       children: []
     },
     {
-      name: 'Push to Custom Vision',
+      name: 'Upload Settings',
       handleClick: () => {
         this.state.socket.disconnect();
-        this.props.history.push('/push-custom-vision');
-      },
-      children: []
-    },
-    {
-      name: 'Push to Blob Store',
-      handleClick: () => {
-        this.state.socket.disconnect();
-        this.props.history.push('/push-blob-store');
+        this.props.history.push('/upload');
       },
       children: []
     }
   ];
 
-  componentWillMount = () => {
+  UNSAFE_componentWillMount = () => {
     var self = this;
 
-    // Create data and metadata folders
-    axios.post(path+'/viewing/set-up');
-
-    // Get the cameras
-    axios
-    .post(path+'/viewing/get-cameras')
-    .then(response => {
-      console.log(response.data);
-      this.setState({
-        cameras: response.data
-      });
-    })
-    .catch(rejected => {
-      console.log(rejected);
-    });
-
-    // Get the names of all files already saved
-    axios
-    .post(path+'/viewing/filenames')
-    .then(response => {
-      this.setState({ 
-        filenames: response.data
-      }); 
-    })
-    .catch(rejected => {
-      console.log(rejected);
-    });
-
     /** Set up Socket Logic **/
-    this.state.socket.on('connect', function() {
+    this.state.socket.on('connect', () => {
       self.onSocketOpen();
     });
 
@@ -123,79 +89,75 @@ class ViewingPage extends Component {
    * web socket for the video stream.
    */
   onSocketOpen = () => {
-    console.log("Socket Open");
+    console.log(`Viewing::Socket Open - http://${document.location.hostname}:${wsPort}`);
 
     var {buffer, queue, mediaSource} = this.state;
     var self = this;
 
-    mediaSource = new MediaSource();
+    self.getPageInitSetting();
 
-    mediaSource.addEventListener('sourceopen', function (e){
-      console.log('MediaSource sourceopen fired: ' + mediaSource.readyState);
-
-      // Begin playing the video when the media source is opened
-      const playPromise = self.refs.vidRef.play();
-      if (playPromise !== undefined) {
-        playPromise.then(_ => {
-            // Autoplay started!
-        }).catch(error => {
-            // Autoplay was prevented.
-        });
-      }
-
-      buffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
-      console.log(buffer);
-      self.setState({
-        buffer: buffer
+    if(mediaSource === null)
+    {
+      mediaSource = new MediaSource();
+      mediaSource.addEventListener('sourceopen', function (e){
+        console.log('MediaSource sourceopen fired: ' + mediaSource.readyState);
+  
+        if (mediaSource.sourceBuffers.length === 0)
+        {
+          buffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
+          buffer.mode = "sequence";
+    
+          self.setState({
+            buffer: buffer
+          });
+    
+          buffer.addEventListener('updatestart', function (e) {
+              //console.log('buffer updatestart: ' + mediaSource.readyState);
+          });
+          buffer.addEventListener('update', function (e) {
+              //console.log('buffer update: ' + mediaSource.readyState + ', queue length: ' +queue.length);;
+              if (queue.length > 0 && !buffer.updating) {
+                buffer.appendBuffer(queue.shift());
+              }
+          });
+          buffer.addEventListener('updateend', function (e) {
+              //console.log('buffer updateend: ' + mediaSource.readyState);
+          });
+          buffer.addEventListener('error', function (e) {
+              console.log('buffer error: ' + mediaSource.readyState);
+          });
+          buffer.addEventListener('abort', function (e) {
+              console.log('buffer abort: ' + mediaSource.readyState);
+          });  
+        }
+      }, false);
+  
+      mediaSource.addEventListener('sourceended', function (e) {
+        console.log('sourceended: ' + mediaSource.readyState);
       });
-
-      buffer.addEventListener('updatestart', function (e) {
-          // console.log('buffer updatestart: ' + mediaSource.readyState);
+      mediaSource.addEventListener('sourceclose', function (e) {
+          console.log('sourceclose: ' + mediaSource.readyState);
       });
-      buffer.addEventListener('update', function (e) {
-          // console.log('buffer update: ' + mediaSource.readyState);
+      mediaSource.addEventListener('error', function (e) {
+          console.log('sourceerror: ' + mediaSource.readyState);
       });
-      buffer.addEventListener('updateend', function (e) {
-          // console.log('buffer updateend: ' + mediaSource.readyState);
+  
+      // Handle visibility change
+      document.addEventListener("visibilitychange", function () {
+        if(document.hidden) {
+          self.state.socket.disconnect();
+        }
+        else {
+          self.state.socket.connect();
+        }
+      }, false);
+  
+      // Update state
+      this.setState({
+        mediaSource: URL.createObjectURL(mediaSource),
+        isVideoStreaming: true
       });
-      buffer.addEventListener('error', function (e) {
-          console.log('buffer error: ' + mediaSource.readyState);
-      });
-      buffer.addEventListener('abort', function (e) {
-          console.log('buffer abort: ' + mediaSource.readyState);
-      });
-      buffer.addEventListener('update', function (e) {
-          if (queue.length > 0 && !buffer.updating) {
-              buffer.appendBuffer(queue.shift());
-          }
-      });
-    }, false);
-
-    mediaSource.addEventListener('sourceended', function (e) {
-      console.log('sourceended: ' + mediaSource.readyState);
-    });
-    mediaSource.addEventListener('sourceclose', function (e) {
-        console.log('sourceclose: ' + mediaSource.readyState);
-    });
-    mediaSource.addEventListener('error', function (e) {
-        console.log('sourceerror: ' + mediaSource.readyState);
-    });
-
-    // Handle visibility change
-    document.addEventListener("visibilitychange", function () {
-      if(document.hidden) {
-        self.state.socket.disconnect();
-      }
-      else {
-        self.state.socket.connect();
-      }
-    }, false);
-
-    // Update state
-    this.setState({
-      mediaSource: URL.createObjectURL(mediaSource),
-      isVideoStreaming: true
-    });
+    }
   }
 
   /*
@@ -344,44 +306,47 @@ class ViewingPage extends Component {
     // Keep the form from POSTing
     e.preventDefault();
 
-    // Get the existing cameras
-    var camArray = [...this.state.cameras];
-    camArray.push({
-      name: form.camName.value,
-      rtspAddress: form.rtspAddress.value
-    });
 
-    // Save the camera to the state
-    this.setState({
-      cameras: camArray
-    });
+    // Check Input
+    if ( form.camName.value && form.rtspAddress.value)
+    {
+      var camArray = [...this.state.cameras];
+      var sameKey = camArray.find(x => x.name === form.camName.value);
+      var sameIp = camArray.find(x => x.rtspAddress === form.rtspAddress.value);
+      if (sameKey || sameIp)
+      {
+        return;
+      }
 
-    // Write the cameras to file for permanent storage
-    axios
-    .post(path+'/viewing/save-camera', {
-      cameras: camArray
-    })
-    .then(response => {
-      console.log("Cameras saved"); 
-    })
-    .catch(rejected => {
-      console.log(rejected);
-    });
+      // Get the existing cameras
+      camArray.push({
+        name: form.camName.value,
+        rtspAddress: form.rtspAddress.value
+      });
 
-    form.reset();
+      // Save the camera to the state
+      this.setState({ cameras: camArray }, () => {
+        
+        // Write the cameras to file for permanent storage
+        axios
+        .post(path+'/viewing/save-camera', {
+          cameras: camArray
+        })
+        .then(response => {
+          console.log("Cameras saved"); 
+        })
+        .catch(rejected => {
+          console.log(`Save Camera Settings rejected: ${rejected}`);
+        });
+      });
+    }
   }
 
   /**
    * Send the new rtsp stream to the server
    */
   onSelectCamera = (e) => {
-    this.setState({
-      selectedCamIp: e.target.value
-    });
-
-    // Change the IP of the live stream on the server side
-    this.state.socket.emit('change-camera', e.target.value);
-    this.state.socket.disconnect();
+    this.setState({ selectedCamIp: e.target.value});
   }
 
   /**
@@ -397,7 +362,8 @@ class ViewingPage extends Component {
 
     // Update the state with the current camera
     this.setState({
-      currentCamIp: rtspUrl
+      currentCamIp: rtspUrl,
+      selectedCamIp: rtspUrl
     });
 
     // Check if the rtspUrl already exists in the array of cameras
@@ -422,23 +388,70 @@ class ViewingPage extends Component {
   /**
    * Reconnect the socket on camera start
    */ 
-  onStartCamera = () => {
-    this.state.socket.connect();
+  onSaveCameraSetting = () => {
+
+    if( this.state.currentCamIp !== this.state.selectedCamIp )
+    {
+      console.log(`Changing Camera: ${this.state.currentCamIp} => ${this.state.selectedCamIp}`);
+      this.setState({
+        currentCamIp: this.state.selectedCamIp
+      }, () => {
+        this.state.socket.emit('change-camera', this.state.selectedCamIp);
+      });
+    }
+  }
+
+  getPageInitSetting = () =>{
+    // Create data and metadata folders
+    axios.post(path+'/viewing/set-up');
+
+    // Get the cameras
+    axios
+    .post(path+'/viewing/get-cameras')
+    .then(response => {
+        if (response.data !== "")
+        {
+          this.setState({
+            cameras: response.data
+          });
+        }
+    })
+    .catch(rejected => {
+      console.log(`Viewing::GetCameras::rejected`);
+      console.log(rejected);
+    });
+
+    // Get the names of all files already saved
+    axios
+    .post(path+'/viewing/filenames')
+    .then(response => {
+      if (response.data !== "")
+      {
+        this.setState({ 
+          filenames: response.data
+        });
+      }
+    })
+    .catch(rejected => {
+      console.log(`Viewing::GetFilenames::rejected`);
+      console.log(rejected);
+    });
   }
 
   render() {
-    const {message, mediaSource, isVideoStreaming, saveMessage, currentCamIp, selectedCamIp} = this.state;
+    const {message, mediaSource, isVideoStreaming, saveMessage, currentCamIp} = this.state;
 
     return (
       <AppWithSideBar listElements={this.sidebarOptions} >
         {/* Live stream and Captured Image */}
         <div className="view-container">
+          <h1>Capture</h1>
           <div className="video-container">
             <canvas ref="captureCanvas" className="capture-canvas" width={880} height={580} hidden={(isVideoStreaming) ? 'hidden' : ''}/>
             <video ref='vidRef' key={mediaSource} hidden={(isVideoStreaming) ? '' : 'hidden'} controls autoPlay playsInline={true} muted="muted">
               <source src={mediaSource}/>
             </video>
-            <button ref='playButton' onClick={this.playVideo} hidden={true}>Play</button>
+
             <h3>{message}{(isVideoStreaming) && currentCamIp}</h3>
           </div>
 
@@ -448,9 +461,9 @@ class ViewingPage extends Component {
               listElements={this.state.cameras}
               handleSelect={this.onSelectCamera}
               handleAddCam={this.onAddCamera}
-              handleSave={this.onStartCamera}
-              currentCamIp={currentCamIp}
-              selectedCamIp={selectedCamIp}
+              handleSave={this.onSaveCameraSetting}
+              currentCamIp={this.state.currentCamIp}
+              selectedCamIp={this.state.selectedCamIp}
             /><br/>
 
             <button className="capture-button" onClick={this.onClickCapture}>Capture</button>

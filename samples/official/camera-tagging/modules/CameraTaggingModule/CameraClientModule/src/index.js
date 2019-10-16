@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ViewingPage from './pages/viewing';
 import ReviewPage from './pages/review';
+import UploadPage from './pages/upload'; 
 import PushCustomVisionPage from './pages/push-custom-vision';
 import PushBlobStorePage from './pages/push-blob-store';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
@@ -11,12 +12,11 @@ require('dotenv').config();
 
 const routing = (
     <Router>
-        <div>
-            <Route exact path="/" component={ViewingPage} />
-            <Route path="/review" component={ReviewPage} />
-            <Route path="/push-custom-vision" component={PushCustomVisionPage} />
-            <Route path="/push-blob-store" component={PushBlobStorePage} />
-        </div>
+        <Route exact path="/" component={ViewingPage} />
+        <Route path="/review" component={ReviewPage} />
+        <Route path="/upload" component={UploadPage} />
+        <Route path="/push-custom-vision" component={PushCustomVisionPage} />
+        <Route path="/push-blob-store" component={PushBlobStorePage} />
     </Router>
 );
 

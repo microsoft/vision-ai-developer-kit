@@ -42,24 +42,19 @@ class ReviewPage extends Component {
 
   sidebarOptions = [
     {
-      name: 'Live Stream',
+      name: 'Capture',
       handleClick: () => this.props.history.push('/'),
       children: []
     },
     {
-      name: 'Review',
+      name: 'Images',
       handleClick: () => this.props.history.push('/review'),
       children: [],
       isActive: true
     },
     {
-      name: 'Push to Custom Vision',
-      handleClick: () => this.props.history.push('/push-custom-vision'),
-      children: []
-    },
-    {
-      name: 'Push to Blob Store',
-      handleClick: () => this.props.history.push('/push-blob-store'),
+      name: 'Upload Settings',
+      handleClick: () => this.props.history.push('/upload'),
       children: []
     }
   ];
@@ -67,7 +62,7 @@ class ReviewPage extends Component {
   /**
    * Get all the images, tags, and the association of image: tag
    */
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getImages(true);
     this.getImageTagMap();
     this.getTags(true);
@@ -96,10 +91,12 @@ class ReviewPage extends Component {
           var isImageSelected = this.state.isImageSelected;
           var fileNames = Object.keys(this.state.nameToImage);
 
+          /* eslint-disable no-unused-vars */
           // Initiate each image to not be selected
           for(var [index, fileName] of fileNames.entries()) {
             isImageSelected[fileName] = false;
           }
+          /* eslint-enable no-unused-vars */
 
           this.setState({
             isImageSelected: isImageSelected
@@ -153,9 +150,11 @@ class ReviewPage extends Component {
           // Initiate the tags to not be selected
           var isTagSelected = this.state.isTagSelected;
 
+          /* eslint-disable no-unused-vars */
           for(var [index, tag] of this.state.tags.entries()) {
             isTagSelected[tag] = false;
           }
+          /* eslint-enable no-unused-vars */
         }
       });
   }
@@ -181,9 +180,9 @@ class ReviewPage extends Component {
             modal>
             {close => (
               <div className="review-popup-modal">
-                <a className="close" onClick={close}>
+                <button type="button" onClick={close}>
                   &times;
-                </a>
+                </button>
 
                 <div className="review-popup-header">
                   Image Detail
@@ -383,18 +382,20 @@ class ReviewPage extends Component {
       return;
     }
 
+    /* eslint-disable no-unused-vars */
     // Loop through each image and update its selection status
     for(var [index, fileName] of fileNames.entries()) {
       isImageSelected[fileName] = false;
 
       // Loop through each tag for that image
       if(imageToTag[fileName]) {
-        for(var [index, tag] of imageToTag[fileName].entries()) {
+        for(var [index2, tag] of imageToTag[fileName].entries()) {
           // This image is selected if any of the tags are selected
           isImageSelected[fileName] = isImageSelected[fileName] || isTagSelected[tag];
         }
       }
     }
+    /* eslint-enable no-unused-vars */
 
     this.setState({
       isImageSelected: isImageSelected
@@ -408,6 +409,7 @@ class ReviewPage extends Component {
     var isTagSelected = this.state.isTagSelected;
     var target = e.target;
 
+    /* eslint-disable no-unused-vars */
     // If Select All
     if(target.value === "Select All") {
       // Loop through each tag and set it accordingly
@@ -419,6 +421,7 @@ class ReviewPage extends Component {
       // Update the tag that is selected
       isTagSelected[target.value] = target.checked || document.getElementById("check-box-select-all").checked;
     }
+    /* eslint-enable no-unused-vars */
 
     // Update the images that are selected
     this.updateSelectedImages();
@@ -431,6 +434,8 @@ class ReviewPage extends Component {
       <AppWithSideBar listElements={this.sidebarOptions} >
         <div className="review-container">
           {/* Top Filter Bar */}
+          <h1>Images</h1>
+          <p>only non uploaded iamges show up here</p>
           <div className="review-filter-container">
             {/* Select Tag */}
             <form className="review-filter-form">

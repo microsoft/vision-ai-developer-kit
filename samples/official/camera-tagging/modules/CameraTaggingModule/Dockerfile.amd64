@@ -1,4 +1,9 @@
-FROM node:8-alpine
+FROM node:10-alpine
+
+# install ffmpeg binary
+RUN apk update && \
+    apk upgrade -U && \
+    apk add --no-cache ffmpeg
 
 # To build the client
 WORKDIR /app
@@ -7,16 +12,15 @@ COPY /CameraClientModule/package*.json /app/client/
 COPY /CameraClientModule/yarn.lock /app/client/
 
 WORKDIR /app/client
-RUN yarn install
+RUN yarn install && yarn upgrade
 
 # To build the server
 WORKDIR /app
-
-COPY package*.json /app/server/
+COPY /CameraServerModule/package*.json /app/server/
 
 WORKDIR /app/server
-RUN npm install -q \
-    && npm prune --production
+RUN npm install -q --no-optional &&\
+    npm prune --production
 
 # copy all the files from client and server to the right folder
 WORKDIR /app
