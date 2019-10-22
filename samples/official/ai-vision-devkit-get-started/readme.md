@@ -13,7 +13,7 @@ This solution is used to build and deploy a new AIVisionDevKitGetStartedModule d
 
 ## Develop a New AIVisionDevKitGetStartedModule
 
-Refer to [modules/AIVisionDevKitGetStartedModule/python_iotcc_sdk/README.md](modules/AIVisionDevKitGetStartedModule/python_iotcc_sdk/README.md) to develop and test source code for a new AIVisionDevKitGetStartedModule.
+Refer to [modules/AIVisionDevKitGetStartedModule/python_iotcc_sdk/README.md](https://github.com/microsoft/vision-ai-developer-kit/tree/master/camera-sdk) to develop and test source code for a new AIVisionDevKitGetStartedModule.
 
 ## Build a Local Container Image for AIVisionDevKitGetStartedModule
 
