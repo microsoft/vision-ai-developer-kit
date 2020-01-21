@@ -58,7 +58,7 @@
         },
         "modules": {
           "CameraTaggingModule": {
-            "version": "1.0",
+            "version": "1.0.1",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
@@ -93,7 +93,7 @@
             },
             "env": {
               "RTSP_IP": {
-                "value": "192.168.0.100"
+                "value": "192.168.0.103"
               },
               "RTSP_PORT": {
                 "value": "8900"

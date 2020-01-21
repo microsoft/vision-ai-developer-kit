@@ -8,7 +8,7 @@
     "start": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
-  "author": "Nandhini Namasivayam, Mary Chau",
+  "author": "Nandhini Namasivayam, Mary Chau, David Grob",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "3.5.1"
