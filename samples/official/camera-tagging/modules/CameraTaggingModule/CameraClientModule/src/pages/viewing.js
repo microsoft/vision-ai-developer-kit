@@ -446,15 +446,7 @@ class ViewingPage extends Component {
         {/* Live stream and Captured Image */}
         <div className="view-container">
           <h1>Capture</h1>
-          <div className="video-container">
-            <canvas ref="captureCanvas" className="capture-canvas" width={880} height={580} hidden={(isVideoStreaming) ? 'hidden' : ''}/>
-            <video ref='vidRef' key={mediaSource} hidden={(isVideoStreaming) ? '' : 'hidden'} controls autoPlay playsInline={true} muted="muted">
-              <source src={mediaSource}/>
-            </video>
-
-            <h3>{message}{(isVideoStreaming) && currentCamIp}</h3>
-          </div>
-
+          
           {/* Change Camera and Capture Image options */}
           <div className="capture-container">
             <AddCamera 
@@ -477,6 +469,16 @@ class ViewingPage extends Component {
               </form>
             )}
             <h4>{saveMessage}</h4>
+          </div>
+
+          {/* Live stream */}
+          <div className="video-container">
+            <canvas ref="captureCanvas" className="capture-canvas" width={880} height={580} hidden={(isVideoStreaming) ? 'hidden' : ''}/>
+            <video ref='vidRef' key={mediaSource} hidden={(isVideoStreaming) ? '' : 'hidden'} controls autoPlay playsInline={true} muted="muted">
+              <source src={mediaSource}/>
+            </video>
+
+            <h3>{message}{(isVideoStreaming) && currentCamIp}</h3>
           </div>
         </div>
       </AppWithSideBar>
