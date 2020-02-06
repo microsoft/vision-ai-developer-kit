@@ -435,7 +435,7 @@ class ReviewPage extends Component {
         <div className="review-container">
           {/* Top Filter Bar */}
           <h1>Images</h1>
-          <p>only non uploaded iamges show up here</p>
+          <p>Only non uploaded images show up here.</p>
           <div className="review-filter-container">
             {/* Select Tag */}
             <form className="review-filter-form">
