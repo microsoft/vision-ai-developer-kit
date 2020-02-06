@@ -1,21 +1,41 @@
-# Copy all files from the client into the client container
+FROM arm32v7/node:10-slim
 
-FROM <container registry address>/camerataggingclient:0.0.1 as client
-COPY /CameraClientModule/. .
+# To build the client
+WORKDIR /app
 
-# The base container is the server container
-FROM <container registry address>/camerataggingserver:0.0.1
+COPY /CameraClientModule/package*.json /app/client/
+COPY /CameraClientModule/yarn.lock /app/client/
 
-# Copy all files from the server into the server container
+WORKDIR /app/client
+RUN yarn install && yarn upgrade
+
+
+# To build the server
+
+WORKDIR /app
+COPY /CameraServerModule/package*.json /app/server/
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && ls /var/lib/apt/lists \
+    && rm -rf /var/lib/apt/lists/*
+
+
 WORKDIR /app/server
-COPY /CameraServerModule/. /app/server/.
+RUN npm install -q \
+    && npm prune --production
 
-# Copy the image from the client here
-COPY --from=client . /app/client/.
+# copy all the files from client and server to the right folder
+WORKDIR /app
+
+COPY /CameraClientModule/. /app/client/.
+COPY /CameraServerModule/. /app/server/.
 
 # Copy the package.json to run the client and server together
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
+
+EXPOSE 3000 3002 3003
 
 CMD ["npm", "start"]

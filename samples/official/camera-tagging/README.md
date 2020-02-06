@@ -12,21 +12,6 @@ This module is currently only supports the ARM32 and AMD64 platforms and it does
 
 ### ARM32
 
-#### Build and push the Client and Server Container Images
-
-Arm32 devices require the base client and server docker images to be built on an arm32 device because certain installation commands are only supported by that platform.
-
-1. Copy over all the folders from **CameraTaggingModule/Arm32Base/** to a folder on an arm32v7 device.
-
-1. Using a command prompt, cd into TaggingClientDocker and run
-    - `docker build -t <REGISTRY_NAME>.azurecr.io/<IMAGE_NAME>:<VERSION> .`
-
-1. Push the image to your repository
-    - Make sure to first login using `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
-    - Then push the image using the command `docker push <REGISTRY_NAME>.azurecr.io/<IMAGE_NAME>:<VERSION>`
-
-1. Repeat steps 2 & 3 for TaggingServerDocker.
-
 #### Build a Local Container Image
 
 1. Launch Visual Studio Code, and select **File > Open Folder...** command to open the camera-tagging directory as workspace root.
@@ -39,10 +24,6 @@ Arm32 devices require the base client and server docker images to be built on an
 
 1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
     - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
-
-1. Open **CameraTaggingModule/Dockerfile.arm32v7** and change lines 2 and 6 (FROM ...) to reflect the client and server images you just built and pushed.
-
-1. Open **CameraTaggingModule/module.json** and change the version setting in the tag property to create a new version of the module image.
 
 1. Fill in the environment variables found in deployment.template.json 
 
