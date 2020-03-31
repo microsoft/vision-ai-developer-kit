@@ -155,4 +155,4 @@ Refer to [Deploy Blob Storage Modules](https://docs.microsoft.com/en-us/azure/io
     > Note: this means that if no clients are viewing the stream, ffmpeg will not run and therefore not consume any CPU cycles.
 - The module requires ports 3000-3003 to be used by the website. If those ports are in use by other software, there could be a conflict.
 
-Note:This module currently only supports Chrome browser 
+Note: This module currently only supports Chrome browser 
