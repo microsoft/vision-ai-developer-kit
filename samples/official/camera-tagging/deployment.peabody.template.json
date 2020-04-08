@@ -22,7 +22,7 @@
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.9",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
               "createOptions": {}
             }
           },
@@ -31,7 +31,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azureiotedge-hub:1.0.9",
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
@@ -58,7 +58,7 @@
         },
         "modules": {
           "CameraTaggingModule": {
-            "version": "1.0.3",
+            "version": "1.0.2",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
@@ -121,13 +121,30 @@
               }
             }
           },
-          "azureblobstorageoniotedge": {
-            "version": "1.2",
+          "VisionSampleModule": {
+            "version": "1.0",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azure-blob-storage:1.2",
+              "image": "mcr.microsoft.com/aivision/visionsamplemodule:1.1.3-arm32v7",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/data/misc/camera:/app/vam_model_folder",
+                    "/run/systemd:/run/systemd"
+                  ]
+                }
+              }
+            }
+          },
+          "azureblobstorageoniotedge": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azure-blob-storage:latest",
               "createOptions": {
                 "Env":[
                   "LOCAL_STORAGE_ACCOUNT_NAME=<local-storage-account-name>",
@@ -155,6 +172,22 @@
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
         }
+      }
+    },
+    "VisionSampleModule": {
+      "properties.desired": {
+        "ModelZipUrl": "",
+        "TimeBetweenMessagesInSeconds": 12,
+        "ObjectsOfInterest": "[\"ALL\"]",
+        "ShowVideoOverlay": true,
+        "Bitrate": "1.5Mbps",
+        "Resolution": "1080P",
+        "VideoOverlayConfig": "inference",
+        "FrameRate": 30,
+        "HdmiDisplayActive": true,
+        "VideoAnalyticsEnabled": true,
+        "ShowVideoPreview": true,
+        "Codec": "AVC/H.264"
       }
     },
     "azureblobstorageoniotedge":{

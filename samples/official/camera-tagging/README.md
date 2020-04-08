@@ -6,7 +6,7 @@ This repository contains the modules necessary to allow individuals to capture i
 
 It reads 9 environment variables from which 3 are used to build the default URI to the RTSP stream (i.e. rtsp://<RTSP_IP>:<RTSP_PORT>/<RTSP_PATH>), and 4 are used to describe the local blob store. These environment variables can be specified in the file deployment.template.json.
 
-This module is currently only supports the ARM32 and AMD64 platforms and it does not support the Windows file system.
+This module is currently only supports the ARM32, ARM64, and AMD64 Linux platforms and it does not support the Windows file system. There is a seperate depolyment temmplate for the vision AI dev kit with additional modules specified in the deployment for the device named deployment.peabody.template.json
 
 ## Building Container Images
 
@@ -25,7 +25,48 @@ This module is currently only supports the ARM32 and AMD64 platforms and it does
 1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
     - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
 
-1. Fill in the environment variables found in deployment.template.json 
+1. Fill in the environment variables found in deployment.template.json. If targeting the AI Dev Kit device use: **deployment.peabody.template.json**
+
+1. Select your target architecture. Open the command palette and search for Azure IoT Edge: Set Default Target Platform for Edge Solution, or select the shortcut icon in the side bar at the bottom of the window. In the promoted window, select arm32v7.
+
+1. Right-click on deployment.template.json and select the **Build and Push IoT Edge Solution** command to generate a new deployment.json file in the config folder, build a module image, and push the image to the specified ACR repository. If targeting the AI Dev Kit device use: **deployment.peabody.template.json**
+    > Note: Some red warnings "Unknown host QEMU_IFLA type: ##" and "qemu: Unsupported syscall: ##" displayed during the building process can be ignored.
+
+1. Right-click on config/deployment.json, select **Create Deployment for Single Device**, and choose the targeted IoT Edge device to deploy the container image.
+
+1. You'll find troubleshooting steps at <https://visionaidevkitsupport.azurewebsites.net/>.
+
+### ARM64
+
+1. ARM64 support is in preview, to add the new os/arch option to your IoT Edge tools in VS code, update setings settings (JSON) by adding:
+
+```
+"azure-iot-edge.platforms": {
+    "amd64": [],
+    "arm32v7": [],
+    "windows-amd64": [],
+    "arm64v8": [],
+},
+```
+
+See this [dev blog post](https://devblogs.microsoft.com/iotdev/develop-and-debug-arm64-iot-edge-modules-in-visual-studio-code-preview/) for more details
+
+#### Build a Local Container Image
+
+1. Launch Visual Studio Code, and select **File > Open Folder...** command to open the camera-tagging directory as workspace root.
+
+1. Update the .env file with the values for your container registry. Refer to [Create a container registry](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-python-module#create-a-container-registry) for more detail about ACR settings.
+
+    CONTAINER_REGISTRY_NAME=<Your_Acr_Uri>  
+    CONTAINER_REGISTRY_USERNAME=<Your_Acr_UserName>  
+    CONTAINER_REGISTRY_PASSWORD=<Your_Acr_Password>  
+
+1. Sign in to your Azure Container Registry by entering the following command in the Visual Studio Code integrated terminal (replace <REGISTRY_USER_NAME>, <REGISTRY_PASSWORD>, and <REGISTRY_NAME> to your container registry values set in the .env file).
+    - `docker login -u <REGISTRY_USER_NAME> -p <REGISTRY_PASSWORD> <REGISTRY_NAME>.azurecr.io`
+
+1. Fill in the environment variables found in deployment.template.json
+
+1. Select your target architecture. Open the command palette and search for Azure IoT Edge: Set Default Target Platform for Edge Solution, or select the shortcut icon in the side bar at the bottom of the window. In the promoted window, select arm64v8.
 
 1. Right-click on deployment.template.json and select the **Build and Push IoT Edge Solution** command to generate a new deployment.json file in the config folder, build a module image, and push the image to the specified ACR repository.
     > Note: Some red warnings "Unknown host QEMU_IFLA type: ##" and "qemu: Unsupported syscall: ##" displayed during the building process can be ignored.
@@ -50,6 +91,8 @@ This module is currently only supports the ARM32 and AMD64 platforms and it does
 1. Open **CameraTaggingModule/module.json** and change the version setting in the tag property to create a new version of the module image.
 
 1. Set the environment variables found in deployment.template.json
+
+1. Select your target architecture. Open the command palette and search for Azure IoT Edge: Set Default Target Platform for Edge Solution, or select the shortcut icon in the side bar at the bottom of the window. In the promoted window, select amd64.
 
 1. Right-click on deployment.template.json and select the **Build and Push IoT Edge Solution** command to generate a new deployment.json file in the config folder, build a module image, and push the image to the specified ACR repository.
     > Note: Some red warnings "Unknown host QEMU_IFLA type: ##" and "qemu: Unsupported syscall: ##" displayed during the building process can be ignored.
@@ -154,5 +197,3 @@ Refer to [Deploy Blob Storage Modules](https://docs.microsoft.com/en-us/azure/io
   - If the ffmpeg process failed to start, refresh the webpage and it will restart ffmpeg.
     > Note: this means that if no clients are viewing the stream, ffmpeg will not run and therefore not consume any CPU cycles.
 - The module requires ports 3000-3003 to be used by the website. If those ports are in use by other software, there could be a conflict.
-
-##### Note: This module currently only supports Chrome browser 
