@@ -1,0 +1,41 @@
+FROM arm64v8/node:10-slim
+
+# To build the client
+WORKDIR /app
+
+COPY /CameraClientModule/package*.json /app/client/
+COPY /CameraClientModule/yarn.lock /app/client/
+
+WORKDIR /app/client
+RUN yarn install && yarn upgrade
+
+
+# To build the server
+
+WORKDIR /app
+COPY /CameraServerModule/package*.json /app/server/
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && ls /var/lib/apt/lists \
+    && rm -rf /var/lib/apt/lists/*
+
+
+WORKDIR /app/server
+RUN npm install -q \
+    && npm prune --production
+
+# copy all the files from client and server to the right folder
+WORKDIR /app
+
+COPY /CameraClientModule/. /app/client/.
+COPY /CameraServerModule/. /app/server/.
+
+# Copy the package.json to run the client and server together
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+
+EXPOSE 3000 3002 3003
+
+CMD ["npm", "start"]
