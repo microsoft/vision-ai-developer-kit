@@ -7,7 +7,7 @@ This repository contains the modules necessary to allow individuals to capture i
 It reads 9 environment variables from which 3 are used to build the default URI to the RTSP stream (i.e. rtsp://<RTSP_IP>:<RTSP_PORT>/<RTSP_PATH>), and 4 are used to describe the local blob store. These environment variables can be specified in the file deployment.template.json.
 
 This module is currently only supports the ARM32, ARM64, and AMD64 Linux platforms and it does not support the Windows file system. ARM64 support is in preview see this [dev blog post](https://devblogs.microsoft.com/iotdev/develop-and-debug-arm64-iot-edge-modules-in-visual-studio-code-preview/) for more details.
-There is a seperate depolyment temmplate for the vision AI dev kit with additional modules specified in the deployment for that device, use **deployment.peabody.template.json** for the AI dev kit device.
+There is a separate depolyment template for the vision AI dev kit with additional modules specified in the deployment for that device, use **deployment.peabody.template.json** for the AI dev kit device.
 
 ## Building Container Images
 
