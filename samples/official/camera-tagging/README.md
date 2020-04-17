@@ -92,6 +92,30 @@ Open a browser to http://DEVICE_IP:3000 where DEVICE_IP is the IP address you fo
     | RTSP_PATH      | False     | ''             |
     | TAGS           | True      | None           |
 
+### Upload to Custom Vision Project
+
+- Method Name: upload
+- Payload:
+    {  
+        "ENDPOINT":"<Custom_Vision_Endpoint>",  
+        "KEY":"<Custom_Vision_Key>",  
+        "PROJECT_ID":"<Custom_Project_ID>" 
+    }  
+    
+    | Variable Name   | Required  | Default Value  |
+    |-----------------|:---------:|:--------------:|
+    | ENDPOINT        | True      | None           |
+    | KEY             | True      | None           |
+    | PROJECT_ID      | True      | None           |
+
+    These values can be found at customvision.ai under the project settings (Gear Icon).  
+    The Endpoint should be entered as just the Domain Name, not the full URL.  
+
+    For Example enter:  
+    southcentralus.api.cognitive.microsoft.com  
+    Not:  
+    https://southcentralus.api.cognitive.microsoft.com/  
+
 ### Push to Local Blob Storage
 
 - Method Name: push

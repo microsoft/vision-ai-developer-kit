@@ -11,6 +11,7 @@ var Transport = require('azure-iot-device-mqtt').Mqtt;
 var Client = require('azure-iot-device').ModuleClient;
 const fs = require('fs');
 const azure = require('azure-storage');
+const TrainingApiClient = require("@azure/cognitiveservices-customvision-training");
 
 const dataRoot = 'CustomVision/data'
 
@@ -88,6 +89,8 @@ Client.fromEnvironment(Transport, function (err, client) {
         client.onMethod('capture', captureImage);
         client.onMethod('delete', deleteImages);
         client.onMethod('push', pushToBlobStore);
+        client.onMethod('upload', uploadToCustomVision);
+
 
       }
     });
@@ -209,5 +212,73 @@ function pushToBlobStore(request, response) {
   }
   response.send(200, 'Success');
 }
+
+// Callback on event "upload"
+async function uploadToCustomVision(request, response) {
+  var payload = request.payload;
+
+  if(!payload.ENDPOINT || !payload.KEY || !payload.PROJECT_ID) {
+    response.send(500, 'Need to provide ENDPOINT, KEY, and PROJECT_ID for Custom Vision project');
+    return;
+  }
+
+  var endpoint = `https://${payload.ENDPOINT}/`;
+  var trainingKey = payload.KEY;
+  var projectid = payload.PROJECT_ID;
+
+  try {
+    const trainer = new TrainingApiClient.TrainingAPIClient(trainingKey, endpoint);
+
+    // Get tags of the project
+    projectExists = true;
+    tags = await trainer.getTags(projectid);
+
+    let fileUploadPromises = [];
+
+    // Create a tag per folder in the data root directory
+    const tagFolders = fs.readdirSync(dataRoot);
+    for (const folder of tagFolders) {
+        var imageTag = null;
+
+        // If the project and tag already exists, use that tag
+        if(projectExists) {
+            for(var index in tags) {
+                if(tags[index].name === folder) {
+                    imageTag = tags[index];
+                }
+            }
+        }
+
+        // Else, create a new tag
+        if (!imageTag) {
+            console.log(`Creating tag: ${folder}`);
+            imageTag = await trainer.createTag(projectid, folder);
+        }
+
+        console.log(`Adding images for tag: ${folder}`);
+
+        // Upload each image in the folder to Custom Vision
+        const taggedImages = fs.readdirSync(dataRoot+'/'+folder);
+        taggedImages.forEach(file => {
+            console.log("Adding Image...."+folder+'/'+file);
+            fileUploadPromises.push(trainer.createImagesFromData(projectid, fs.readFileSync(dataRoot+'/'+folder+'/'+file), { tagIds: [imageTag.id] }));
+        })
+    }
+    // Wait for all files to upload
+    await Promise.all(fileUploadPromises);
+
+  } catch (e) {
+
+    console.log(e);
+    
+    return res.status(500).send({
+        error: e,
+        code: 500,
+    });
+  }
+  response.send(200, 'Success');
+
+}
+
 
 module.exports = app;
