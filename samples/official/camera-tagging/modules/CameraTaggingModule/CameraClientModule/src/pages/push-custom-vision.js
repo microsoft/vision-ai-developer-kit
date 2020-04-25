@@ -195,7 +195,7 @@ class PushCustomVisionPage extends Component {
             <AppWithSideBar listElements={this.sidebarOptions} >
                 <div className="push-container">
                     <div className="form-container">
-                        <h1>Custome Vision API Settings</h1>
+                        <h1>Custom Vision API Settings</h1>
                         {/* Get the endpoint and training key */}
                         <form id="pushForm" method="post" onSubmit={this.onSaveKeyAndEndpoint}>
                             <label className="push-form-label" key="endpoint">
