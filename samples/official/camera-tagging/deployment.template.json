@@ -63,7 +63,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "toolboc/camerataggingmodule:latest",
+              "image": "${MODULES.CameraTaggingModule}",
               "createOptions": {
                 "ExposedPorts": {
                   "3000/tcp": {},
