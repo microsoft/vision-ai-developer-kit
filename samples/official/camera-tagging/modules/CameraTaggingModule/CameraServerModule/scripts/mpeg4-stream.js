@@ -171,7 +171,7 @@ class Mpeg4Stream {
             });
 
             // Capture the image
-            const ffmpegParams = `-rtsp_transport tcp -y -i rtsp://admin:admin@${RTSP_IP}:${RTSP_PORT}/${RTSP_PATH} -vframes 1 -strftime 1 ${dataRoot}/${tag}/img-%m%d%y-%H%M%S.png`;
+            const ffmpegParams = `-rtsp_transport tcp -y -i rtsp://${RTSP_IP}:${RTSP_PORT}/${RTSP_PATH} -vframes 1 -strftime 1 ${dataRoot}/${tag}/img-%m%d%y-%H%M%S.png`;
             console.log(`Running: ffmpeg ${ffmpegParams}`);
 
             ffmpegCaptureProcess = Process.spawn('ffmpeg', ffmpegParams.split(' '));

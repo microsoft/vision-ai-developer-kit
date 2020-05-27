@@ -337,7 +337,6 @@ machine-learning-notebooks/aml_config/config.json
 
 # Edge development
 **/config/deployment*.json
-**/.env
 
 camera-sdk/iotccsdk.egg-info/*
 camera-sdk/dist/*

@@ -93,13 +93,13 @@
             },
             "env": {
               "RTSP_IP": {
-                "value": "192.168.0.103"
+                "value": "wowzaec2demo.streamlock.net"
               },
               "RTSP_PORT": {
-                "value": "8900"
+                "value": "554"
               },
               "RTSP_PATH": {
-                "value": "live"
+                "value": "vod/mp4:BigBuckBunny_115k.mov"
               },
               "REACT_APP_SERVER_PORT": {
                 "value": "3003"
@@ -114,10 +114,10 @@
                 "value": "11002"
               },
               "REACT_APP_LOCAL_STORAGE_ACCOUNT_NAME": {
-                "value": "<local-storage-account-name>"
+                "value": "$LOCAL_STORAGE_ACCOUNT_NAME"
               },
               "REACT_APP_LOCAL_STORAGE_ACCOUNT_KEY": {
-                "value": "<local_storage_key>"
+                "value": "$LOCAL_STORAGE_ACCOUNT_KEY"
               }
             }
           },
@@ -127,11 +127,11 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "mcr.microsoft.com/azure-blob-storage:1.2",
+              "image": "mcr.microsoft.com/azure-blob-storage:latest",
               "createOptions": {
                 "Env":[
-                  "LOCAL_STORAGE_ACCOUNT_NAME=<local-storage-account-name>",
-                  "LOCAL_STORAGE_ACCOUNT_KEY=<key>"
+                  "LOCAL_STORAGE_ACCOUNT_NAME=$LOCAL_STORAGE_ACCOUNT_NAME",
+                  "LOCAL_STORAGE_ACCOUNT_KEY=$LOCAL_STORAGE_ACCOUNT_KEY"
                  ],
                  "HostConfig":{
                    "Binds": ["/data/containerdata:/blobroot"],
@@ -166,10 +166,10 @@
         "deviceToCloudUploadProperties": {
           "uploadOn": true,
           "uploadOrder": "OldestFirst",
-          "cloudStorageConnectionString": "<connection-string>",
+          "cloudStorageConnectionString": "$CLOUD_STORAGE_CONNECTION_STRING",
           "storageContainersForUpload": {
-            "<source-local-storage-account-name>": {
-              "target": "<destination-storage-name>"
+            "$LOCAL_STORAGE_ACCOUNT_NAME": {
+              "target": "$DESTINATION_STORAGE_NAME"
             }
           },
           "deleteAfterUpload": true
