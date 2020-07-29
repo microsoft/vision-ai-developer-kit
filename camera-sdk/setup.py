@@ -58,7 +58,7 @@ setup_args = {
         DEPENDENCIES
     ],
     'packages': _packages,
-    'package_data': {'sdk': 'logger.conf'},
+    'package_data': {'sdk': ['logger.conf']},
     'zip_safe': False,
     'cmdclass': {
     },
