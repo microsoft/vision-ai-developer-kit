@@ -3,7 +3,7 @@
 #Configuration
 iothubName=iothubname
 deviceId=deviceId
-#Generated with 'az iot hub generate-sas-token -n <iothubName> -du 31536000'
+#Generated with 'az iot hub generate-sas-token -n <iothubName> --du 31536000'
 SharedAccessSignature='SharedAccessSignature sr=iothubname.azure-devices.net&sig=x&se=x&skn=iothubowner'
 
 usage(){
