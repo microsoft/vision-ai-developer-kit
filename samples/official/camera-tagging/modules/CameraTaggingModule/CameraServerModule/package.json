@@ -20,7 +20,7 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "nodemon": "^1.19.1",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.5.0",
     "ws": "^7.0.0"
   },
   "nodemonConfig":{
