@@ -14,7 +14,7 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
-    "express": "~4.16.1",
+    "express": "~4.17.3",
     "express-fileupload": "^1.1.5",
     "ffmpeg": "^0.0.4",
     "http-errors": "~1.6.3",
