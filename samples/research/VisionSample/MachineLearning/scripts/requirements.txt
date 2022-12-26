@@ -6,4 +6,4 @@ azureml-core==1.0.18
 easydict==1.9
 numpy==1.16
 tensorflow==1.13.1
-wheel==0.30.0
+wheel==0.38.1
